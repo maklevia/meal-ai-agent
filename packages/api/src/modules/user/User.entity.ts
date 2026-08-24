@@ -8,6 +8,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  Relation,
 } from "typeorm";
 import { UserPreferences } from "src/modules/userPreferences/UserPreferences.entity.js";
 import { Family } from "src/modules/family/Family.entity.js";
@@ -36,15 +37,16 @@ export class User {
 
   @OneToOne(() => UserPreferences, (preferences) => preferences.user)
   @JoinColumn()
-  userPreferences: UserPreferences;
+  userPreferences: Relation<UserPreferences>;
 
   @ManyToOne(() => Family, (family) => family.users, { nullable: true })
   @JoinColumn()
-  family: Family | null;
+  family: Relation<Family> | null;
 
   @OneToMany(() => MealHistory, (mealHistory) => mealHistory.user)
-  mealHistory: MealHistory[];
+  mealHistory: Relation<MealHistory[]>;
 
   @OneToMany(() => ChatThread, (chatThread) => chatThread.user)
-  chatThreads: ChatThread[];
+  chatThreads: Relation<ChatThread[]>;
 }
+

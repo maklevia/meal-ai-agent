@@ -4,6 +4,7 @@ import {
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from "typeorm";
 import { Family } from "src/modules/family/Family.entity.js";
@@ -29,5 +30,5 @@ export class ProductsInventory {
   finishedAt: Date | null;
 
   @OneToOne(() => Family, (family) => family.productsInventory)
-  family: Family;
+  family: Relation<Family>;
 }

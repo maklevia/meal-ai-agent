@@ -5,6 +5,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "src/modules/user/User.entity.js";
@@ -22,9 +23,9 @@ export class Family {
   updatedAt: Date;
 
   @OneToMany(() => User, (user) => user.family)
-  users: User[];
+  users: Relation<User[]>;
 
   @OneToOne(() => ProductsInventory, (inventory) => inventory.family)
   @JoinColumn()
-  productsInventory: ProductsInventory;
+  productsInventory: Relation<ProductsInventory>;
 }

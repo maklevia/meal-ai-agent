@@ -6,12 +6,13 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
 } from "typeorm";
 import { ChatThread } from "src/modules/chatThread/ChatThread.entity.js";
 import { ChatMessageRole } from "src/modules/chatMessage/typedefs.js";
 
 @Entity("chat_message")
-@Check("CHK_token_count_positive", '"tokenCount" >= 0')
+@Check("CHK_token_count_positive", '"token_count" >= 0')
 export class ChatMessage {
   @PrimaryGeneratedColumn()
   id: number;
@@ -30,5 +31,5 @@ export class ChatMessage {
 
   @ManyToOne(() => ChatThread, (thread) => thread.messages)
   @JoinColumn()
-  thread: ChatThread;
+  thread: Relation<ChatThread>;
 }

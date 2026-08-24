@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "src/modules/user/User.entity.js";
@@ -38,8 +39,8 @@ export class ChatThread {
 
   @ManyToOne(() => User, (user) => user.chatThreads)
   @JoinColumn()
-  user: User;
+  user: Relation<User>;
 
   @OneToMany(() => ChatMessage, (message) => message.thread)
-  messages: ChatMessage[];
+  messages: Relation<ChatMessage[]>;
 }

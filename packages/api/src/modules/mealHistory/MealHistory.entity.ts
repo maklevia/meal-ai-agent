@@ -6,6 +6,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
 } from "typeorm";
 import { User } from "src/modules/user/User.entity.js";
 import type { MealScore } from "src/modules/mealHistory/typedefs.js";
@@ -27,5 +28,5 @@ export class MealHistory {
 
   @ManyToOne(() => User, (user) => user.mealHistory)
   @JoinColumn()
-  user: User;
+  user: Relation<User>;
 }
