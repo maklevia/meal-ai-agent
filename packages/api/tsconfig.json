@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
+    "paths": {
+      "src/*": ["./src/*"]
+    },
     // TypeORM decorators require legacy experimental support
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

@@ -1,0 +1,45 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
+import { User } from "src/modules/user/User.entity.js";
+import { ChatMessage } from "src/modules/chatMessage/ChatMessage.entity.js";
+import { ChatThreadStatus } from "src/modules/chatThread/typedefs.js";
+
+@Entity("chat_thread")
+export class ChatThread {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: "varchar", length: 255 })
+  title: string;
+
+  @Column({
+    type: "enum",
+    enum: ChatThreadStatus,
+    default: ChatThreadStatus.Active,
+  })
+  status: ChatThreadStatus;
+
+  @Column({ type: "jsonb", nullable: true })
+  metadata: Record<string, unknown> | null;
+
+  @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: "timestamptz", default: () => "NOW()" })
+  updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.chatThreads)
+  @JoinColumn()
+  user: User;
+
+  @OneToMany(() => ChatMessage, (message) => message.thread)
+  messages: ChatMessage[];
+}

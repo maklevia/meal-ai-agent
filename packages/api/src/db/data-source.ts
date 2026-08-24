@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { env } from '../config/env.js';
-import { User } from '../modules/user/User.entity.js';
-import { UserPreferences } from '../modules/userPreferences/UserPreferences.entity.js';
-import { Family } from '../modules/family/Family.entity.js';
-import { MealHistory } from '../modules/mealHistory/MealHistory.entity.js';
-import { ProductsInventory } from '../modules/productsInventory/ProductsInventory.entity.js';
+import { env } from 'src/config/env.js';
+import { User } from 'src/modules/user/User.entity.js';
+import { UserPreferences } from 'src/modules/userPreferences/UserPreferences.entity.js';
+import { Family } from 'src/modules/family/Family.entity.js';
+import { MealHistory } from 'src/modules/mealHistory/MealHistory.entity.js';
+import { ProductsInventory } from 'src/modules/productsInventory/ProductsInventory.entity.js';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',

@@ -1,4 +1,5 @@
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
@@ -6,10 +7,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { User } from "../user/User.entity";
-import type { MealScore } from "./typedefs";
+import { User } from "src/modules/user/User.entity.js";
+import type { MealScore } from "src/modules/mealHistory/typedefs.js";
 
 @Entity("meal_history")
+@Check("CHK_score_range", '"score" >= 1 AND "score" <= 5')
 export class MealHistory {
   @PrimaryGeneratedColumn()
   id: number;

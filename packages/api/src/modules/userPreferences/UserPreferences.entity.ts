@@ -1,8 +1,12 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { SpecialDiet } from "./typedefs";
-import { User } from "../user/User.entity";
+import { Check, Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { SpecialDiet } from "src/modules/userPreferences/typedefs.js";
+import { User } from "src/modules/user/User.entity.js";
 
 @Entity("user_preferences")
+@Check("CHK_age_range", '"age" > 14 AND "age" < 99')
+@Check("CHK_height_range", '"height" > 0 AND "height" < 300')
+@Check("CHK_weight_positive", '"weight" > 0')
+@Check("CHK_kcal_positive", '"kcalPerDay" > 0')
 export class UserPreferences {
   @PrimaryGeneratedColumn()
   id: number;

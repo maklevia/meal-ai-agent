@@ -9,9 +9,10 @@ import {
   ManyToOne,
   OneToMany,
 } from "typeorm";
-import { UserPreferences } from "../userPreferences/UserPreferences.entity";
-import { Family } from "../family/Family.entity";
-import { MealHistory } from "../mealHistory/MealHistory.entity";
+import { UserPreferences } from "src/modules/userPreferences/UserPreferences.entity.js";
+import { Family } from "src/modules/family/Family.entity.js";
+import { MealHistory } from "src/modules/mealHistory/MealHistory.entity.js";
+import { ChatThread } from "src/modules/chatThread/ChatThread.entity.js";
 
 @Entity("user")
 export class User {
@@ -43,4 +44,7 @@ export class User {
 
   @OneToMany(() => MealHistory, (mealHistory) => mealHistory.user)
   mealHistory: MealHistory[];
+
+  @OneToMany(() => ChatThread, (chatThread) => chatThread.user)
+  chatThreads: ChatThread[];
 }
