@@ -26,8 +26,8 @@ export class User {
   @Column({ type: "varchar", length: 255, unique: true })
   email: string;
 
-  @Column({ type: "varchar", length: 255 })
-  passwordHash: string;
+  @Column({ type: "varchar", length: 255, select: false })
+  passwordHash?: string;
 
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;
