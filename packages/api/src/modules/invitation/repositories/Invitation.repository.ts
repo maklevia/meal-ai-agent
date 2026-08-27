@@ -25,4 +25,18 @@ export class InvitationRepository {
     const createdInvitation = await this.repo.save(newInvitation);
     return createdInvitation.id;
   }
+
+  async findByValidInvitation(invitationCode: string): Promise<Invitation | null> {
+    const validInvitation = await this.repo.findOneBy({id: invitationCode});
+
+    if (!validInvitation || validInvitation.expiresAt < new Date()) {
+      return null;
+    }
+
+    return validInvitation;
+  }
+
+  async deleteInvitation(invitationCode: string): Promise<void> {
+    await this.repo.delete({id: invitationCode});
+  }
 }

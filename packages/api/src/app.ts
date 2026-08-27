@@ -1,5 +1,9 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { env } from 'src/config/env.js';
+import { errorMiddleware } from 'src/middlewares/errorMiddleware';
+import { authRouter } from 'src/modules/auth/Auth.routes';
+import { invitationRoutes } from 'src/modules/invitation/Invitation.routes';
 import { healthRouter } from 'src/routes/health.routes.js';
 
 export function createApp() {
@@ -18,12 +22,15 @@ export function createApp() {
     }
     next();
   });
+  app.use(cookieParser());
 
-  // Used by Docker HEALTHCHECK and monitoring
   app.use('/health', healthRouter);
 
-  // Register domain routers here:
-  // app.use('/api/meals', mealsRouter);
+  app.use('/auth', authRouter);
+  app.use('/invitation', invitationRoutes);
+
+  app.use(errorMiddleware);
 
   return app;
 }
+

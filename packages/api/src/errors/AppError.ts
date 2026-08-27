@@ -9,9 +9,21 @@ export class AppError extends Error {
     }
 }
 
+export class ValidationError extends AppError {
+    constructor(message = 'Request is invalid') {
+        super(message, 400);
+    }
+}
+
 export class AuthenticationError extends AppError {
     constructor(message = 'Not authenticated') {
         super(message, 401)
+    }
+}
+
+export class ForbiddenError extends AppError {
+    constructor(message = 'Access forbidden') {
+        super(message, 403)
     }
 }
 

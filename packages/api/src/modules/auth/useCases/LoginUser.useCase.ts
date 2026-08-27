@@ -39,7 +39,7 @@ export class LoginUserUseCase extends UseCase<LoginOptions, LoginResult> {
     delete existingUser.passwordHash;
 
     const { accessToken, refreshToken } =
-      await this.authService.handleTokenCreations(existingUser.id);
+      await this.authService.handleTokenCreations({userId: existingUser.id, userRole: existingUser.role});
 
     return { user: existingUser, accessToken, refreshToken };
   }

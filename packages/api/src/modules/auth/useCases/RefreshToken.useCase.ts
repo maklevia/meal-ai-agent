@@ -18,7 +18,7 @@ export class RefreshUseCase extends UseCase<RefreshOptions, RefreshResult> {
   async execute(options: RefreshOptions): Promise<RefreshResult> {
     const { refreshToken } = options;
 
-    const userId: number = this.authService.validateRefreshToken(refreshToken);
+    const {userId, userRole} = this.authService.validateRefreshToken(refreshToken);
 
     const storedRefreshToken =
       await this.refreshTokenRepository.findByToken(refreshToken);
@@ -31,7 +31,7 @@ export class RefreshUseCase extends UseCase<RefreshOptions, RefreshResult> {
       throw new AuthenticationError("Invalid token");
     }
 
-    const accessToken = this.authService.generateAccessToken(userId);
+    const accessToken = this.authService.generateAccessToken({userId, userRole});
     return { accessToken };
   }
 }
