@@ -1,5 +1,6 @@
 import { UseCase } from "src/core/UseCase.base";
-import { AuthService } from "src/modules/auth/authService";
+import { AuthenticationError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
 import { User } from "src/modules/user/User.entity";
 import { UserRepository } from "src/modules/user/User.repository";
 
@@ -8,7 +9,11 @@ type LoginOptions = {
   password: string;
 };
 
-type LoginResult = User;
+type LoginResult = {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+};
 
 export class LoginUserUseCase extends UseCase<LoginOptions, LoginResult> {
   constructor(
@@ -23,20 +28,22 @@ export class LoginUserUseCase extends UseCase<LoginOptions, LoginResult> {
 
     const existingUser = await this.userRepository.findUserForLogin(email);
     if (!existingUser || !existingUser.passwordHash) {
-      throw new Error();
+      throw new AuthenticationError("Invalid credentials.");
     }
 
-    const doPasswordsMatch = this.authService.comparePasswords({
+    const doPasswordsMatch = await this.authService.comparePasswords({
       passwordHash: existingUser.passwordHash,
       givenPassword: password,
     });
 
     if (!doPasswordsMatch) {
-      throw new Error();
+      throw new AuthenticationError("Invalid credentials.");
     }
 
     delete existingUser.passwordHash;
 
-    return existingUser;
+    const { accessToken, refreshToken } = await this.authService.handleTokenCreations(existingUser.id);
+
+    return { user: existingUser, accessToken, refreshToken };
   }
 }

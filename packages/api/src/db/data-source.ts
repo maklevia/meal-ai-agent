@@ -11,6 +11,7 @@ import { MealHistory } from 'src/modules/mealHistory/MealHistory.entity.js';
 import { ProductsInventory } from 'src/modules/productsInventory/ProductsInventory.entity.js';
 import { ChatThread } from 'src/modules/chatThread/ChatThread.entity.js';
 import { ChatMessage } from 'src/modules/chatMessage/ChatMessage.entity.js';
+import { RefreshToken } from 'src/modules/auth/entities/RefreshToken.entity';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -22,7 +23,7 @@ export const AppDataSource = new DataSource({
   synchronize: env.DB_SYNCHRONIZE,
   logging: env.DB_LOGGING,
   namingStrategy: new SnakeNamingStrategy(),
-  entities: [User, UserPreferences, Family, MealHistory, ProductsInventory, ChatThread, ChatMessage],
+  entities: [User, UserPreferences, Family, MealHistory, ProductsInventory, ChatThread, ChatMessage, RefreshToken],
   migrations: [
     path.join(fileURLToPath(new URL('./migrations', import.meta.url)), '*{.ts,.js}'),
   ],

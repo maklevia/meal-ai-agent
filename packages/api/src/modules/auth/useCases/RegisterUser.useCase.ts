@@ -1,5 +1,6 @@
 import { UseCase } from "src/core/UseCase.base";
-import { AuthService } from "src/modules/auth/authService";
+import { ConflictError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
 import { User } from "src/modules/user/User.entity";
 import { UserRepository } from "src/modules/user/User.repository";
 
@@ -9,7 +10,11 @@ type RegisterOptions = {
   name: string;
 };
 
-type RegisterResult = User;
+type RegisterResult = {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+};
 
 export class RegisterUserUseCase extends UseCase<
   RegisterOptions,
@@ -27,12 +32,18 @@ export class RegisterUserUseCase extends UseCase<
 
     const isUserRegistered = await this.userRepository.existsByEmail(email);
     if (isUserRegistered) {
-        throw new Error();
+      throw new ConflictError('Email is already taken.');
     }
-    
-    const passwordHash = await this.authService.hashPassword(password);
-    const createdUserProfile = await this.userRepository.createUser({email, passwordHash, name});
 
-    return createdUserProfile;
+    const passwordHash = await this.authService.hashPassword(password);
+    const createdUser = await this.userRepository.createUser({
+      email,
+      passwordHash,
+      name,
+    });
+
+    const { accessToken, refreshToken } = await this.authService.handleTokenCreations(createdUser.id);
+
+    return { user: createdUser, accessToken, refreshToken };
   }
 }

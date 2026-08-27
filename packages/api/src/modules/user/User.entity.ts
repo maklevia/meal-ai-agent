@@ -14,6 +14,7 @@ import { UserPreferences } from "src/modules/userPreferences/UserPreferences.ent
 import { Family } from "src/modules/family/Family.entity.js";
 import { MealHistory } from "src/modules/mealHistory/MealHistory.entity.js";
 import { ChatThread } from "src/modules/chatThread/ChatThread.entity.js";
+import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 
 @Entity("user")
 export class User {
@@ -48,5 +49,8 @@ export class User {
 
   @OneToMany(() => ChatThread, (chatThread) => chatThread.user)
   chatThreads: Relation<ChatThread[]>;
+
+  @OneToMany(() => RefreshToken, (token) => token.user) 
+  refreshTokens: Relation<RefreshToken[]>;
 }
 
