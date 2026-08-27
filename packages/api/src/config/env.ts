@@ -26,7 +26,10 @@ const envSchema = z.object({
     .string()
     .default('false')
     .transform((v) => v === 'true'),
+
+    WEB_ORIGIN: z.string().default('http://localhost:5173')
 });
+
 
 const parsed = envSchema.safeParse(process.env);
 

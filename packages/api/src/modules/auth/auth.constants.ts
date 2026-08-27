@@ -1,5 +1,7 @@
 import { CookieOptions } from "express"
 
+export const SALT_ROUNDS = 10;
+
 export const AUTH_CONSTANTS = {
     ACCESS_TOKEN_EXPIRES_IN: "5m",
     REFRESH_TOKEN_EXPIRES_IN: "7d",

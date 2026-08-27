@@ -15,6 +15,7 @@ import { Family } from "src/modules/family/Family.entity.js";
 import { MealHistory } from "src/modules/mealHistory/MealHistory.entity.js";
 import { ChatThread } from "src/modules/chatThread/ChatThread.entity.js";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
+import { UserRole } from "src/modules/user/typedefs";
 
 @Entity("user")
 export class User {
@@ -23,6 +24,9 @@ export class User {
 
   @Column({ type: "varchar", length: 25 })
   name: string;
+
+  @Column({type: "enum", enum: UserRole, default: UserRole.Memder})
+  role: UserRole;
 
   @Column({ type: "varchar", length: 255, unique: true })
   email: string;

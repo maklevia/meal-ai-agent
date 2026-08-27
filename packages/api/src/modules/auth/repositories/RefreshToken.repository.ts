@@ -9,9 +9,7 @@ type StoreTokenOptions = {
 }
 
 export class RefreshTokenRepository{
-    constructor(
-        private readonly repo = AppDataSource.getRepository(RefreshToken),
-    ){}
+    private readonly repo = AppDataSource.getRepository(RefreshToken)
 
     async storeToken(options: StoreTokenOptions): Promise<void> {
         const {userId, refreshToken, expiresAt} = options;

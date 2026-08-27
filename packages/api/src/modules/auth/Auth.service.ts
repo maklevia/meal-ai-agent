@@ -6,7 +6,7 @@ import jwt, {
   SignOptions,
   VerifyErrors,
 } from "jsonwebtoken";
-import { RefreshTokenRepository } from "src/modules/auth/RefreshToken.repository";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 import { AuthenticationError } from "src/errors/AppError";
 
 type ComparePasswordsOptions = {
@@ -15,11 +15,10 @@ type ComparePasswordsOptions = {
 };
 
 export class AuthService {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly refreshTokenRepository: RefreshTokenRepository,
-  ) {}
   private readonly saltRounds = 10;
+  private readonly userRepository: UserRepository = new UserRepository();
+  private readonly refreshTokenRepository: RefreshTokenRepository =
+    new RefreshTokenRepository();
 
   async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(this.saltRounds);
@@ -62,20 +61,19 @@ export class AuthService {
     return this.signToken({ userId }, refreshSecret, "7d");
   }
 
-  private validateToken(
-    token: string,
-    secret: string,
-  ): {userId: number}  {
+  private validateToken(token: string, secret: string): { userId: number } {
     try {
       const decoded = jwt.verify(token, secret) as JwtPayload;
       if (typeof decoded === "string" || typeof decoded?.userId !== "number") {
         throw new AuthenticationError("Invalid token payload");
       }
 
-      return {userId: decoded.userId};
+      return { userId: decoded.userId };
     } catch (err) {
-      if (err instanceof jwt.TokenExpiredError) throw new AuthenticationError("Token expired");
-      if (err instanceof jwt.JsonWebTokenError) throw new AuthenticationError('Invalid token');
+      if (err instanceof jwt.TokenExpiredError)
+        throw new AuthenticationError("Token expired");
+      if (err instanceof jwt.JsonWebTokenError)
+        throw new AuthenticationError("Invalid token");
       throw err;
     }
   }

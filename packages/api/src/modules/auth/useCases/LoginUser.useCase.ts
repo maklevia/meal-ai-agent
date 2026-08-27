@@ -16,12 +16,8 @@ type LoginResult = {
 };
 
 export class LoginUserUseCase extends UseCase<LoginOptions, LoginResult> {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly authService: AuthService,
-  ) {
-    super();
-  }
+  private readonly userRepository: UserRepository = new UserRepository();
+  private readonly authService: AuthService = new AuthService();
 
   async execute(options: LoginOptions): Promise<LoginResult> {
     const { email, password } = options;
@@ -42,7 +38,8 @@ export class LoginUserUseCase extends UseCase<LoginOptions, LoginResult> {
 
     delete existingUser.passwordHash;
 
-    const { accessToken, refreshToken } = await this.authService.handleTokenCreations(existingUser.id);
+    const { accessToken, refreshToken } =
+      await this.authService.handleTokenCreations(existingUser.id);
 
     return { user: existingUser, accessToken, refreshToken };
   }
