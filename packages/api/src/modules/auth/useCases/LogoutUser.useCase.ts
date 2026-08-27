@@ -8,11 +8,7 @@ type LogoutOptions = {
 type LogoutResult = void;
 
 export class LogoutUseCase extends UseCase<LogoutOptions, LogoutResult> {
-  constructor(
-    private readonly refreshTokenRepository: RefreshTokenRepository,
-  ) {
-    super();
-  }
+  private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async execute(options: LogoutOptions): Promise<LogoutResult> {
     const { userId } = options;

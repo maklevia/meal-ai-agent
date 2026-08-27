@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { User } from "src/modules/user/User.entity.js";
+import { User } from "src/modules/user/entities/User.entity.js";
 import type { MealScore } from "src/modules/mealHistory/typedefs.js";
 
 @Entity("meal_history")

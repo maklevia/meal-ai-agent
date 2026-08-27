@@ -10,10 +10,10 @@ import {
   OneToMany,
   Relation,
 } from "typeorm";
-import { UserPreferences } from "src/modules/userPreferences/UserPreferences.entity.js";
-import { Family } from "src/modules/family/Family.entity.js";
-import { MealHistory } from "src/modules/mealHistory/MealHistory.entity.js";
-import { ChatThread } from "src/modules/chatThread/ChatThread.entity.js";
+import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity.js";
+import { Family } from "src/modules/family/entities/Family.entity.js";
+import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity.js";
+import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity.js";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 import { UserRole } from "src/modules/user/typedefs";
 
@@ -25,7 +25,7 @@ export class User {
   @Column({ type: "varchar", length: 25 })
   name: string;
 
-  @Column({type: "enum", enum: UserRole, default: UserRole.Memder})
+  @Column({type: "enum", enum: UserRole, default: UserRole.Member})
   role: UserRole;
 
   @Column({ type: "varchar", length: 255, unique: true })

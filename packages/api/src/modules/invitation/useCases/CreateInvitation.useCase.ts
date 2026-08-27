@@ -1,9 +1,10 @@
 import { env } from "src/config/env";
 import { UseCase } from "src/core/UseCase.base";
 import { ConflictError } from "src/errors/AppError";
-import { InvitationRepository } from "src/modules/invitation/Invitation.repository";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
 import { UserRole } from "src/modules/user/typedefs";
-import { UserRepository } from "src/modules/user/User.repository";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
+import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants";
 
 type CreateInvitationOptions = {
   email: string;
@@ -18,13 +19,8 @@ export class CreateInvitationUseCase extends UseCase<
   CreateInvitationOptions,
   CreateInvitationResult
 > {
-  constructor(
-    private readonly invitationRepository: InvitationRepository,
-    private readonly userRepository: UserRepository,
-  ) {
-    super();
-  }
-
+  private readonly invitationRepository: InvitationRepository = new InvitationRepository();
+  private readonly userRepository: UserRepository = new UserRepository();
 
   async execute(
     options: CreateInvitationOptions,
@@ -37,7 +33,7 @@ export class CreateInvitationUseCase extends UseCase<
     }
 
     const invitationExpiresAt = new Date();
-    invitationExpiresAt.setDate(invitationExpiresAt.getHours() + 24);
+    invitationExpiresAt.setDate(invitationExpiresAt.getHours() + INVITATION_VALID_HOURS);
 
     const invitationCode: string =
       await this.invitationRepository.createInvitation({

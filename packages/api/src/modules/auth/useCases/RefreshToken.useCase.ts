@@ -12,12 +12,8 @@ type RefreshResult = {
 };
 
 export class RefreshUseCase extends UseCase<RefreshOptions, RefreshResult> {
-  constructor(
-    private readonly refreshTokenRepository: RefreshTokenRepository,
-    private readonly authService: AuthService,
-  ) {
-    super();
-  }
+  private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
+  private readonly authService: AuthService = new AuthService();
 
   async execute(options: RefreshOptions): Promise<RefreshResult> {
     const { refreshToken } = options;

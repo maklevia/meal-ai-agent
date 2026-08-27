@@ -1,13 +1,12 @@
 import { compare, genSalt, hash } from "bcrypt-ts";
-import { UserRepository } from "src/modules/user/User.repository";
 import jwt, {
-  JsonWebTokenError,
   JwtPayload,
   SignOptions,
-  VerifyErrors,
 } from "jsonwebtoken";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 import { AuthenticationError } from "src/errors/AppError";
+import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants";
+import { env } from "src/config/env";
 
 type ComparePasswordsOptions = {
   passwordHash: string;
@@ -15,13 +14,10 @@ type ComparePasswordsOptions = {
 };
 
 export class AuthService {
-  private readonly saltRounds = 10;
-  private readonly userRepository: UserRepository = new UserRepository();
-  private readonly refreshTokenRepository: RefreshTokenRepository =
-    new RefreshTokenRepository();
+  private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async hashPassword(password: string): Promise<string> {
-    const salt = await genSalt(this.saltRounds);
+    const salt = await genSalt(SALT_ROUNDS);
     const hashedPassword = await hash(password, salt);
 
     return hashedPassword;
@@ -42,23 +38,11 @@ export class AuthService {
   }
 
   generateAccessToken(userId: number): string {
-    //make this dissapear pls
-    const accessSecret = process.env.ACCESS_SECRET;
-    if (!accessSecret) {
-      throw new Error();
-    }
-
-    return this.signToken({ userId }, accessSecret, "5m");
+    return this.signToken({ userId }, env.ACCESS_SECRET, AUTH_CONSTANTS.ACCESS_TOKEN_EXPIRES_IN);
   }
 
   generateRefreshToken(userId: number): string {
-    //make this dissapear pls
-    const refreshSecret = process.env.REFRESH_SECRET;
-    if (!refreshSecret) {
-      throw new Error();
-    }
-
-    return this.signToken({ userId }, refreshSecret, "7d");
+    return this.signToken({ userId }, env.REFRESH_SECRET,  AUTH_CONSTANTS.REFRESH_TOKEN_EXPIRES_IN);
   }
 
   private validateToken(token: string, secret: string): { userId: number } {
@@ -79,20 +63,12 @@ export class AuthService {
   }
 
   validateAccessToken(accessToken: string): number {
-    //change
-    const accessSecret = process.env.ACCESS_TOKEN;
-    if (!accessSecret) throw Error();
-
-    const { userId } = this.validateToken(accessToken, accessSecret);
+    const { userId } = this.validateToken(accessToken, env.ACCESS_SECRET);
     return userId;
   }
 
   validateRefreshToken(refreshToken: string): number {
-    //change
-    const refreshSecret = process.env.REFRESH_TOKEN;
-    if (!refreshSecret) throw Error();
-
-    const { userId } = this.validateToken(refreshToken, refreshSecret);
+    const { userId } = this.validateToken(refreshToken, env.REFRESH_SECRET);
     return userId;
   }
 
@@ -103,7 +79,7 @@ export class AuthService {
     const refreshToken = this.generateRefreshToken(userId);
 
     const tokenExpiresAt = new Date();
-    tokenExpiresAt.setDate(tokenExpiresAt.getDate() + 7);
+    tokenExpiresAt.setDate(tokenExpiresAt.getDate() + parseInt(AUTH_CONSTANTS.REFRESH_TOKEN_EXPIRES_IN));
 
     await this.refreshTokenRepository.storeToken({
       userId: userId,

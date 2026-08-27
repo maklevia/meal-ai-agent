@@ -8,8 +8,8 @@ import {
   Relation,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "src/modules/user/User.entity.js";
-import { ProductsInventory } from "src/modules/productsInventory/ProductsInventory.entity.js";
+import { User } from "src/modules/user/entities/User.entity.js";
+import { ProductsInventory } from "src/modules/productsInventory/entities/ProductsInventory.entity.js";
 
 @Entity("family")
 export class Family {

@@ -1,5 +1,5 @@
 import { UserRole } from "src/modules/user/typedefs";
-import { User } from "src/modules/user/User.entity";
+import { User } from "src/modules/user/entities/User.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 @Entity("invitations")

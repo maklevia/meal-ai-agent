@@ -4,13 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { DataSource } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { env } from 'src/config/env.js';
-import { User } from 'src/modules/user/User.entity.js';
-import { UserPreferences } from 'src/modules/userPreferences/UserPreferences.entity.js';
-import { Family } from 'src/modules/family/Family.entity.js';
-import { MealHistory } from 'src/modules/mealHistory/MealHistory.entity.js';
-import { ProductsInventory } from 'src/modules/productsInventory/ProductsInventory.entity.js';
-import { ChatThread } from 'src/modules/chatThread/ChatThread.entity.js';
-import { ChatMessage } from 'src/modules/chatMessage/ChatMessage.entity.js';
+import { User } from 'src/modules/user/entities/User.entity.js';
+import { UserPreferences } from 'src/modules/userPreferences/entities/UserPreferences.entity.js';
+import { Family } from 'src/modules/family/entities/Family.entity.js';
+import { MealHistory } from 'src/modules/mealHistory/entities/MealHistory.entity.js';
+import { ProductsInventory } from 'src/modules/productsInventory/entities/ProductsInventory.entity.js';
+import { ChatThread } from 'src/modules/chatThread/entities/ChatThread.entity.js';
+import { ChatMessage } from 'src/modules/chatMessage/entities/ChatMessage.entity.js';
 import { RefreshToken } from 'src/modules/auth/entities/RefreshToken.entity';
 
 export const AppDataSource = new DataSource({

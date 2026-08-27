@@ -1,5 +1,5 @@
 import { AppDataSource } from "src/db/data-source";
-import { User } from "src/modules/user/User.entity";
+import { User } from "src/modules/user/entities/User.entity";
 
 interface CreateUserOptions {
     name: string,
@@ -8,9 +8,7 @@ interface CreateUserOptions {
 }
 
 export class UserRepository {
-  constructor(
-    private readonly repo = AppDataSource.getRepository(User),
-  ) {}
+  private readonly repo = AppDataSource.getRepository(User);
 
   async createUser(options: CreateUserOptions): Promise<User> {
     const {name, email, passwordHash} = options;

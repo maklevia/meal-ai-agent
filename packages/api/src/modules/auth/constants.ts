@@ -1,10 +1,12 @@
 import { CookieOptions } from "express"
+import type { StringValue } from 'ms';
+import { env } from "src/config/env";
 
 export const SALT_ROUNDS = 10;
 
 export const AUTH_CONSTANTS = {
-    ACCESS_TOKEN_EXPIRES_IN: "5m",
-    REFRESH_TOKEN_EXPIRES_IN: "7d",
+    ACCESS_TOKEN_EXPIRES_IN: "5m" as StringValue,
+    REFRESH_TOKEN_EXPIRES_IN: "7d" as StringValue,
 
     ACCESS_TOKEN_MAX_AGE: 5 * 60 * 1000,
     REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60 * 1000,
@@ -12,7 +14,7 @@ export const AUTH_CONSTANTS = {
 
 const BASE_COOKIE_OPTIONS: CookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: env.NODE_ENV === 'production',
     sameSite: 'strict',
 }
 

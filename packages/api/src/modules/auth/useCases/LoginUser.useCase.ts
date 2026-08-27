@@ -1,8 +1,8 @@
 import { UseCase } from "src/core/UseCase.base";
 import { AuthenticationError } from "src/errors/AppError";
 import { AuthService } from "src/modules/auth/Auth.service";
-import { User } from "src/modules/user/User.entity";
-import { UserRepository } from "src/modules/user/User.repository";
+import { User } from "src/modules/user/entities/User.entity";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type LoginOptions = {
   email: string;

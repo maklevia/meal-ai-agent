@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { ChatThread } from "src/modules/chatThread/ChatThread.entity.js";
+import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity.js";
 import { ChatMessageRole } from "src/modules/chatMessage/typedefs.js";
 
 @Entity("chat_message")

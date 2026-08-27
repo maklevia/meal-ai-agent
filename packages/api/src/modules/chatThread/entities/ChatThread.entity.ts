@@ -9,8 +9,8 @@ import {
   Relation,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "src/modules/user/User.entity.js";
-import { ChatMessage } from "src/modules/chatMessage/ChatMessage.entity.js";
+import { User } from "src/modules/user/entities/User.entity.js";
+import { ChatMessage } from "src/modules/chatMessage/entities/ChatMessage.entity.js";
 import { ChatThreadStatus } from "src/modules/chatThread/typedefs.js";
 
 @Entity("chat_thread")

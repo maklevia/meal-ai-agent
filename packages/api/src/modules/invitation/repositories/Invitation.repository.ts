@@ -1,7 +1,7 @@
 import { AppDataSource } from "src/db/data-source";
-import { Invitation } from "src/modules/invitation/Invitation.entity";
+import { Invitation } from "src/modules/invitation/entities/Invitation.entity";
 import { UserRole } from "src/modules/user/typedefs";
-import { User } from "src/modules/user/User.entity";
+import { User } from "src/modules/user/entities/User.entity";
 
 type CreateInvitationOptions = {
   email: string;
@@ -11,7 +11,7 @@ type CreateInvitationOptions = {
 };
 
 export class InvitationRepository {
-  constructor(private readonly repo = AppDataSource.getRepository(Invitation)) {}
+  private readonly repo = AppDataSource.getRepository(Invitation)
 
   async createInvitation(options: CreateInvitationOptions): Promise<string> {
     const { email, role, expiresAt, invitedByUserId } = options;

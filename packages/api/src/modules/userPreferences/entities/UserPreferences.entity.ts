@@ -1,6 +1,13 @@
-import { Check, Column, Entity, OneToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
+import {
+  Check,
+  Column,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+} from "typeorm";
 import { SpecialDiet } from "src/modules/userPreferences/typedefs.js";
-import { User } from "src/modules/user/User.entity.js";
+import { User } from "src/modules/user/entities/User.entity.js";
 
 @Entity("user_preferences")
 @Check("CHK_age_range", '"age" > 14 AND "age" < 99')

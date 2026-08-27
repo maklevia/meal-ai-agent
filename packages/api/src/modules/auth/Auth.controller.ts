@@ -4,15 +4,13 @@ import { Request, Response } from "express";
 import {
   ACCESS_COOKIE_OPTIONS,
   REFRESH_COOKIE_OPTIONS,
-} from "src/modules/auth/auth.constants";
+} from "src/modules/auth/constants";
 import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase";
 
 export class AuthController {
-  constructor(
-    private readonly loginUseCase: LoginUserUseCase,
-    private readonly registerUseCase: RegisterUserUseCase,
-    private readonly logoutUseCase: LogoutUseCase,
-  ) {}
+  private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
+  private readonly registerUseCase: RegisterUserUseCase = new RegisterUserUseCase();
+  private readonly logoutUseCase: LogoutUseCase = new LogoutUseCase();
 
   login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
