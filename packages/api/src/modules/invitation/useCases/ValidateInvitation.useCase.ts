@@ -1,7 +1,7 @@
-import { UseCase } from "src/core/UseCase.base";
-import { ValidationError } from "src/errors/AppError";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
-import { UserRole } from "src/modules/user/typedefs";
+import { UseCase } from "src/core/UseCase.base.js";
+import { ValidationError } from "src/errors/AppError.js";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
+import { UserRole } from "src/modules/user/typedefs.js";
 
 type ValidateInvitationOptions = {
   invitationCode: string;
@@ -23,7 +23,11 @@ export class ValidateInvitationUseCase extends UseCase<
   ): Promise<ValidateInvitationResult> {
     const { invitationCode } = options;
 
+    console.log(`usecase code ${invitationCode} \n\n\n`)
+
     const recordByInvitation = await this.invitationRepository.findByValidInvitation(invitationCode);
+
+    console.log(`usecase record ${recordByInvitation}`)
 
     if(!recordByInvitation) {
         throw new ValidationError('Invitation link is invalid.');

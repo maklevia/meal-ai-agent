@@ -1,9 +1,9 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import { env } from 'src/config/env.js';
-import { errorMiddleware } from 'src/middlewares/errorMiddleware';
-import { authRouter } from 'src/modules/auth/Auth.routes';
-import { invitationRoutes } from 'src/modules/invitation/Invitation.routes';
+import { errorMiddleware } from 'src/middlewares/errorMiddleware.js';
+import { authRouter } from 'src/modules/auth/Auth.routes.js';
+import { invitationRoutes } from 'src/modules/invitation/Invitation.routes.js';
 import { healthRouter } from 'src/routes/health.routes.js';
 
 export function createApp() {

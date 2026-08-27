@@ -1,6 +1,6 @@
 import { CookieOptions } from "express"
 import type { StringValue } from 'ms';
-import { env } from "src/config/env";
+import { env } from "src/config/env.js";
 
 export const SALT_ROUNDS = 10;
 
@@ -25,6 +25,6 @@ export const ACCESS_COOKIE_OPTIONS: CookieOptions = {
 
 export const REFRESH_COOKIE_OPTIONS: CookieOptions = {
     ...BASE_COOKIE_OPTIONS,
-    path: '/api/auth/refresh',
+    path: '/auth',
     maxAge: AUTH_CONSTANTS.REFRESH_TOKEN_MAX_AGE,
 }

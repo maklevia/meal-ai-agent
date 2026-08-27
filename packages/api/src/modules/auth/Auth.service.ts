@@ -1,11 +1,11 @@
 import { compare, genSalt, hash } from "bcrypt-ts";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
-import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
-import { AuthenticationError } from "src/errors/AppError";
-import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants";
-import { env } from "src/config/env";
-import { UserRole } from "src/modules/user/typedefs";
-import { AppJwtPayload } from "src/modules/auth/typedefs";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
+import { AuthenticationError } from "src/errors/AppError.js";
+import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants.js";
+import { env } from "src/config/env.js";
+import { UserRole } from "src/modules/user/typedefs.js";
+import { AppJwtPayload } from "src/modules/auth/typedefs.js";
 
 type ComparePasswordsOptions = {
   passwordHash: string;

@@ -1,6 +1,6 @@
-import { AppDataSource } from "src/db/data-source";
-import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
-import { User } from "src/modules/user/entities/User.entity";
+import { AppDataSource } from "src/db/data-source.js";
+import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity.js";
+import { User } from "src/modules/user/entities/User.entity.js";
 
 type StoreTokenOptions = {
   userId: number;
@@ -23,11 +23,7 @@ export class RefreshTokenRepository {
   }
 
   async deleteToken(userId: number): Promise<void> {
-    const record = await this.repo.findOneBy({ user: { id: userId } });
-
-    if (record) {
-      await this.repo.remove(record);
-    }
+    await this.repo.delete({user: {id: userId}});
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {

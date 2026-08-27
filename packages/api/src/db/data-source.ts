@@ -11,7 +11,7 @@ import { MealHistory } from 'src/modules/mealHistory/entities/MealHistory.entity
 import { ProductsInventory } from 'src/modules/productsInventory/entities/ProductsInventory.entity.js';
 import { ChatThread } from 'src/modules/chatThread/entities/ChatThread.entity.js';
 import { ChatMessage } from 'src/modules/chatMessage/entities/ChatMessage.entity.js';
-import { RefreshToken } from 'src/modules/auth/entities/RefreshToken.entity';
+import { RefreshToken } from 'src/modules/auth/entities/RefreshToken.entity.js';
 import { Invitation } from 'src/modules/invitation/entities/Invitation.entity.js';
 
 export const AppDataSource = new DataSource({

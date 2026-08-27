@@ -1,4 +1,4 @@
-import { User } from "src/modules/user/entities/User.entity";
+import { User } from "src/modules/user/entities/User.entity.js";
 import {
   Check,
   Column,

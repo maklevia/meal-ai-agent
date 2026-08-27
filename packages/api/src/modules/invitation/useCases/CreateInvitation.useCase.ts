@@ -1,10 +1,10 @@
-import { env } from "src/config/env";
-import { UseCase } from "src/core/UseCase.base";
-import { ConflictError } from "src/errors/AppError";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
-import { UserRole } from "src/modules/user/typedefs";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
-import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants";
+import { env } from "src/config/env.js";
+import { UseCase } from "src/core/UseCase.base.js";
+import { ConflictError } from "src/errors/AppError.js";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
+import { UserRole } from "src/modules/user/typedefs.js";
+import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants.js";
 
 type CreateInvitationOptions = {
   email: string;

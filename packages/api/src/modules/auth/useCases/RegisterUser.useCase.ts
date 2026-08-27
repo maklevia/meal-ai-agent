@@ -1,9 +1,9 @@
-import { UseCase } from "src/core/UseCase.base";
-import { ConflictError, ValidationError } from "src/errors/AppError";
-import { AuthService } from "src/modules/auth/Auth.service";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
-import { User } from "src/modules/user/entities/User.entity";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
+import { UseCase } from "src/core/UseCase.base.js";
+import { ConflictError, ValidationError } from "src/errors/AppError.js";
+import { AuthService } from "src/modules/auth/Auth.service.js";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
+import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { toUserDto, UserDto } from "src/modules/user/typedefs.js";
 
 type RegisterOptions = {
   invitationCode: string;
@@ -12,7 +12,7 @@ type RegisterOptions = {
 };
 
 type RegisterResult = {
-  user: User;
+  user: UserDto;
   accessToken: string;
   refreshToken: string;
 };
@@ -28,26 +28,28 @@ export class RegisterUserUseCase extends UseCase<
   async execute(options: RegisterOptions): Promise<RegisterResult> {
     const { invitationCode, password, name } = options;
 
-    const result = await this.invitationRepository.findByValidInvitation(invitationCode);
-    if (!result) {
-      throw new ValidationError("Invitation link is not valid")
+    const invitation = await this.invitationRepository.findByValidInvitation(invitationCode);
+    if (!invitation) {
+      throw new ValidationError("Invitation link is not valid");
     }
 
-    const isUserRegistered = await this.userRepository.existsByEmail(result.email);
+    const isUserRegistered = await this.userRepository.existsByEmail(invitation.email);
     if (isUserRegistered) {
       throw new ConflictError("Email is already taken");
     }
 
     const passwordHash = await this.authService.hashPassword(password);
     const createdUser = await this.userRepository.createUser({
-      email: result.email,
+      email: invitation.email,
       passwordHash,
       name,
     });
 
-    const { accessToken, refreshToken } =
-      await this.authService.handleTokenCreations({userId: createdUser.id, userRole: createdUser.role});
+    await this.invitationRepository.deleteInvitation(invitationCode);
 
-    return { user: createdUser, accessToken, refreshToken };
+    const { accessToken, refreshToken } =
+      await this.authService.handleTokenCreations({ userId: createdUser.id, userRole: createdUser.role });
+
+    return { user: toUserDto(createdUser), accessToken, refreshToken };
   }
 }

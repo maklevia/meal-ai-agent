@@ -14,8 +14,8 @@ import { UserPreferences } from "src/modules/userPreferences/entities/UserPrefer
 import { Family } from "src/modules/family/entities/Family.entity.js";
 import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity.js";
 import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity.js";
-import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
-import { UserRole } from "src/modules/user/typedefs";
+import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity.js";
+import { UserRole } from "src/modules/user/typedefs.js";
 
 @Entity("user")
 export class User {

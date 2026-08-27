@@ -1,8 +1,8 @@
-import { UseCase } from "src/core/UseCase.base";
-import { AuthenticationError } from "src/errors/AppError";
-import { AuthService } from "src/modules/auth/Auth.service";
-import { User } from "src/modules/user/entities/User.entity";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
+import { UseCase } from "src/core/UseCase.base.js";
+import { AuthenticationError } from "src/errors/AppError.js";
+import { AuthService } from "src/modules/auth/Auth.service.js";
+import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { toUserDto, UserDto } from "src/modules/user/typedefs.js";
 
 type LoginOptions = {
   email: string;
@@ -10,7 +10,7 @@ type LoginOptions = {
 };
 
 type LoginResult = {
-  user: User;
+  user: UserDto;
   accessToken: string;
   refreshToken: string;
 };
@@ -36,11 +36,10 @@ export class LoginUserUseCase extends UseCase<LoginOptions, LoginResult> {
       throw new AuthenticationError("Invalid credentials.");
     }
 
-    delete existingUser.passwordHash;
-
     const { accessToken, refreshToken } =
-      await this.authService.handleTokenCreations({userId: existingUser.id, userRole: existingUser.role});
+      await this.authService.handleTokenCreations({ userId: existingUser.id, userRole: existingUser.role });
 
-    return { user: existingUser, accessToken, refreshToken };
+    return { user: toUserDto(existingUser), accessToken, refreshToken };
   }
 }
+

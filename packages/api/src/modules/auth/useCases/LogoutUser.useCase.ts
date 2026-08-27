@@ -1,5 +1,5 @@
-import { UseCase } from "src/core/UseCase.base";
-import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
+import { UseCase } from "src/core/UseCase.base.js";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
 
 type LogoutOptions = {
   userId: number;

@@ -1,5 +1,5 @@
-import { AppDataSource } from "src/db/data-source";
-import { User } from "src/modules/user/entities/User.entity";
+import { AppDataSource } from "src/db/data-source.js";
+import { User } from "src/modules/user/entities/User.entity.js";
 
 interface CreateUserOptions {
     name: string,
