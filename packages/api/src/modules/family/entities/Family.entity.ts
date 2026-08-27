@@ -25,7 +25,11 @@ export class Family {
   @OneToMany(() => User, (user) => user.family)
   users: Relation<User[]>;
 
-  @OneToOne(() => ProductsInventory, (inventory) => inventory.family)
+  @OneToOne(() => ProductsInventory, (inventory) => inventory.family, {
+    nullable: true,
+    onDelete: "SET NULL",
+    cascade: true,
+  })
   @JoinColumn()
-  productsInventory: Relation<ProductsInventory>;
+  productsInventory: Relation<ProductsInventory> | null;
 }

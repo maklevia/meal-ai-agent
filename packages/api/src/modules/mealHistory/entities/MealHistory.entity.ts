@@ -26,7 +26,10 @@ export class MealHistory {
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.mealHistory)
+  @ManyToOne(() => User, (user) => user.mealHistory, {
+    onDelete: "CASCADE",
+    nullable: false,
+  })
   @JoinColumn()
   user: Relation<User>;
 }

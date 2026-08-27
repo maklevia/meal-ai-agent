@@ -26,10 +26,10 @@ export class AuthController {
   };
 
   register = async (req: Request, res: Response) => {
-    const { email, password, name } = req.body;
+    const { invitationCode, password, name } = req.body;
 
     const { user, accessToken, refreshToken } =
-      await this.registerUseCase.execute({ email, password, name });
+      await this.registerUseCase.execute({ invitationCode, password, name });
 
     res.cookie("accessToken", accessToken, ACCESS_COOKIE_OPTIONS);
     res.cookie("refreshToken", refreshToken, REFRESH_COOKIE_OPTIONS);

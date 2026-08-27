@@ -29,7 +29,10 @@ export class ChatMessage {
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;
 
-  @ManyToOne(() => ChatThread, (thread) => thread.messages)
+  @ManyToOne(() => ChatThread, (thread) => thread.messages, {
+    onDelete: "CASCADE",
+    nullable: false,
+  })
   @JoinColumn()
   thread: Relation<ChatThread>;
 }

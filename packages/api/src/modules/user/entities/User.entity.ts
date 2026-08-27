@@ -40,21 +40,31 @@ export class User {
   @UpdateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   updatedAt: Date;
 
-  @OneToOne(() => UserPreferences, (preferences) => preferences.user)
-  @JoinColumn()
+  @OneToOne(() => UserPreferences, (preferences) => preferences.user, {
+    cascade: true,
+  })
   userPreferences: Relation<UserPreferences>;
 
-  @ManyToOne(() => Family, (family) => family.users, { nullable: true })
+  @ManyToOne(() => Family, (family) => family.users, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
   @JoinColumn()
   family: Relation<Family> | null;
 
-  @OneToMany(() => MealHistory, (mealHistory) => mealHistory.user)
+  @OneToMany(() => MealHistory, (mealHistory) => mealHistory.user, {
+    cascade: true,
+  })
   mealHistory: Relation<MealHistory[]>;
 
-  @OneToMany(() => ChatThread, (chatThread) => chatThread.user)
+  @OneToMany(() => ChatThread, (chatThread) => chatThread.user, {
+    cascade: true,
+  })
   chatThreads: Relation<ChatThread[]>;
 
-  @OneToMany(() => RefreshToken, (token) => token.user) 
+  @OneToMany(() => RefreshToken, (token) => token.user, {
+    cascade: true,
+  })
   refreshTokens: Relation<RefreshToken[]>;
 }
 

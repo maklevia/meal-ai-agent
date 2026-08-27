@@ -37,10 +37,15 @@ export class ChatThread {
   @UpdateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   updatedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.chatThreads)
+  @ManyToOne(() => User, (user) => user.chatThreads, {
+    onDelete: "CASCADE",
+    nullable: false,
+  })
   @JoinColumn()
   user: Relation<User>;
 
-  @OneToMany(() => ChatMessage, (message) => message.thread)
+  @OneToMany(() => ChatMessage, (message) => message.thread, {
+    cascade: true,
+  })
   messages: Relation<ChatMessage[]>;
 }

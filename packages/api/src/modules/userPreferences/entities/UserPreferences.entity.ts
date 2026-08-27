@@ -2,6 +2,7 @@ import {
   Check,
   Column,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   Relation,
@@ -33,6 +34,9 @@ export class UserPreferences {
   @Column({ type: "enum", enum: SpecialDiet, default: SpecialDiet.None })
   specialDiet: SpecialDiet;
 
-  @OneToOne(() => User, (user) => user.userPreferences)
+  @OneToOne(() => User, (user) => user.userPreferences, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
   user: Relation<User>;
 }

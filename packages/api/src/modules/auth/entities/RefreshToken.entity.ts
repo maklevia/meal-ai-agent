@@ -1,8 +1,10 @@
 import { User } from "src/modules/user/entities/User.entity";
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +12,7 @@ import {
 } from "typeorm";
 
 @Entity("refresh_tokens")
+@Check('"expires_at" > "created_at"')
 export class RefreshToken {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -17,6 +20,7 @@ export class RefreshToken {
   @Column({ type: "varchar", length: 500, unique: true })
   refreshToken: string;
 
+  @Index()
   @Column({ type: "timestamptz" })
   expiresAt: Date;
 
@@ -25,6 +29,7 @@ export class RefreshToken {
 
   @ManyToOne(() => User, (user) => user.refreshTokens, {
     onDelete: "CASCADE",
+    nullable: false,
   })
   @JoinColumn()
   user: Relation<User>;

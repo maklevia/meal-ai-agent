@@ -1,12 +1,14 @@
 import { UserRole } from "src/modules/user/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
+import { Check, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 @Entity("invitations")
+@Check('"expires_at" > "created_at"')
 export class Invitation{
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
+    @Index()
     @Column({type: "varchar", length: 255})
     email: string;
 
