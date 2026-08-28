@@ -8,8 +8,13 @@ import {
 } from "src/modules/auth/constants.js";
 import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase.js";
 import { RefreshUseCase } from "src/modules/auth/useCases/RefreshToken.useCase.js";
-import { AuthenticationError } from "src/errors/AppError.js";
-import { LoginBody, RefreshCookies, RegisterBody } from "src/modules/auth/validators";
+import {
+  ChangePasswordBody,
+  LoginBody,
+  RefreshCookies,
+  RegisterBody,
+} from "src/modules/auth/validators";
+import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase.js";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -17,6 +22,8 @@ export class AuthController {
     new RegisterUserUseCase();
   private readonly logoutUseCase: LogoutUseCase = new LogoutUseCase();
   private readonly refreshUseCase: RefreshUseCase = new RefreshUseCase();
+  private readonly changePasswordUseCase: ChangePasswordUseCase =
+    new ChangePasswordUseCase();
 
   login = async (req: Request<object, any, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -26,7 +33,11 @@ export class AuthController {
     );
 
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
-    res.cookie(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, REFRESH_COOKIE_OPTIONS);
+    res.cookie(
+      COOKIE_NAMES.REFRESH_TOKEN,
+      refreshToken,
+      REFRESH_COOKIE_OPTIONS,
+    );
 
     res.status(200).json(user);
   };
@@ -38,7 +49,11 @@ export class AuthController {
       await this.registerUseCase.execute({ invitationCode, password, name });
 
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
-    res.cookie(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, REFRESH_COOKIE_OPTIONS);
+    res.cookie(
+      COOKIE_NAMES.REFRESH_TOKEN,
+      refreshToken,
+      REFRESH_COOKIE_OPTIONS,
+    );
 
     res.status(201).json(user);
   };
@@ -54,7 +69,10 @@ export class AuthController {
     res.status(204).send();
   };
 
-  refresh = async (req: Request & {cookies: RefreshCookies}, res: Response) => {
+  refresh = async (
+    req: Request & { cookies: RefreshCookies },
+    res: Response,
+  ) => {
     const token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
 
     const { accessToken } = await this.refreshUseCase.execute({
@@ -62,6 +80,22 @@ export class AuthController {
     });
 
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
+    res.status(204).send();
+  };
+
+  changePassword = async (
+    req: Request<object, any, ChangePasswordBody>,
+    res: Response,
+  ) => {
+    const { newPassword, oldPassword } = req.body;
+    const userId = req.userId;
+
+    await this.changePasswordUseCase.execute({
+      newPassword,
+      oldPassword,
+      userId,
+    });
+
     res.status(204).send();
   };
 }

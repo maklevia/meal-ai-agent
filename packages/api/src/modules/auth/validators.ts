@@ -20,3 +20,11 @@ export const refreshCookiesSchema = z.object({
 });
 
 export type RefreshCookies = z.infer<typeof refreshCookiesSchema>;
+
+
+export const changePasswordBodySchema = z.object({
+  oldPassword: z.string().min(8), 
+  newPassword: z.string().min(8),
+})
+
+export type ChangePasswordBody = z.infer<typeof changePasswordBodySchema>;
