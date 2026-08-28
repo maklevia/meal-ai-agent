@@ -33,7 +33,7 @@ export class CreateInvitationUseCase extends UseCase<
     }
 
     const invitationExpiresAt = new Date();
-    invitationExpiresAt.setDate(invitationExpiresAt.getHours() + INVITATION_VALID_HOURS);
+    invitationExpiresAt.setHours(invitationExpiresAt.getHours() + INVITATION_VALID_HOURS);
 
     const invitationCode: string =
       await this.invitationRepository.createInvitation({

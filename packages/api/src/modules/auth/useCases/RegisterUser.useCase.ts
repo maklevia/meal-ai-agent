@@ -3,7 +3,7 @@ import { ConflictError, ValidationError } from "src/errors/AppError.js";
 import { AuthService } from "src/modules/auth/Auth.service.js";
 import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
 import { UserRepository } from "src/modules/user/repositories/User.repository.js";
-import { toUserDto, UserDto } from "src/modules/user/typedefs.js";
+import { toUserDto, UserDto, UserRole } from "src/modules/user/typedefs.js";
 
 type RegisterOptions = {
   invitationCode: string;
@@ -43,6 +43,7 @@ export class RegisterUserUseCase extends UseCase<
       email: invitation.email,
       passwordHash,
       name,
+      role: invitation.role,
     });
 
     await this.invitationRepository.deleteInvitation(invitationCode);
