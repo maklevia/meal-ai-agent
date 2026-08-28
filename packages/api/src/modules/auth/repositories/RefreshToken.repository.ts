@@ -22,8 +22,12 @@ export class RefreshTokenRepository {
     await this.repo.save(newRecord);
   }
 
-  async deleteToken(userId: number): Promise<void> {
-    await this.repo.delete({user: {id: userId}});
+  async deleteTokenByValue(token: string): Promise<void> {
+    await this.repo.delete({ refreshToken: token });
+  }
+
+  async deleteAllUserTokens(userId: number): Promise<void> {
+    await this.repo.delete({ user: { id: userId } });
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {

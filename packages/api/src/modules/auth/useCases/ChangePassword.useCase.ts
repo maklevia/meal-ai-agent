@@ -1,6 +1,7 @@
 import { UseCase } from "src/core/UseCase.base.js";
 import { AuthenticationError } from "src/errors/AppError.js";
 import { AuthService } from "src/modules/auth/Auth.service.js";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 import { UserRepository } from "src/modules/user/repositories/User.repository.js";
 
 type ChangePasswordOptions = {
@@ -16,7 +17,8 @@ export class ChangePasswordUseCase extends UseCase<
   ChangePasswordResult
 > {
   private readonly userRepository: UserRepository = new UserRepository();
-  private readonly authServive: AuthService = new AuthService();
+  private readonly authService: AuthService = new AuthService();
+  private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async execute(options: ChangePasswordOptions): Promise<ChangePasswordResult> {
     const { oldPassword, newPassword, userId } = options;
@@ -28,7 +30,7 @@ export class ChangePasswordUseCase extends UseCase<
       throw new AuthenticationError("Invalid credentials");
     }
 
-    const doPasswordsMatch = this.authServive.comparePasswords({
+    const doPasswordsMatch = await this.authService.comparePasswords({
       givenPassword: oldPassword,
       passwordHash: existingUser.passwordHash,
     });
@@ -37,12 +39,14 @@ export class ChangePasswordUseCase extends UseCase<
       throw new AuthenticationError("Old password is not valid");
     }
 
-    const newPasswordHash = await this.authServive.hashPassword(newPassword);
+    const newPasswordHash = await this.authService.hashPassword(newPassword);
 
     await this.userRepository.updatePassword({
       userId: existingUser.id,
       newPasswordHash,
     });
+
+    await this.refreshTokenRepository.deleteAllUserTokens(userId);
 
     return;
   }

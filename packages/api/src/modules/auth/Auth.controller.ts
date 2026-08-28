@@ -11,7 +11,7 @@ import { RefreshUseCase } from "src/modules/auth/useCases/RefreshToken.useCase.j
 import {
   ChangePasswordBody,
   LoginBody,
-  RefreshCookies,
+  TokenCookies,
   RegisterBody,
 } from "src/modules/auth/validators";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase.js";
@@ -58,19 +58,18 @@ export class AuthController {
     res.status(201).json(user);
   };
 
-  logout = async (req: Request, res: Response) => {
-    const userId: number = req.userId;
-
+  logout = async (req: Request & { cookies: TokenCookies }, res: Response) => {
     res.clearCookie(COOKIE_NAMES.ACCESS_TOKEN, ACCESS_COOKIE_OPTIONS);
+    const token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
     res.clearCookie(COOKIE_NAMES.REFRESH_TOKEN, REFRESH_COOKIE_OPTIONS);
 
-    await this.logoutUseCase.execute({ userId });
+    await this.logoutUseCase.execute({ token });
 
     res.status(204).send();
   };
 
   refresh = async (
-    req: Request & { cookies: RefreshCookies },
+    req: Request & { cookies: TokenCookies },
     res: Response,
   ) => {
     const token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];

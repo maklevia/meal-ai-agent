@@ -15,12 +15,11 @@ export const registerBodySchema = z.object({
 
 export type RegisterBody = z.infer<typeof registerBodySchema>;
 
-export const refreshCookiesSchema = z.object({
+export const tokenCookiesSchema = z.object({
   refreshToken: z.string().min(1),
 });
 
-export type RefreshCookies = z.infer<typeof refreshCookiesSchema>;
-
+export type TokenCookies = z.infer<typeof tokenCookiesSchema>;
 
 export const changePasswordBodySchema = z.object({
   oldPassword: z.string().min(8), 
