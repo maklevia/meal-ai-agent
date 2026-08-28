@@ -13,7 +13,7 @@ import { User } from "src/modules/user/entities/User.entity.js";
 import { ChatMessage } from "src/modules/chatMessage/entities/ChatMessage.entity.js";
 import { ChatThreadStatus } from "src/modules/chatThread/typedefs.js";
 
-@Entity("chat_thread")
+@Entity("chat_threads")
 export class ChatThread {
   @PrimaryGeneratedColumn()
   id: number;

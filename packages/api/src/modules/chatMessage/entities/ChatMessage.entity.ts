@@ -11,7 +11,7 @@ import {
 import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity.js";
 import { ChatMessageRole } from "src/modules/chatMessage/typedefs.js";
 
-@Entity("chat_message")
+@Entity("chat_messages")
 @Check("CHK_token_count_positive", '"token_count" >= 0')
 export class ChatMessage {
   @PrimaryGeneratedColumn()

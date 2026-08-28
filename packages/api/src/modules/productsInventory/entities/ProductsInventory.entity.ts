@@ -9,7 +9,7 @@ import {
 } from "typeorm";
 import { Family } from "src/modules/family/entities/Family.entity.js";
 
-@Entity("products_inventory")
+@Entity("products_inventories")
 export class ProductsInventory {
   @PrimaryGeneratedColumn()
   id: number;

@@ -13,6 +13,7 @@ import { ChatThread } from 'src/modules/chatThread/entities/ChatThread.entity.js
 import { ChatMessage } from 'src/modules/chatMessage/entities/ChatMessage.entity.js';
 import { RefreshToken } from 'src/modules/auth/entities/RefreshToken.entity.js';
 import { Invitation } from 'src/modules/invitation/entities/Invitation.entity.js';
+import { ResetPasswordCode } from 'src/modules/auth/entities/ResetPasswordCode.entity.js';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -24,7 +25,7 @@ export const AppDataSource = new DataSource({
   synchronize: env.DB_SYNCHRONIZE,
   logging: env.DB_LOGGING,
   namingStrategy: new SnakeNamingStrategy(),
-  entities: [User, UserPreferences, Family, MealHistory, ProductsInventory, ChatThread, ChatMessage, RefreshToken, Invitation],
+  entities: [User, UserPreferences, Family, MealHistory, ProductsInventory, ChatThread, ChatMessage, RefreshToken, Invitation, ResetPasswordCode],
   migrations: [
     path.join(fileURLToPath(new URL('./migrations', import.meta.url)), '*{.ts,.js}'),
   ],

@@ -11,7 +11,7 @@ import {
 import { User } from "src/modules/user/entities/User.entity.js";
 import { ProductsInventory } from "src/modules/productsInventory/entities/ProductsInventory.entity.js";
 
-@Entity("family")
+@Entity("families")
 export class Family {
   @PrimaryGeneratedColumn()
   id: number;
