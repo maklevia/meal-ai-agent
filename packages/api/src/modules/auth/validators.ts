@@ -10,7 +10,7 @@ export type LoginBody = z.infer<typeof loginBodySchema>;
 export const registerBodySchema = z.object({
   invitationCode: z.string().uuid(),
   password: z.string().min(8),
-  name: z.string(),
+  name: z.string().trim().min(1).max(25),
 });
 
 export type RegisterBody = z.infer<typeof registerBodySchema>;

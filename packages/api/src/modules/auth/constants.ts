@@ -7,6 +7,7 @@ export const SALT_ROUNDS = 10;
 export const AUTH_CONSTANTS = {
     ACCESS_TOKEN_EXPIRES_IN: "5m" as StringValue,
     REFRESH_TOKEN_EXPIRES_IN: "7d" as StringValue,
+    REFRESH_TOKEN_EXPIRES_IN_DAYS: 7,
 
     ACCESS_TOKEN_MAX_AGE: 5 * 60 * 1000,
     REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60 * 1000,

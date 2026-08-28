@@ -23,13 +23,9 @@ export class ValidateInvitationUseCase extends UseCase<
   ): Promise<ValidateInvitationResult> {
     const { invitationCode } = options;
 
-    console.log(`usecase code ${invitationCode} \n\n\n`)
-
     const recordByInvitation = await this.invitationRepository.findByValidInvitation(invitationCode);
 
-    console.log(`usecase record ${recordByInvitation}`)
-
-    if(!recordByInvitation) {
+    if (!recordByInvitation) {
         throw new ValidationError('Invitation link is invalid.');
     }
 

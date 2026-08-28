@@ -101,8 +101,7 @@ export class AuthService {
 
     const tokenExpiresAt = new Date();
     tokenExpiresAt.setDate(
-      tokenExpiresAt.getDate() +
-        parseInt(AUTH_CONSTANTS.REFRESH_TOKEN_EXPIRES_IN),
+      tokenExpiresAt.getDate() + AUTH_CONSTANTS.REFRESH_TOKEN_EXPIRES_IN_DAYS,
     );
 
     const { userId } = payload;

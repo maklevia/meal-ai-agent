@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { ValidationError } from "src/errors/AppError.js";
 import { CreateInvitationUseCase } from "src/modules/invitation/useCases/CreateInvitation.useCase.js";
 import { ValidateInvitationUseCase } from "src/modules/invitation/useCases/ValidateInvitation.useCase.js";
 import { CreateInvitationBody, ValidateInvitationParams } from "src/modules/invitation/validators";

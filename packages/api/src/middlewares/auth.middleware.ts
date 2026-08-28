@@ -11,12 +11,7 @@ export const authMiddleware = (req: Request, _res: Response, next: NextFunction)
         throw new AuthenticationError("Not authenticated");
     }
 
-    const result = authService.validateAccessToken(accessToken);
-    if (!result) {
-        throw new AuthenticationError()
-    }
-
-    const {userId, userRole} = result;
+    const { userId, userRole } = authService.validateAccessToken(accessToken);
 
     req.userId = userId;
     req.userRole = userRole;

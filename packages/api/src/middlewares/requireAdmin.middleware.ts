@@ -4,7 +4,7 @@ import { UserRole } from "src/modules/user/typedefs.js"
 
 export const requireAdmin = (req: Request, _res: Response, next: NextFunction) => {
     if(req.userRole !== UserRole.Admin) {
-        throw new ForbiddenError("You need Admin permisson to access resource");
+        throw new ForbiddenError("You need Admin permission to access resource");
     }
 
     next();
