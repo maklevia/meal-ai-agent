@@ -30,6 +30,13 @@ const envSchema = z.object({
 
   ACCESS_SECRET: z.string(),
   REFRESH_SECRET: z.string(),
+
+  RATE_LIMIT_ENABLED: z
+    .string()
+    .default("true")
+    .transform((v) => v === "true"),
+  AUTH_RATE_LIMIT_MAX: z.coerce.number().default(20),
+  GLOBAL_RATE_LIMIT_MAX: z.coerce.number().default(300),
 });
 
 const parsed = envSchema.safeParse(process.env);
