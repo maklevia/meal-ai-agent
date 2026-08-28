@@ -1,9 +1,6 @@
 import * as dotenv from "dotenv";
 import { z } from "zod";
 
-// Load repo-root .env (monorepo layout), then package-local .env overrides.
-// In Docker neither file exists (dockerignored) — compose provides env vars.
-// Path is resolved relative to this file, so CWD doesn't matter.
 dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
 dotenv.config();
 

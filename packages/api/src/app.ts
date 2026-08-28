@@ -1,10 +1,10 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import { env } from "src/config/env.js";
-import { errorMiddleware } from "src/middlewares/errorMiddleware.js";
+import { errorMiddleware } from "src/middlewares/error.middleware.js";
 import { authRouter } from "src/modules/auth/Auth.routes.js";
-import { invitationRoutes } from "src/modules/invitation/Invitation.routes.js";
-import { healthRouter } from "src/routes/health.routes.js";
+import { invitationRouter } from "src/modules/invitation/Invitation.routes.js";
+import { healthRouter } from "src/routes/Health.routes.js";
 
 export function createApp() {
   const app = express();
@@ -32,7 +32,7 @@ export function createApp() {
   app.use("/health", healthRouter);
 
   app.use("/auth", authRouter);
-  app.use("/invitation", invitationRoutes);
+  app.use("/invitation", invitationRouter);
 
   app.use(errorMiddleware);
 

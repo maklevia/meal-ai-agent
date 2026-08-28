@@ -12,6 +12,11 @@ export const AUTH_CONSTANTS = {
     REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60 * 1000,
 }
 
+export const COOKIE_NAMES = {
+    ACCESS_TOKEN: "accessToken",
+    REFRESH_TOKEN: "refreshToken",
+} as const;
+
 const BASE_COOKIE_OPTIONS: CookieOptions = {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',

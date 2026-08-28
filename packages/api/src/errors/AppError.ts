@@ -9,9 +9,14 @@ export class AppError extends Error {
     }
 }
 
+export type ValidationIssue = { path: string; message: string };
+
 export class ValidationError extends AppError {
-    constructor(message = 'Request is invalid') {
+    public readonly details?: ValidationIssue[];
+
+    constructor(message = 'Request is invalid', details?: ValidationIssue[]) {
         super(message, 400);
+        this.details = details;
     }
 }
 
