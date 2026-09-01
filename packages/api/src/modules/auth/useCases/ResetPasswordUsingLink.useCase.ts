@@ -1,9 +1,8 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { AuthenticationError } from "src/errors/AppError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository.js";
-import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { UseCase } from "src/core/UseCase.base";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type ResetPasswordOptions = {
   resetCode: string;
@@ -28,20 +27,10 @@ export class ResetPasswordUsingLinkUseCase extends UseCase<
   async execute(options: ResetPasswordOptions): Promise<ResetPasswordResult> {
     const { resetCode, newPassword } = options;
 
-    const codeHash = this.authService.hashString(resetCode);
+    const codeRecord = await this.authService.assertValidResetCode(resetCode);
 
-    const codeRecord =
-      await this.passwordResetCodeRepository.findResetCode(codeHash);
-    if (!codeRecord) {
-      throw new AuthenticationError("Invalid reset code");
-    }
-
-    if (codeRecord.expiresAt < new Date()) {
-      throw new AuthenticationError("Reset code has expired")
-    }
-
-    const userId = codeRecord.user.id
-    const userRole = codeRecord.user.role; 
+    const userId = codeRecord.user.id;
+    const userRole = codeRecord.user.role;
     const newPasswordHash = await this.authService.hashPassword(newPassword);
 
     await this.userRepository.updatePassword({newPasswordHash, userId });
