@@ -61,6 +61,12 @@ export class UserRepository {
     return foundUser;
   }
 
+  async findUserByEmail(email: string): Promise<User | null> {
+    const foundUser = await this.repo.findOneBy({email: email});
+
+    return foundUser;
+  }
+
   async updatePassword(options: UpdatePasswordOptions): Promise<void> {
     const { userId, newPasswordHash } = options;
     await this.repo.update(

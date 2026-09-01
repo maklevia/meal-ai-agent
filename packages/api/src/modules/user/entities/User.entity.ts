@@ -16,7 +16,7 @@ import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity
 import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity.js";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity.js";
 import { UserRole } from "src/modules/user/typedefs.js";
-import { ResetPasswordCode } from "src/modules/auth/entities/ResetPasswordCode.entity.js";
+import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity.js";
 
 @Entity("users")
 export class User {
@@ -68,9 +68,9 @@ export class User {
   })
   refreshTokens: Relation<RefreshToken[]>;
 
-  @OneToMany(() => ResetPasswordCode, (code) => code.user, {
+  @OneToMany(() => PasswordResetCode, (code) => code.user, {
     cascade: true,
   })
-  resetPasswordCodes: Relation<ResetPasswordCode[]>
+  passwordResetCodes: Relation<PasswordResetCode[]>
 }
 

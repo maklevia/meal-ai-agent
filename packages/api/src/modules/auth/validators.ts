@@ -27,3 +27,9 @@ export const changePasswordBodySchema = z.object({
 })
 
 export type ChangePasswordBody = z.infer<typeof changePasswordBodySchema>;
+
+export const createPasswordResetLinkBodySchema = z.object({
+  email: z.string().email(),
+})
+
+export type CreatePasswordResetLinkBody = z.infer<typeof createPasswordResetLinkBodySchema>;

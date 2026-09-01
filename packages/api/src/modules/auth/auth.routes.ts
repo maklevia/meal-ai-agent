@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { authMiddleware } from "src/middlewares/auth.middleware.js";
+import { requireAdmin } from "src/middlewares/requireAdmin.middleware.js";
 import { validate } from "src/middlewares/validate.middleware.js";
 import { AuthController } from "src/modules/auth/Auth.controller.js";
-import { changePasswordBodySchema, loginBodySchema, tokenCookiesSchema, registerBodySchema } from "src/modules/auth/validators.js";
+import { changePasswordBodySchema, loginBodySchema, tokenCookiesSchema, registerBodySchema, createPasswordResetLinkBodySchema } from "src/modules/auth/validators.js";
 
 export const authRouter = Router();
 
@@ -13,3 +14,4 @@ authRouter.post("/login", validate({body: loginBodySchema}), authController.logi
 authRouter.post("/logout", authMiddleware, validate({cookies: tokenCookiesSchema}), authController.logout);
 authRouter.post("/refresh", validate({cookies: tokenCookiesSchema}), authController.refresh);
 authRouter.patch("/changePassword", authMiddleware, validate({body: changePasswordBodySchema}), authController.changePassword);
+authRouter.get("/createResetLink", validate({body: createPasswordResetLinkBodySchema}), authMiddleware, requireAdmin, authController.createPasswordResetLink);

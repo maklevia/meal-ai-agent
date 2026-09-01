@@ -13,8 +13,10 @@ import {
   LoginBody,
   TokenCookies,
   RegisterBody,
-} from "src/modules/auth/validators";
+  CreatePasswordResetLinkBody,
+} from "src/modules/auth/validators.js";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase.js";
+import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase.js";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -24,6 +26,8 @@ export class AuthController {
   private readonly refreshUseCase: RefreshUseCase = new RefreshUseCase();
   private readonly changePasswordUseCase: ChangePasswordUseCase =
     new ChangePasswordUseCase();
+  private readonly createPasswordResetLinkUseCase: CreatePasswordResetLinkUseCase =
+    new CreatePasswordResetLinkUseCase();
 
   login = async (req: Request<object, any, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -68,10 +72,7 @@ export class AuthController {
     res.status(204).send();
   };
 
-  refresh = async (
-    req: Request & { cookies: TokenCookies },
-    res: Response,
-  ) => {
+  refresh = async (req: Request & { cookies: TokenCookies }, res: Response) => {
     const token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
 
     const { accessToken } = await this.refreshUseCase.execute({
@@ -96,5 +97,13 @@ export class AuthController {
     });
 
     res.status(204).send();
+  };
+
+  createPasswordResetLink = async (req: Request<object, any, CreatePasswordResetLinkBody>, res: Response) => {
+    const { email } = req.body;
+
+    const resetLink = await this.createPasswordResetLinkUseCase.execute({email});
+
+    res.status(200).json({resetLink: resetLink});
   };
 }
