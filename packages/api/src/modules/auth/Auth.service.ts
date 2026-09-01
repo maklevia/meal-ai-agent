@@ -6,6 +6,7 @@ import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants.js";
 import { env } from "src/config/env.js";
 import { UserRole } from "src/modules/user/typedefs.js";
 import { AppJwtPayload } from "src/modules/auth/typedefs.js";
+import { createHash } from "crypto";
 
 type ComparePasswordsOptions = {
   passwordHash: string;
@@ -112,5 +113,11 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  hashString(str: string): string {
+    const hash = createHash("sha256").update(str).digest("hex");
+
+    return hash;
   }
 }

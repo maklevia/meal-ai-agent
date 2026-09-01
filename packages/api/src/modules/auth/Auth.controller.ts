@@ -14,9 +14,11 @@ import {
   TokenCookies,
   RegisterBody,
   CreatePasswordResetLinkBody,
+  ResetPasswordUsingLinkBody,
 } from "src/modules/auth/validators.js";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase.js";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase.js";
+import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase.js";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -28,6 +30,7 @@ export class AuthController {
     new ChangePasswordUseCase();
   private readonly createPasswordResetLinkUseCase: CreatePasswordResetLinkUseCase =
     new CreatePasswordResetLinkUseCase();
+  private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase = new ResetPasswordUsingLinkUseCase();
 
   login = async (req: Request<object, any, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -89,11 +92,13 @@ export class AuthController {
   ) => {
     const { newPassword, oldPassword } = req.body;
     const userId = req.userId;
+    const currentRefreshToken = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
 
     await this.changePasswordUseCase.execute({
       newPassword,
       oldPassword,
       userId,
+      currentRefreshToken,
     });
 
     res.status(204).send();
@@ -102,8 +107,19 @@ export class AuthController {
   createPasswordResetLink = async (req: Request<object, any, CreatePasswordResetLinkBody>, res: Response) => {
     const { email } = req.body;
 
-    const resetLink = await this.createPasswordResetLinkUseCase.execute({email});
+    const { passwordResetLink } = await this.createPasswordResetLinkUseCase.execute({ email });
 
-    res.status(200).json({resetLink: resetLink});
+    res.status(200).json({ passwordResetLink });
   };
+
+  resetPasswordUsingLink = async (req: Request<object, any, ResetPasswordUsingLinkBody>, res: Response) => {
+    const {newPassword, resetCode} = req.body;
+
+    const {accessToken, refreshToken} = await this.resetPasswordUsingLinkUseCase.execute({newPassword, resetCode});
+  
+    res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
+    res.cookie(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, REFRESH_COOKIE_OPTIONS);
+
+    res.status(200).send();
+  }
 }

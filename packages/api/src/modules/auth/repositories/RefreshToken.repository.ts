@@ -1,11 +1,17 @@
 import { AppDataSource } from "src/db/data-source.js";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity.js";
 import { User } from "src/modules/user/entities/User.entity.js";
+import { Not } from "typeorm";
 
 type StoreTokenOptions = {
   userId: number;
   refreshToken: string;
   expiresAt: Date;
+};
+
+type DeleteAllTokensExceptOptions = {
+  userId: number;
+  tokenToKeep: string;
 };
 
 export class RefreshTokenRepository {
@@ -28,6 +34,17 @@ export class RefreshTokenRepository {
 
   async deleteAllUserTokens(userId: number): Promise<void> {
     await this.repo.delete({ user: { id: userId } });
+  }
+
+  async deleteAllUserTokensExcept(
+    options: DeleteAllTokensExceptOptions,
+  ): Promise<void> {
+    const { userId, tokenToKeep } = options;
+
+    await this.repo.delete({
+      user: { id: userId },
+      refreshToken: Not(tokenToKeep),
+    });
   }
 
   async findByToken(token: string): Promise<RefreshToken | null> {

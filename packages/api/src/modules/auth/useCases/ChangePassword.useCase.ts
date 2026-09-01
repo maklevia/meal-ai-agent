@@ -8,6 +8,7 @@ type ChangePasswordOptions = {
   userId: number;
   oldPassword: string;
   newPassword: string;
+  currentRefreshToken: string
 };
 
 type ChangePasswordResult = void;
@@ -21,7 +22,7 @@ export class ChangePasswordUseCase extends UseCase<
   private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async execute(options: ChangePasswordOptions): Promise<ChangePasswordResult> {
-    const { oldPassword, newPassword, userId } = options;
+    const { oldPassword, newPassword, userId, currentRefreshToken } = options;
 
     const existingUser =
       await this.userRepository.findUserForPasswordChange(userId);
@@ -46,8 +47,8 @@ export class ChangePasswordUseCase extends UseCase<
       newPasswordHash,
     });
 
-    await this.refreshTokenRepository.deleteAllUserTokens(userId);
-
+    await this.refreshTokenRepository.deleteAllUserTokensExcept({userId: existingUser.id, tokenToKeep: currentRefreshToken});
+    
     return;
   }
 }

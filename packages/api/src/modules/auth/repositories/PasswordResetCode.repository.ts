@@ -1,6 +1,6 @@
 import { AppDataSource } from "src/db/data-source.js";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity.js";
-import { User } from "src/modules/user/entities/User.entity";
+import { User } from "src/modules/user/entities/User.entity.js";
 
 interface CreatePasswordResetCodeOptions {
     userId: number,
@@ -21,5 +21,18 @@ export class PasswordResetCodeRepository {
 
         const createdRecord = await this.repo.save(newRecord);
         return createdRecord;
+    }
+
+    async findResetCode(codeHash: string): Promise<PasswordResetCode | null> {
+        const codeRecord = await this.repo.findOne({
+            where: { codeHash },
+            relations: { user: true },
+        });
+
+        return codeRecord;
+    }
+
+    async deleteAllUserResetCodes(userId: number): Promise<void> {
+        await this.repo.delete({user: {id: userId}});
     }
 }

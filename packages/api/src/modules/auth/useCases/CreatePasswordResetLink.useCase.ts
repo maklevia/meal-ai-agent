@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "crypto";
+import { randomUUID } from "crypto";
 import { env } from "src/config/env.js";
 import { UseCase } from "src/core/UseCase.base.js";
 import { NotFoundError } from "src/errors/AppError.js";
@@ -32,11 +32,12 @@ export class CreatePasswordResetLinkUseCase extends UseCase<
         };
 
         const rawResetCode = randomUUID();
-        const hashedResetCode =  createHash("sha256").update(rawResetCode).digest("hex");
+        const hashedResetCode =  this.authService.hashString(rawResetCode);
 
         const expiresAt = new Date();
         expiresAt.setHours(expiresAt.getHours() + RESET_CODE_EXPIRES_IN_HOURS);
 
+        await this.passwordResetLinkRepository.deleteAllUserResetCodes(user.id);
         await this.passwordResetLinkRepository.createPasswordResetCode({codeHash: hashedResetCode, expiresAt, userId: user.id});
 
         const resetLink = `${env.WEB_ORIGIN}/resetPassword?token=${rawResetCode}`;

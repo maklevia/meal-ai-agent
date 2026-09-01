@@ -22,9 +22,12 @@ export const tokenCookiesSchema = z.object({
 export type TokenCookies = z.infer<typeof tokenCookiesSchema>;
 
 export const changePasswordBodySchema = z.object({
-  oldPassword: z.string().min(8), 
+  oldPassword: z.string().min(8),
   newPassword: z.string().min(8),
-})
+}).refine((data) => data.oldPassword !== data.newPassword, {
+  message: "New password must differ from the old password",
+  path: ["newPassword"],
+});
 
 export type ChangePasswordBody = z.infer<typeof changePasswordBodySchema>;
 
@@ -33,3 +36,10 @@ export const createPasswordResetLinkBodySchema = z.object({
 })
 
 export type CreatePasswordResetLinkBody = z.infer<typeof createPasswordResetLinkBodySchema>;
+
+export const resetPasswordUsingLinkBodySchema = z.object({
+  newPassword: z.string().min(8),
+  resetCode: z.string().uuid(),
+})
+
+export type ResetPasswordUsingLinkBody = z.infer<typeof resetPasswordUsingLinkBodySchema>;
