@@ -15,10 +15,12 @@ import {
   RegisterBody,
   CreatePasswordResetLinkBody,
   ResetPasswordUsingLinkBody,
+  BootstrapAdminBody,
 } from "src/modules/auth/validators";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase";
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
+import { BootstrapAdminUseCase } from "src/modules/invitation/useCases/BootstrapAdmin.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -30,7 +32,10 @@ export class AuthController {
     new ChangePasswordUseCase();
   private readonly createPasswordResetLinkUseCase: CreatePasswordResetLinkUseCase =
     new CreatePasswordResetLinkUseCase();
-  private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase = new ResetPasswordUsingLinkUseCase();
+  private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase =
+    new ResetPasswordUsingLinkUseCase();
+  private readonly bootstrapAdminUseCase: BootstrapAdminUseCase =
+    new BootstrapAdminUseCase();
 
   login = async (req: Request<object, any, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -104,22 +109,48 @@ export class AuthController {
     res.status(204).send();
   };
 
-  createPasswordResetLink = async (req: Request<object, any, CreatePasswordResetLinkBody>, res: Response) => {
+  createPasswordResetLink = async (
+    req: Request<object, any, CreatePasswordResetLinkBody>,
+    res: Response,
+  ) => {
     const { email } = req.body;
 
-    const { passwordResetLink } = await this.createPasswordResetLinkUseCase.execute({ email });
+    const { passwordResetLink } =
+      await this.createPasswordResetLinkUseCase.execute({ email });
 
     res.status(200).json({ passwordResetLink });
   };
 
-  resetPasswordUsingLink = async (req: Request<object, any, ResetPasswordUsingLinkBody>, res: Response) => {
-    const {newPassword, resetCode} = req.body;
+  resetPasswordUsingLink = async (
+    req: Request<object, any, ResetPasswordUsingLinkBody>,
+    res: Response,
+  ) => {
+    const { newPassword, resetCode } = req.body;
 
-    const {accessToken, refreshToken} = await this.resetPasswordUsingLinkUseCase.execute({newPassword, resetCode});
-  
+    const { accessToken, refreshToken } =
+      await this.resetPasswordUsingLinkUseCase.execute({
+        newPassword,
+        resetCode,
+      });
+
+    res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
+    res.cookie(
+      COOKIE_NAMES.REFRESH_TOKEN,
+      refreshToken,
+      REFRESH_COOKIE_OPTIONS,
+    );
+
+    res.status(200).send();
+  };
+
+  bootstrapAdmin = async (req: Request<object, any, BootstrapAdminBody>, res: Response) => {
+    const { email, password, name } = req.body;
+
+    const {accessToken, refreshToken, user} = await this.bootstrapAdminUseCase.execute({email, password, name});
+
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
     res.cookie(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, REFRESH_COOKIE_OPTIONS);
 
-    res.status(200).send();
-  }
+    res.status(201).json(user);
+  };
 }

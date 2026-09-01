@@ -1,4 +1,5 @@
 import { AppDataSource } from "src/db/data-source";
+import { ConflictError } from "src/errors/AppError";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserRole } from "src/modules/user/typedefs";
 
@@ -7,6 +8,12 @@ interface CreateUserOptions {
   email: string;
   passwordHash: string;
   role: UserRole;
+}
+
+interface CreateFirstAdminOptions {
+  name: string;
+  email: string;
+  passwordHash: string;
 }
 
 interface UpdatePasswordOptions {
@@ -62,7 +69,7 @@ export class UserRepository {
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
-    const foundUser = await this.repo.findOneBy({email: email});
+    const foundUser = await this.repo.findOneBy({ email: email });
 
     return foundUser;
   }
@@ -75,5 +82,38 @@ export class UserRepository {
         passwordHash: newPasswordHash,
       },
     );
+  }
+
+  async existsAny(): Promise<boolean> {
+    const result = await this.repo.existsBy({});
+    return result;
+  }
+
+  async createFirstAdmin(options: CreateFirstAdminOptions): Promise<User> {
+    const { name, email, passwordHash } = options;
+
+    return AppDataSource.transaction(async (manager) => {
+      await manager.query("SELECT pg_advisory_xact_lock(1)");
+
+      const transactionalRepo = manager.getRepository(User);
+
+      const hasAnyUser = await transactionalRepo.existsBy({});
+      if (hasAnyUser) {
+        throw new ConflictError("System already initialized");
+      }
+
+      if (await transactionalRepo.existsBy({ email })) {
+        throw new ConflictError("Email is already taken");
+      }
+
+      const newUser = transactionalRepo.create({
+        name,
+        email,
+        passwordHash,
+        role: UserRole.Admin,
+      });
+
+      return transactionalRepo.save(newUser);
+    });
   }
 }
