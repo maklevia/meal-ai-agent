@@ -1,7 +1,7 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { ValidationError } from "src/errors/AppError.js";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
-import { UserRole } from "src/modules/user/typedefs.js";
+import { UseCase } from "src/core/UseCase.base";
+import { ValidationError } from "src/errors/AppError";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { UserRole } from "src/modules/user/typedefs";
 
 type ValidateInvitationOptions = {
   invitationCode: string;

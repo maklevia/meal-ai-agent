@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express"
-import { AuthenticationError } from "src/errors/AppError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { COOKIE_NAMES } from "src/modules/auth/constants.js";
+import { AuthenticationError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { COOKIE_NAMES } from "src/modules/auth/constants";
 
 const authService: AuthService = new AuthService();
 

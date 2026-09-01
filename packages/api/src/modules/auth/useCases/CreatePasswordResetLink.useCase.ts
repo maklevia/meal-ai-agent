@@ -1,11 +1,11 @@
 import { randomUUID } from "crypto";
-import { env } from "src/config/env.js";
-import { UseCase } from "src/core/UseCase.base.js";
-import { NotFoundError } from "src/errors/AppError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { RESET_CODE_EXPIRES_IN_HOURS } from "src/modules/auth/constants.js";
-import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { env } from "src/config/env";
+import { UseCase } from "src/core/UseCase.base";
+import { NotFoundError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { RESET_CODE_EXPIRES_IN_HOURS } from "src/modules/auth/constants";
+import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type CreatePasswordResetLinkOptions = {
   email: string;

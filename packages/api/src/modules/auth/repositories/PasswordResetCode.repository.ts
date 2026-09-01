@@ -1,6 +1,6 @@
-import { AppDataSource } from "src/db/data-source.js";
-import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity.js";
-import { User } from "src/modules/user/entities/User.entity.js";
+import { AppDataSource } from "src/db/data-source";
+import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
+import { User } from "src/modules/user/entities/User.entity";
 
 interface CreatePasswordResetCodeOptions {
     userId: number,

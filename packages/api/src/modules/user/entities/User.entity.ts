@@ -10,13 +10,13 @@ import {
   OneToMany,
   Relation,
 } from "typeorm";
-import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity.js";
-import { Family } from "src/modules/family/entities/Family.entity.js";
-import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity.js";
-import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity.js";
-import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity.js";
-import { UserRole } from "src/modules/user/typedefs.js";
-import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity.js";
+import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity";
+import { Family } from "src/modules/family/entities/Family.entity";
+import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity";
+import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity";
+import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
+import { UserRole } from "src/modules/user/typedefs";
+import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
 
 @Entity("users")
 export class User {

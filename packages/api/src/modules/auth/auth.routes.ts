@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { authMiddleware } from "src/middlewares/auth.middleware.js";
-import { requireAdmin } from "src/middlewares/requireAdmin.middleware.js";
-import { validate } from "src/middlewares/validate.middleware.js";
-import { AuthController } from "src/modules/auth/Auth.controller.js";
-import { changePasswordBodySchema, loginBodySchema, tokenCookiesSchema, registerBodySchema, createPasswordResetLinkBodySchema, resetPasswordUsingLinkBodySchema } from "src/modules/auth/validators.js";
+import { authMiddleware } from "src/middlewares/auth.middleware";
+import { requireAdmin } from "src/middlewares/requireAdmin.middleware";
+import { validate } from "src/middlewares/validate.middleware";
+import { AuthController } from "src/modules/auth/Auth.controller";
+import { changePasswordBodySchema, loginBodySchema, tokenCookiesSchema, registerBodySchema, createPasswordResetLinkBodySchema, resetPasswordUsingLinkBodySchema } from "src/modules/auth/validators";
 
 export const authRouter = Router();
 

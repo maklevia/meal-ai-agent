@@ -1,9 +1,9 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { ConflictError, ValidationError } from "src/errors/AppError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
-import { toUserDto, UserDto, UserRole } from "src/modules/user/typedefs.js";
+import { UseCase } from "src/core/UseCase.base";
+import { ConflictError, ValidationError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
+import { toUserDto, UserDto, UserRole } from "src/modules/user/typedefs";
 
 type RegisterOptions = {
   invitationCode: string;

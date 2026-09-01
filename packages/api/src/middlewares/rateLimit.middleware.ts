@@ -1,5 +1,5 @@
 import { rateLimit } from "express-rate-limit";
-import { env } from "src/config/env.js";
+import { env } from "src/config/env";
 
 /**
  * Rate limiting protects the API from abuse.

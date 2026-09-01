@@ -1,6 +1,6 @@
 import { CookieOptions } from "express"
 import type { StringValue } from 'ms';
-import { env } from "src/config/env.js";
+import { env } from "src/config/env";
 
 export const SALT_ROUNDS = 10;
 

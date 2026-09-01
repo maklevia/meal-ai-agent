@@ -1,8 +1,8 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { AuthenticationError } from "src/errors/AppError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
-import { toUserDto, UserDto } from "src/modules/user/typedefs.js";
+import { UseCase } from "src/core/UseCase.base";
+import { AuthenticationError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
+import { toUserDto, UserDto } from "src/modules/user/typedefs";
 
 type LoginOptions = {
   email: string;

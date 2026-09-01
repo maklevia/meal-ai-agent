@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { User } from "src/modules/user/entities/User.entity.js";
-import type { MealScore } from "src/modules/mealHistory/typedefs.js";
+import { User } from "src/modules/user/entities/User.entity";
+import type { MealScore } from "src/modules/mealHistory/typedefs";
 
 @Entity("meal_histories")
 @Check("CHK_score_range", '"score" >= 1 AND "score" <= 5')

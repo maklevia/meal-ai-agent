@@ -1,9 +1,9 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { AuthenticationError } from "src/errors/AppError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository.js";
-import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { UseCase } from "src/core/UseCase.base";
+import { AuthenticationError } from "src/errors/AppError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type ResetPasswordOptions = {
   resetCode: string;

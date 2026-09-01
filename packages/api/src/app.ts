@@ -1,11 +1,11 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import { env } from "src/config/env.js";
-import { errorMiddleware } from "src/middlewares/error.middleware.js";
-import { authLimiter, globalLimiter } from "src/middlewares/rateLimit.middleware.js";
-import { authRouter } from "src/modules/auth/Auth.routes.js";
-import { invitationRouter } from "src/modules/invitation/Invitation.routes.js";
-import { healthRouter } from "src/routes/Health.routes.js";
+import { env } from "src/config/env";
+import { errorMiddleware } from "src/middlewares/error.middleware";
+import { authLimiter, globalLimiter } from "src/middlewares/rateLimit.middleware";
+import { authRouter } from "src/modules/auth/Auth.routes";
+import { invitationRouter } from "src/modules/invitation/Invitation.routes";
+import { healthRouter } from "src/routes/Health.routes";
 
 export function createApp() {
   const app = express();

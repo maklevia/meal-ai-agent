@@ -1,4 +1,4 @@
-import { User } from "src/modules/user/entities/User.entity.js";
+import { User } from "src/modules/user/entities/User.entity";
 
 export enum UserRole {
   Admin = "admin",

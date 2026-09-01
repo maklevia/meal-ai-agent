@@ -7,7 +7,7 @@ import {
   Relation,
   UpdateDateColumn,
 } from "typeorm";
-import { Family } from "src/modules/family/entities/Family.entity.js";
+import { Family } from "src/modules/family/entities/Family.entity";
 
 @Entity("products_inventories")
 export class ProductsInventory {

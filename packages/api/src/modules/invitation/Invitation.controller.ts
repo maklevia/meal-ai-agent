@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { CreateInvitationUseCase } from "src/modules/invitation/useCases/CreateInvitation.useCase.js";
-import { ValidateInvitationUseCase } from "src/modules/invitation/useCases/ValidateInvitation.useCase.js";
+import { CreateInvitationUseCase } from "src/modules/invitation/useCases/CreateInvitation.useCase";
+import { ValidateInvitationUseCase } from "src/modules/invitation/useCases/ValidateInvitation.useCase";
 import { CreateInvitationBody, ValidateInvitationParams } from "src/modules/invitation/validators";
 
 export class InvitationController {

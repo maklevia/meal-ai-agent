@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError, ValidationError } from "src/errors/AppError.js";
+import { AppError, ValidationError } from "src/errors/AppError";
 
 export const errorMiddleware = (
   err: unknown,

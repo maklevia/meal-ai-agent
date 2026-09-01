@@ -1,13 +1,13 @@
-import { LoginUserUseCase } from "src/modules/auth/useCases/LoginUser.useCase.js";
-import { RegisterUserUseCase } from "src/modules/auth/useCases/RegisterUser.useCase.js";
+import { LoginUserUseCase } from "src/modules/auth/useCases/LoginUser.useCase";
+import { RegisterUserUseCase } from "src/modules/auth/useCases/RegisterUser.useCase";
 import { Request, Response } from "express";
 import {
   ACCESS_COOKIE_OPTIONS,
   COOKIE_NAMES,
   REFRESH_COOKIE_OPTIONS,
-} from "src/modules/auth/constants.js";
-import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase.js";
-import { RefreshUseCase } from "src/modules/auth/useCases/RefreshToken.useCase.js";
+} from "src/modules/auth/constants";
+import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase";
+import { RefreshUseCase } from "src/modules/auth/useCases/RefreshToken.useCase";
 import {
   ChangePasswordBody,
   LoginBody,
@@ -15,10 +15,10 @@ import {
   RegisterBody,
   CreatePasswordResetLinkBody,
   ResetPasswordUsingLinkBody,
-} from "src/modules/auth/validators.js";
-import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase.js";
-import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase.js";
-import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase.js";
+} from "src/modules/auth/validators";
+import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase";
+import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase";
+import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();

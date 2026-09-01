@@ -1,6 +1,6 @@
-import { AppDataSource } from "src/db/data-source.js";
-import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity.js";
-import { User } from "src/modules/user/entities/User.entity.js";
+import { AppDataSource } from "src/db/data-source";
+import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
+import { User } from "src/modules/user/entities/User.entity";
 import { Not } from "typeorm";
 
 type StoreTokenOptions = {

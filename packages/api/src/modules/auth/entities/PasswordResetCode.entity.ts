@@ -1,4 +1,4 @@
-import { User } from "src/modules/user/entities/User.entity.js";
+import { User } from "src/modules/user/entities/User.entity";
 import { Column, CreateDateColumn, Entity, Index, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
 @Entity("password_reset_codes")
