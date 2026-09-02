@@ -5,10 +5,11 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "../user/User.entity";
-import { ProductsInventory } from "../productsInventory/ProductsInventory.entity";
+import { User } from "src/modules/user/entities/User.entity.js";
+import { ProductsInventory } from "src/modules/productsInventory/entities/ProductsInventory.entity.js";
 
 @Entity("family")
 export class Family {
@@ -22,9 +23,13 @@ export class Family {
   updatedAt: Date;
 
   @OneToMany(() => User, (user) => user.family)
-  users: User[];
+  users: Relation<User[]>;
 
-  @OneToOne(() => ProductsInventory, (inventory) => inventory.family)
+  @OneToOne(() => ProductsInventory, (inventory) => inventory.family, {
+    nullable: true,
+    onDelete: "SET NULL",
+    cascade: true,
+  })
   @JoinColumn()
-  productsInventory: ProductsInventory;
+  productsInventory: Relation<ProductsInventory> | null;
 }

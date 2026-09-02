@@ -1,15 +1,18 @@
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
 } from "typeorm";
-import { User } from "../user/User.entity";
-import type { MealScore } from "./typedefs";
+import { User } from "src/modules/user/entities/User.entity.js";
+import type { MealScore } from "src/modules/mealHistory/typedefs.js";
 
 @Entity("meal_history")
+@Check("CHK_score_range", '"score" >= 1 AND "score" <= 5')
 export class MealHistory {
   @PrimaryGeneratedColumn()
   id: number;
@@ -23,7 +26,10 @@ export class MealHistory {
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.mealHistory)
+  @ManyToOne(() => User, (user) => user.mealHistory, {
+    onDelete: "CASCADE",
+    nullable: false,
+  })
   @JoinColumn()
-  user: User;
+  user: Relation<User>;
 }

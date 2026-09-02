@@ -1,0 +1,74 @@
+services:
+  db:
+    image: ${POSTGRES_IMAGE}
+    restart: ${RESTART_POLICY}
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      PGDATABASE: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: ${DB_HEALTH_INTERVAL}
+      timeout: ${DB_HEALTH_TIMEOUT}
+      retries: ${DB_HEALTH_RETRIES}
+
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+      args:
+        API_PORT: ${API_PORT}
+        NODE_ENV: ${NODE_ENV}
+    restart: ${RESTART_POLICY}
+    ports:
+      - "${API_BIND_HOST}:${API_PORT}:${API_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      API_PORT: ${API_PORT}
+      NODE_ENV: ${NODE_ENV}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      DB_LOGGING: ${DB_LOGGING}
+      ACCESS_SECRET: ${ACCESS_SECRET}
+      REFRESH_SECRET: ${REFRESH_SECRET}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX}
+      GLOBAL_RATE_LIMIT_MAX: ${GLOBAL_RATE_LIMIT_MAX}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${API_PORT}/health || exit 1"]
+      interval: ${API_HEALTH_INTERVAL}
+      timeout: ${API_HEALTH_TIMEOUT}
+      start_period: ${API_HEALTH_START_PERIOD}
+      retries: ${API_HEALTH_RETRIES}
+
+  web:
+    build:
+      context: .
+      dockerfile: packages/web/Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        WEB_CONTAINER_PORT: ${WEB_CONTAINER_PORT}
+    restart: ${RESTART_POLICY}
+    ports:
+      - "${WEB_PORT}:${WEB_CONTAINER_PORT}"
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_HOST: ${API_HOST}
+      API_PORT: ${API_PORT}
+
+volumes:
+  pgdata:
