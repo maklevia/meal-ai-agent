@@ -15,10 +15,12 @@ import {
   RegisterBody,
   CreatePasswordResetLinkBody,
   ResetPasswordUsingLinkBody,
+  ValidatePasswordResetCodeParams,
 } from "src/modules/auth/validators.js";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase.js";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase.js";
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase.js";
+import { ValidatePasswordResetCodeUseCase } from "src/modules/auth/useCases/ValidatePasswordResetCode.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -30,6 +32,7 @@ export class AuthController {
     new ChangePasswordUseCase();
   private readonly createPasswordResetLinkUseCase: CreatePasswordResetLinkUseCase =
     new CreatePasswordResetLinkUseCase();
+    private readonly validatePasswordResetCodeUseCase: ValidatePasswordResetCodeUseCase = new ValidatePasswordResetCodeUseCase();
   private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase = new ResetPasswordUsingLinkUseCase();
 
   login = async (req: Request<object, any, LoginBody>, res: Response) => {
@@ -111,6 +114,14 @@ export class AuthController {
 
     res.status(200).json({ passwordResetLink });
   };
+
+  validatePasswordResetCode = async (req: Request<ValidatePasswordResetCodeParams>, res: Response) => {
+    const { resetCode } = req.params;
+
+    await this.validatePasswordResetCodeUseCase.execute({resetCode});
+
+    res.status(204).send();
+  }
 
   resetPasswordUsingLink = async (req: Request<object, any, ResetPasswordUsingLinkBody>, res: Response) => {
     const {newPassword, resetCode} = req.body;

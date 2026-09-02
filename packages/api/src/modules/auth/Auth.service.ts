@@ -1,6 +1,8 @@
 import { compare, genSalt, hash } from "bcrypt-ts";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
+import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository.js";
+import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity.js";
 import { AuthenticationError } from "src/errors/AppError.js";
 import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants.js";
 import { env } from "src/config/env.js";
@@ -21,6 +23,8 @@ type UserPayloadInfo = {
 export class AuthService {
   private readonly refreshTokenRepository: RefreshTokenRepository =
     new RefreshTokenRepository();
+  private readonly passwordResetCodeRepository: PasswordResetCodeRepository =
+    new PasswordResetCodeRepository();
 
   async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(SALT_ROUNDS);
@@ -119,5 +123,21 @@ export class AuthService {
     const hash = createHash("sha256").update(str).digest("hex");
 
     return hash;
+  }
+
+  async assertValidResetCode(resetCode: string): Promise<PasswordResetCode> {
+    const codeHash = this.hashString(resetCode);
+
+    const codeRecord =
+      await this.passwordResetCodeRepository.findResetCode(codeHash);
+    if (!codeRecord) {
+      throw new AuthenticationError("Invalid reset code");
+    }
+
+    if (codeRecord.expiresAt < new Date()) {
+      throw new AuthenticationError("Reset code has expired");
+    }
+
+    return codeRecord;
   }
 }
