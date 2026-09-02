@@ -19,7 +19,7 @@ export function createApp() {
   app.use(express.json());
 
   app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", env.CORS_ORIGIN);
+    res.setHeader("Access-Control-Allow-Origin", env.CLIENT_ORIGIN);
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET,POST,PUT,PATCH,DELETE,OPTIONS",

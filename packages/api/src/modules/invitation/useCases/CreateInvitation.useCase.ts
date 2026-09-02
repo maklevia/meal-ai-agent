@@ -1,9 +1,6 @@
-import { env } from "src/config/env.js";
 import { UseCase } from "src/core/UseCase.base.js";
-import { ConflictError } from "src/errors/AppError.js";
 import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
 import { UserRole } from "src/modules/user/typedefs.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
 import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants.js";
 
 type CreateInvitationOptions = {
@@ -20,17 +17,13 @@ export class CreateInvitationUseCase extends UseCase<
   CreateInvitationResult
 > {
   private readonly invitationRepository: InvitationRepository = new InvitationRepository();
-  private readonly userRepository: UserRepository = new UserRepository();
 
   async execute(
     options: CreateInvitationOptions,
   ): Promise<CreateInvitationResult> {
     const { email, role, invitedByUserId } = options;
 
-    const isRegistered = await this.userRepository.existsByEmail(email);
-    if (isRegistered) {
-      throw new ConflictError("User with this email already exists");
-    }
+    await this.ensureEmailAvailable(email);
 
     const invitationExpiresAt = new Date();
     invitationExpiresAt.setHours(invitationExpiresAt.getHours() + INVITATION_VALID_HOURS);
@@ -43,7 +36,7 @@ export class CreateInvitationUseCase extends UseCase<
         invitedByUserId,
       });
 
-    const invitationLink: string = `${env.WEB_ORIGIN}/register?token=${invitationCode}`;
+    const invitationLink: string = `${this.env.CLIENT_ORIGIN}/register?token=${invitationCode}`;
 
     return { invitationLink };
   }

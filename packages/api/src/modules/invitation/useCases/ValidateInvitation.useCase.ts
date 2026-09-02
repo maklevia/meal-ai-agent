@@ -1,5 +1,5 @@
 import { UseCase } from "src/core/UseCase.base.js";
-import { ValidationError } from "src/errors/AppError.js";
+import { ValidationError } from "src/errors/http/ValidationError.js";
 import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
 import { UserRole } from "src/modules/user/typedefs.js";
 

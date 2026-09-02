@@ -8,7 +8,7 @@ import {
 } from "src/modules/auth/constants.js";
 import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase.js";
 import { RefreshUseCase } from "src/modules/auth/useCases/RefreshToken.useCase.js";
-import { AuthenticationError } from "src/errors/AppError.js";
+import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
 import { LoginBody, RefreshCookies, RegisterBody } from "src/modules/auth/validators";
 
 export class AuthController {

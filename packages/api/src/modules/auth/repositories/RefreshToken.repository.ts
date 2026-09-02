@@ -22,7 +22,7 @@ export class RefreshTokenRepository {
     await this.repo.save(newRecord);
   }
 
-  async deleteToken(userId: number): Promise<void> {
+  async deleteTokensIfExist(userId: number): Promise<void> {
     await this.repo.delete({user: {id: userId}});
   }
 

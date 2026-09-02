@@ -1,5 +1,5 @@
 import { UseCase } from "src/core/UseCase.base.js";
-import { AuthenticationError } from "src/errors/AppError.js";
+import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
 import { AuthService } from "src/modules/auth/Auth.service.js";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
 

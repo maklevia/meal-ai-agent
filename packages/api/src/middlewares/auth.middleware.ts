@@ -1,20 +1,24 @@
-import { Request, Response, NextFunction } from "express"
-import { AuthenticationError } from "src/errors/AppError.js";
+import { Request, Response, NextFunction } from "express";
+import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
 import { AuthService } from "src/modules/auth/Auth.service.js";
 import { COOKIE_NAMES } from "src/modules/auth/constants.js";
 
-const authService: AuthService = new AuthService();
+export class AuthMiddleware {
+  constructor(private readonly authService: AuthService = new AuthService()) {}
 
-export const authMiddleware = (req: Request, _res: Response, next: NextFunction) => {
+  handle = (req: Request, _res: Response, next: NextFunction): void => {
     const accessToken = req.cookies?.[COOKIE_NAMES.ACCESS_TOKEN];
     if (!accessToken) {
-        throw new AuthenticationError("Not authenticated");
+      throw new AuthenticationError("Not authenticated");
     }
 
-    const { userId, userRole } = authService.validateAccessToken(accessToken);
+    const { userId, userRole } = this.authService.validateAccessToken(accessToken);
 
     req.userId = userId;
     req.userRole = userRole;
 
     next();
+  };
 }
+
+export const authMiddleware = new AuthMiddleware().handle;

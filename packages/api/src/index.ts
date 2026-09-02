@@ -8,8 +8,8 @@ async function bootstrap() {
 
   const app = createApp();
 
-  app.listen(env.PORT, () => {
-    console.log(`API running on http://localhost:${env.PORT} (${env.NODE_ENV})`);
+  app.listen(env.API_PORT, () => {
+    console.log(`API running on http://localhost:${env.API_PORT} (${env.NODE_ENV})`);
   });
 }
 
