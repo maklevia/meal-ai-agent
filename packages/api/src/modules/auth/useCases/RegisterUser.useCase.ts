@@ -1,7 +1,7 @@
 import { UseCase } from "src/core/UseCase.base";
 import { ValidationError } from "src/errors/http/ValidationError";
 import { AuthService } from "src/modules/auth/Auth.service";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { RegistrationInvitationRepository } from "src/modules/registrationInvitation/repositories/RegistrationInvitation.repository";
 import { toUserDto, UserDto } from "src/modules/user/typedefs";
 
 type RegisterOptions = {
@@ -21,7 +21,7 @@ export class RegisterUserUseCase extends UseCase<
   RegisterResult
 > {
   private readonly authService: AuthService = new AuthService();
-  private readonly invitationRepository: InvitationRepository = new InvitationRepository();
+  private readonly invitationRepository: RegistrationInvitationRepository = new RegistrationInvitationRepository();
 
   async execute(options: RegisterOptions): Promise<RegisterResult> {
     const { invitationCode, password, name } = options;

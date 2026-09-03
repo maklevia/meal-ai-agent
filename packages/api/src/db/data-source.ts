@@ -12,7 +12,7 @@ import { ProductsInventory } from 'src/modules/productsInventory/entities/Produc
 import { ChatThread } from 'src/modules/chatThread/entities/ChatThread.entity';
 import { ChatMessage } from 'src/modules/chatMessage/entities/ChatMessage.entity';
 import { RefreshToken } from 'src/modules/auth/entities/RefreshToken.entity';
-import { Invitation } from 'src/modules/invitation/entities/Invitation.entity';
+import { Invitation } from 'src/modules/registrationInvitation/entities/RegistrationInvitation.entity';
 import { PasswordResetCode } from 'src/modules/auth/entities/PasswordResetCode.entity';
 
 export const AppDataSource = new DataSource({

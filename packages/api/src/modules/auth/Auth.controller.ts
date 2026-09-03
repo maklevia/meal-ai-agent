@@ -17,12 +17,16 @@ import {
   ResetPasswordUsingLinkBody,
   BootstrapAdminBody,
   ValidatePasswordResetCodeParams,
+  CreateRegistrationInvitationBody,
+  ValidateRegistrationInvitationParams,
 } from "src/modules/auth/validators";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase";
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
 import { BootstrapAdminUseCase } from "src/modules/auth/useCases/BootstrapAdmin.useCase";
 import { ValidatePasswordResetCodeUseCase } from "src/modules/auth/useCases/ValidatePasswordResetCode.useCase";
+import { CreateRegistrationInvitationUseCase } from "src/modules/registrationInvitation/useCases/CreateRegistrationInvitation.useCase";
+import { ValidateRegistrationInvitationUseCase } from "src/modules/registrationInvitation/useCases/ValidateRegistrationInvitation.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -39,6 +43,8 @@ export class AuthController {
   private readonly bootstrapAdminUseCase: BootstrapAdminUseCase =
     new BootstrapAdminUseCase();
     private readonly validatePasswordResetCodeUseCase: ValidatePasswordResetCodeUseCase = new ValidatePasswordResetCodeUseCase();
+  private readonly createRegistrationInvitationUseCase: CreateRegistrationInvitationUseCase = new CreateRegistrationInvitationUseCase();
+  private readonly validateRegistrationInvitationUseCase: ValidateRegistrationInvitationUseCase = new ValidateRegistrationInvitationUseCase();
 
   login = async (req: Request<unknown, unknown, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -159,5 +165,28 @@ export class AuthController {
     res.cookie(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, REFRESH_COOKIE_OPTIONS);
 
     res.status(201).json(user);
+  };
+
+  createRegistrationInvitation = async (req: Request<unknown, unknown, CreateRegistrationInvitationBody>, res: Response) => {
+    const { email, role } = req.body;
+    const invitedByUserId = req.userId;
+
+    const { invitationLink } = await this.createRegistrationInvitationUseCase.execute({
+      email,
+      role,
+      invitedByUserId,
+    });
+
+    res.status(201).json(invitationLink);
+  };
+
+  validateRegistrationInvitation = async (req: Request<ValidateRegistrationInvitationParams>, res: Response) => {
+    const { invitationCode } = req.params;
+
+    const result = await this.validateRegistrationInvitationUseCase.execute({
+      invitationCode,
+    });
+
+    res.status(200).json(result);
   };
 }

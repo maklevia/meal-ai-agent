@@ -1,5 +1,5 @@
 import { AppDataSource } from "src/db/data-source";
-import { Invitation } from "src/modules/invitation/entities/Invitation.entity";
+import { RegistrationInvitation } from "src/modules/registrationInvitation/entities/RegistrationInvitation.entity";
 import { UserRole } from "src/modules/user/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
 
@@ -10,13 +10,13 @@ type CreateInvitationOptions = {
   invitedByUserId: number;
 };
 
-export class InvitationRepository {
-  private readonly repo = AppDataSource.getRepository(Invitation)
+export class RegistrationInvitationRepository {
+  private readonly repo = AppDataSource.getRepository(RegistrationInvitation)
 
   async createInvitation(options: CreateInvitationOptions): Promise<string> {
     const { email, role, expiresAt, invitedByUserId } = options;
 
-    const newInvitation = new Invitation();
+    const newInvitation = new RegistrationInvitation();
     newInvitation.email = email;
     newInvitation.role = role;
     newInvitation.expiresAt = expiresAt;
@@ -26,7 +26,7 @@ export class InvitationRepository {
     return createdInvitation.id;
   }
 
-  async findByValidInvitation(invitationCode: string): Promise<Invitation | null> {
+  async findByValidInvitation(invitationCode: string): Promise<RegistrationInvitation | null> {
     const validInvitation = await this.repo.findOneBy({id: invitationCode});
 
     if (!validInvitation || validInvitation.expiresAt < new Date()) {

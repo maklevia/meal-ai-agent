@@ -12,6 +12,8 @@ import {
   resetPasswordUsingLinkBodySchema,
   bootstrapAdminBodySchema,
   validatePasswordResetCodeParamsSchema,
+  createRegistrationInvitationBodySchema,
+  validateRegistrationInvitationParamsSchema,
 } from "src/modules/auth/validators";
 
 export const authRouter = Router();
@@ -66,4 +68,16 @@ authRouter.patch(
   "/resetPasswordUsingLink",
   validate({ body: resetPasswordUsingLinkBodySchema }),
   authController.resetPasswordUsingLink,
+);
+authRouter.post(
+  "/invitation",
+  authMiddleware,
+  requireAdmin,
+  validate({ body: createRegistrationInvitationBodySchema }),
+  authController.createRegistrationInvitation,
+);
+authRouter.get(
+  "/invitation/:invitationCode/validate",
+  validate({ params: validateRegistrationInvitationParamsSchema }),
+  authController.validateRegistrationInvitation,
 );

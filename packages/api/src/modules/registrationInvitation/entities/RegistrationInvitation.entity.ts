@@ -4,7 +4,7 @@ import { Check, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, 
 
 @Entity("invitations")
 @Check('"expires_at" > "created_at"')
-export class Invitation{
+export class RegistrationInvitation{
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
