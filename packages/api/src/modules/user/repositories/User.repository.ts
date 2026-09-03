@@ -1,4 +1,5 @@
 import { AppDataSource } from "src/db/data-source";
+import { ConflictError } from "src/errors/AppError";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserRole } from "src/modules/user/typedefs";
 
@@ -7,6 +8,12 @@ interface CreateUserOptions {
   email: string;
   passwordHash: string;
   role: UserRole;
+}
+
+interface CreateFirstAdminOptions {
+  name: string;
+  email: string;
+  passwordHash: string;
 }
 
 interface UpdatePasswordOptions {
@@ -62,7 +69,7 @@ export class UserRepository {
   }
 
   async findUserByEmail(email: string): Promise<User | null> {
-    const foundUser = await this.repo.findOneBy({email: email});
+    const foundUser = await this.repo.findOneBy({ email: email });
 
     return foundUser;
   }
@@ -75,5 +82,23 @@ export class UserRepository {
         passwordHash: newPasswordHash,
       },
     );
+  }
+
+  async existsAny(): Promise<boolean> {
+    const result = await this.repo.existsBy({});
+    return result;
+  }
+
+  async createAdmin(options: CreateFirstAdminOptions): Promise<User> {
+    const { name, email, passwordHash } = options;
+
+    const newAdmin = this.repo.create({
+      name,
+      email,
+      passwordHash,
+      role: UserRole.Admin,
+    });
+
+    return this.repo.save(newAdmin);
   }
 }

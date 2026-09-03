@@ -9,7 +9,7 @@ export class InvitationController {
   private readonly validateInvitationUseCase: ValidateInvitationUseCase =
     new ValidateInvitationUseCase();
 
-  createInvitation = async (req: Request<object, any, CreateInvitationBody>, res: Response) => {
+  createInvitation = async (req: Request<unknown, unknown, CreateInvitationBody>, res: Response) => {
     const { email, role } = req.body;
     const invitedByUserId = req.userId;
 

@@ -15,10 +15,12 @@ import {
   RegisterBody,
   CreatePasswordResetLinkBody,
   ResetPasswordUsingLinkBody,
+  BootstrapAdminBody,
 } from "src/modules/auth/validators";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase";
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
+import { BootstrapAdminUseCase } from "src/modules/invitation/useCases/BootstrapAdmin.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -30,9 +32,12 @@ export class AuthController {
     new ChangePasswordUseCase();
   private readonly createPasswordResetLinkUseCase: CreatePasswordResetLinkUseCase =
     new CreatePasswordResetLinkUseCase();
-  private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase = new ResetPasswordUsingLinkUseCase();
+  private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase =
+    new ResetPasswordUsingLinkUseCase();
+  private readonly bootstrapAdminUseCase: BootstrapAdminUseCase =
+    new BootstrapAdminUseCase();
 
-  login = async (req: Request<object, any, LoginBody>, res: Response) => {
+  login = async (req: Request<unknown, unknown, LoginBody>, res: Response) => {
     const { email, password } = req.body;
 
     const { user, accessToken, refreshToken } = await this.loginUseCase.execute(
@@ -49,7 +54,7 @@ export class AuthController {
     res.status(200).json(user);
   };
 
-  register = async (req: Request<object, any, RegisterBody>, res: Response) => {
+  register = async (req: Request<unknown, unknown, RegisterBody>, res: Response) => {
     const { invitationCode, password, name } = req.body;
 
     const { user, accessToken, refreshToken } =
@@ -87,7 +92,7 @@ export class AuthController {
   };
 
   changePassword = async (
-    req: Request<object, any, ChangePasswordBody>,
+    req: Request<unknown, unknown, ChangePasswordBody>,
     res: Response,
   ) => {
     const { newPassword, oldPassword } = req.body;
@@ -104,22 +109,48 @@ export class AuthController {
     res.status(204).send();
   };
 
-  createPasswordResetLink = async (req: Request<object, any, CreatePasswordResetLinkBody>, res: Response) => {
+  createPasswordResetLink = async (
+    req: Request<unknown, unknown, CreatePasswordResetLinkBody>,
+    res: Response,
+  ) => {
     const { email } = req.body;
 
-    const { passwordResetLink } = await this.createPasswordResetLinkUseCase.execute({ email });
+    const { passwordResetLink } =
+      await this.createPasswordResetLinkUseCase.execute({ email });
 
     res.status(200).json({ passwordResetLink });
   };
 
-  resetPasswordUsingLink = async (req: Request<object, any, ResetPasswordUsingLinkBody>, res: Response) => {
-    const {newPassword, resetCode} = req.body;
+  resetPasswordUsingLink = async (
+    req: Request<unknown, unknown, ResetPasswordUsingLinkBody>,
+    res: Response,
+  ) => {
+    const { newPassword, resetCode } = req.body;
 
-    const {accessToken, refreshToken} = await this.resetPasswordUsingLinkUseCase.execute({newPassword, resetCode});
-  
+    const { accessToken, refreshToken } =
+      await this.resetPasswordUsingLinkUseCase.execute({
+        newPassword,
+        resetCode,
+      });
+
+    res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
+    res.cookie(
+      COOKIE_NAMES.REFRESH_TOKEN,
+      refreshToken,
+      REFRESH_COOKIE_OPTIONS,
+    );
+
+    res.status(200).send();
+  };
+
+  bootstrapAdmin = async (req: Request<unknown, unknown, BootstrapAdminBody>, res: Response) => {
+    const { email, password, name } = req.body;
+
+    const {accessToken, refreshToken, user} = await this.bootstrapAdminUseCase.execute({email, password, name});
+
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
     res.cookie(COOKIE_NAMES.REFRESH_TOKEN, refreshToken, REFRESH_COOKIE_OPTIONS);
 
-    res.status(200).send();
-  }
+    res.status(201).json(user);
+  };
 }
