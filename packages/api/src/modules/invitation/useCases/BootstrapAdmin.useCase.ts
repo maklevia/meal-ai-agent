@@ -1,4 +1,5 @@
 import { UseCase } from "src/core/UseCase.base";
+import { ConflictError } from "src/errors/AppError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { UserRepository } from "src/modules/user/repositories/User.repository";
 import { toUserDto, UserDto } from "src/modules/user/typedefs";
@@ -27,7 +28,12 @@ export class BootstrapAdminUseCase extends UseCase<
 
     const passwordHash = await this.authService.hashPassword(password);
 
-    const user = await this.userRepository.createFirstAdmin({
+    const existsAnyUser = await this.userRepository.existsAny();
+    if (existsAnyUser) {
+      throw new ConflictError("System already initialized");
+    }
+
+    const user = await this.userRepository.createAdmin({
       name,
       email,
       passwordHash,

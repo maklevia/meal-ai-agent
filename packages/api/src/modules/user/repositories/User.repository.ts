@@ -89,31 +89,16 @@ export class UserRepository {
     return result;
   }
 
-  async createFirstAdmin(options: CreateFirstAdminOptions): Promise<User> {
+  async createAdmin(options: CreateFirstAdminOptions): Promise<User> {
     const { name, email, passwordHash } = options;
 
-    return AppDataSource.transaction(async (manager) => {
-      await manager.query("SELECT pg_advisory_xact_lock(1)");
-
-      const transactionalRepo = manager.getRepository(User);
-
-      const hasAnyUser = await transactionalRepo.existsBy({});
-      if (hasAnyUser) {
-        throw new ConflictError("System already initialized");
-      }
-
-      if (await transactionalRepo.existsBy({ email })) {
-        throw new ConflictError("Email is already taken");
-      }
-
-      const newUser = transactionalRepo.create({
-        name,
-        email,
-        passwordHash,
-        role: UserRole.Admin,
-      });
-
-      return transactionalRepo.save(newUser);
+    const newAdmin = this.repo.create({
+      name,
+      email,
+      passwordHash,
+      role: UserRole.Admin,
     });
+
+    return this.repo.save(newAdmin);
   }
 }

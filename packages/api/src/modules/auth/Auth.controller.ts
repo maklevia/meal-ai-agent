@@ -37,7 +37,7 @@ export class AuthController {
   private readonly bootstrapAdminUseCase: BootstrapAdminUseCase =
     new BootstrapAdminUseCase();
 
-  login = async (req: Request<object, any, LoginBody>, res: Response) => {
+  login = async (req: Request<unknown, unknown, LoginBody>, res: Response) => {
     const { email, password } = req.body;
 
     const { user, accessToken, refreshToken } = await this.loginUseCase.execute(
@@ -54,7 +54,7 @@ export class AuthController {
     res.status(200).json(user);
   };
 
-  register = async (req: Request<object, any, RegisterBody>, res: Response) => {
+  register = async (req: Request<unknown, unknown, RegisterBody>, res: Response) => {
     const { invitationCode, password, name } = req.body;
 
     const { user, accessToken, refreshToken } =
@@ -92,7 +92,7 @@ export class AuthController {
   };
 
   changePassword = async (
-    req: Request<object, any, ChangePasswordBody>,
+    req: Request<unknown, unknown, ChangePasswordBody>,
     res: Response,
   ) => {
     const { newPassword, oldPassword } = req.body;
@@ -110,7 +110,7 @@ export class AuthController {
   };
 
   createPasswordResetLink = async (
-    req: Request<object, any, CreatePasswordResetLinkBody>,
+    req: Request<unknown, unknown, CreatePasswordResetLinkBody>,
     res: Response,
   ) => {
     const { email } = req.body;
@@ -122,7 +122,7 @@ export class AuthController {
   };
 
   resetPasswordUsingLink = async (
-    req: Request<object, any, ResetPasswordUsingLinkBody>,
+    req: Request<unknown, unknown, ResetPasswordUsingLinkBody>,
     res: Response,
   ) => {
     const { newPassword, resetCode } = req.body;
@@ -143,7 +143,7 @@ export class AuthController {
     res.status(200).send();
   };
 
-  bootstrapAdmin = async (req: Request<object, any, BootstrapAdminBody>, res: Response) => {
+  bootstrapAdmin = async (req: Request<unknown, unknown, BootstrapAdminBody>, res: Response) => {
     const { email, password, name } = req.body;
 
     const {accessToken, refreshToken, user} = await this.bootstrapAdminUseCase.execute({email, password, name});
