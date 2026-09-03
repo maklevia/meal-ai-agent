@@ -1,14 +1,14 @@
 import { compare, genSalt, hash } from "bcrypt-ts";
-import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
-import { AuthenticationError } from "src/errors/AppError";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants";
-import { env } from "src/config/env";
 import { UserRole } from "src/modules/user/typedefs";
 import { AppJwtPayload } from "src/modules/auth/typedefs";
 import { createHash } from "crypto";
 import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
+import { Service } from "src/core/Service.base";
 
 type ComparePasswordsOptions = {
   passwordHash: string;
@@ -20,7 +20,12 @@ type UserPayloadInfo = {
   userRole: UserRole,
 }
 
-export class AuthService {
+type HandleTokenCreationsOptions = {
+  accessToken: string,
+  refreshToken: string
+}
+
+export class AuthService extends Service {
   private readonly refreshTokenRepository: RefreshTokenRepository =
     new RefreshTokenRepository();
   private readonly passwordResetCodeRepository: PasswordResetCodeRepository =
@@ -50,7 +55,7 @@ export class AuthService {
   generateAccessToken(payload: UserPayloadInfo): string {
     return this.signToken(
       { userId: payload.userId, userRole: payload.userRole },
-      env.ACCESS_SECRET,
+      this.env.ACCESS_SECRET,
       AUTH_CONSTANTS.ACCESS_TOKEN_EXPIRES_IN,
     );
   }
@@ -58,7 +63,7 @@ export class AuthService {
   generateRefreshToken(payload: UserPayloadInfo): string {
     return this.signToken(
       { userId: payload.userId, userRole: payload.userRole },
-      env.REFRESH_SECRET,
+      this.env.REFRESH_SECRET,
       AUTH_CONSTANTS.REFRESH_TOKEN_EXPIRES_IN,
     );
   }
@@ -89,18 +94,18 @@ export class AuthService {
   }
 
   validateAccessToken(accessToken: string): AppJwtPayload {
-    const result = this.validateToken(accessToken, env.ACCESS_SECRET);
+    const result = this.validateToken(accessToken, this.env.ACCESS_SECRET);
     return result;
   }
 
   validateRefreshToken(refreshToken: string): AppJwtPayload {
-    const result = this.validateToken(refreshToken, env.REFRESH_SECRET);
+    const result = this.validateToken(refreshToken, this.env.REFRESH_SECRET);
     return result;
   }
 
   async handleTokenCreations(
     payload: UserPayloadInfo,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
+  ): Promise<HandleTokenCreationsOptions> {
     const accessToken = this.generateAccessToken(payload);
     const refreshToken = this.generateRefreshToken(payload);
 

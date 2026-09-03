@@ -78,7 +78,10 @@ export class AuthController {
     const token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
     res.clearCookie(COOKIE_NAMES.REFRESH_TOKEN, REFRESH_COOKIE_OPTIONS);
 
-    await this.logoutUseCase.execute({ token });
+    await this.logoutUseCase.execute({
+      userId: req.userId,
+      refreshToken: token,
+    });
 
     res.status(204).send();
   };

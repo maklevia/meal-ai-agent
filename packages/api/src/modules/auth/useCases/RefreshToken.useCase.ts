@@ -1,5 +1,5 @@
 import { UseCase } from "src/core/UseCase.base";
-import { AuthenticationError } from "src/errors/AppError";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 

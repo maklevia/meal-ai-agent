@@ -10,16 +10,12 @@ import { healthRouter } from "src/routes/Health.routes";
 export function createApp() {
   const app = express();
 
-  // One trusted proxy hop (nginx in prod, Vite in dev). Required by
-  // express-rate-limit so client IPs come from X-Forwarded-For. Must be a
-  // specific hop count (not `true`) or anyone could spoof the header and
-  // bypass rate limiting.
   app.set("trust proxy", 1);
 
   app.use(express.json());
 
   app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", env.CORS_ORIGIN);
+    res.setHeader("Access-Control-Allow-Origin", env.CLIENT_ORIGIN);
     res.setHeader(
       "Access-Control-Allow-Methods",
       "GET,POST,PUT,PATCH,DELETE,OPTIONS",
@@ -37,11 +33,8 @@ export function createApp() {
   app.use(cookieParser());
 
   app.use("/health", healthRouter);
-
-  // Stricter limiter on auth endpoints (brute-force protection).
   app.use("/auth", authLimiter, authRouter);
-
-  // Everything else gets the coarse global limit.
+  
   app.use(globalLimiter);
   app.use("/invitation", invitationRouter);
 

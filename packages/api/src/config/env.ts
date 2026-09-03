@@ -4,39 +4,30 @@ import { z } from "zod";
 dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
 dotenv.config();
 
-const envSchema = z.object({
-  PORT: z.coerce.number().default(3000),
-  NODE_ENV: z
-    .enum(["development", "test", "production"])
-    .default("development"),
-  CORS_ORIGIN: z.string().default("http://localhost:5173"),
+const stringBoolean = z.enum(["true", "false"]).transform((v) => v === "true");
 
-  DB_HOST: z.string().default("localhost"),
-  DB_PORT: z.coerce.number().default(5432),
+const envSchema = z.object({
+  API_PORT: z.coerce.number(),
+  NODE_ENV: z
+    .enum(["development", "test", "production"]),
+  CLIENT_ORIGIN: z.string(),
+
+  DB_HOST: z.string(),
+  DB_PORT: z.coerce.number(),
   DB_USERNAME: z.string(),
   DB_PASSWORD: z.string(),
   DB_NAME: z.string(),
 
-  DB_SYNCHRONIZE: z
-    .string()
-    .default("false")
-    .transform((v) => v === "true"),
-  DB_LOGGING: z
-    .string()
-    .default("false")
-    .transform((v) => v === "true"),
+  DB_SYNCHRONIZE: stringBoolean,
+  DB_LOGGING: stringBoolean,
 
-  WEB_ORIGIN: z.string().default("http://localhost:5173"),
 
   ACCESS_SECRET: z.string(),
   REFRESH_SECRET: z.string(),
 
-  RATE_LIMIT_ENABLED: z
-    .string()
-    .default("true")
-    .transform((v) => v === "true"),
-  AUTH_RATE_LIMIT_MAX: z.coerce.number().default(20),
-  GLOBAL_RATE_LIMIT_MAX: z.coerce.number().default(300),
+  RATE_LIMIT_ENABLED: stringBoolean,
+  AUTH_RATE_LIMIT_MAX: z.coerce.number(),
+  GLOBAL_RATE_LIMIT_MAX: z.coerce.number(),
 });
 
 const parsed = envSchema.safeParse(process.env);

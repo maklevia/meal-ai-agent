@@ -1,7 +1,6 @@
 import { UseCase } from "src/core/UseCase.base";
-import { ConflictError } from "src/errors/AppError";
+import { ConflictError } from "src/errors/http/ConflictError";
 import { AuthService } from "src/modules/auth/Auth.service";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
 import { toUserDto, UserDto } from "src/modules/user/typedefs";
 
 type BootstrapAdminOptions = {
@@ -20,7 +19,6 @@ export class BootstrapAdminUseCase extends UseCase<
   BootstrapAdminOptions,
   BootstrapAdminResult
 > {
-  private readonly userRepository: UserRepository = new UserRepository();
   private readonly authService: AuthService = new AuthService();
 
   async execute(options: BootstrapAdminOptions): Promise<BootstrapAdminResult> {

@@ -20,8 +20,8 @@ RUN npm run build --workspace=@meal/api
 FROM node:22-alpine AS runner
 WORKDIR /app
 
-# NODE_ENV is a container env var (set via docker-compose), not baked in
-ENV NODE_ENV=production
+ARG API_PORT
+ARG NODE_ENV
 
 # Copy workspace root package files
 COPY package.json package-lock.json ./
@@ -33,11 +33,11 @@ RUN npm ci --workspace=@meal/api --omit=dev
 # Copy compiled output from builder
 COPY --from=builder /app/packages/api/dist packages/api/dist
 
-# Documentation only — the actual listening port comes from the PORT env var
-EXPOSE 3000
+# Documentation only — the actual listening port comes from the API_PORT env var
+EXPOSE ${API_PORT}
 
-# Container-internal healthcheck; PORT is expanded at runtime by the shell
+# Container-internal healthcheck; API_PORT is expanded at runtime by the shell
 HEALTHCHECK --interval=10s --timeout=3s --start-period=15s --retries=5 \
-  CMD wget -qO- "http://127.0.0.1:${PORT:-3000}/health" || exit 1
+  CMD wget -qO- "http://127.0.0.1:${API_PORT}/health" || exit 1
 
 CMD ["node", "packages/api/dist/index.js"]

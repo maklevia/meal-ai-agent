@@ -1,8 +1,7 @@
-import { UseCase } from "src/core/UseCase.base";
-import { AuthenticationError } from "src/errors/AppError";
+import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type ChangePasswordOptions = {
   userId: number;
@@ -13,15 +12,14 @@ type ChangePasswordOptions = {
 
 type ChangePasswordResult = void;
 
-export class ChangePasswordUseCase extends UseCase<
+export class ChangePasswordUseCase extends AuthUseCase<
   ChangePasswordOptions,
   ChangePasswordResult
 > {
-  private readonly userRepository: UserRepository = new UserRepository();
   private readonly authService: AuthService = new AuthService();
   private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
-  async execute(options: ChangePasswordOptions): Promise<ChangePasswordResult> {
+  async executeAuth(options: ChangePasswordOptions): Promise<ChangePasswordResult> {
     const { oldPassword, newPassword, userId, currentRefreshToken } = options;
 
     const existingUser =

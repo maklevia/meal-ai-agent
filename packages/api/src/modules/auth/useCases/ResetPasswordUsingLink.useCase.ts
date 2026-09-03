@@ -21,7 +21,6 @@ export class ResetPasswordUsingLinkUseCase extends UseCase<
   private readonly passwordResetCodeRepository: PasswordResetCodeRepository =
     new PasswordResetCodeRepository();
   private readonly authService: AuthService = new AuthService();
-  private readonly userRepository: UserRepository = new UserRepository();
   private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async execute(options: ResetPasswordOptions): Promise<ResetPasswordResult> {
@@ -35,7 +34,7 @@ export class ResetPasswordUsingLinkUseCase extends UseCase<
 
     await this.userRepository.updatePassword({newPasswordHash, userId });
 
-    await this.refreshTokenRepository.deleteAllUserTokens(userId);
+    await this.refreshTokenRepository.deleteTokensIfExist(userId);
     await this.passwordResetCodeRepository.deleteAllUserResetCodes(userId);
 
     const {accessToken, refreshToken} = await this.authService.handleTokenCreations({userId, userRole});

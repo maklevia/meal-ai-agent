@@ -1,6 +1,6 @@
-import { createApp } from 'src/app.js';
-import { env } from 'src/config/env.js';
-import { AppDataSource } from 'src/db/data-source.js';
+import { createApp } from 'src/app';
+import { env } from 'src/config/env';
+import { AppDataSource } from 'src/db/data-source';
 
 async function bootstrap() {
   await AppDataSource.initialize();
@@ -8,8 +8,8 @@ async function bootstrap() {
 
   const app = createApp();
 
-  app.listen(env.PORT, () => {
-    console.log(`API running on http://localhost:${env.PORT} (${env.NODE_ENV})`);
+  app.listen(env.API_PORT, () => {
+    console.log(`API running on http://localhost:${env.API_PORT} (${env.NODE_ENV})`);
   });
 }
 

@@ -1,70 +1,74 @@
 services:
   db:
-    image: postgres:16-alpine
-    restart: unless-stopped
+    image: ${POSTGRES_IMAGE}
+    restart: ${RESTART_POLICY}
     environment:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
       PGDATABASE: ${DB_NAME}
     ports:
-      - "${DB_PORT:-5432}:5432"
+      - "${DB_PORT}:${DB_PORT}"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: ${DB_HEALTH_INTERVAL}
+      timeout: ${DB_HEALTH_TIMEOUT}
+      retries: ${DB_HEALTH_RETRIES}
 
   api:
     build:
       context: .
       dockerfile: packages/api/Dockerfile
-    restart: unless-stopped
+      args:
+        API_PORT: ${API_PORT}
+        NODE_ENV: ${NODE_ENV}
+    restart: ${RESTART_POLICY}
     ports:
-      - "127.0.0.1:${PORT:-3000}:${PORT:-3000}"
+      - "${API_BIND_HOST}:${API_PORT}:${API_PORT}"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      PORT: ${PORT:-3000}
-      NODE_ENV: ${NODE_ENV:-production}
-      # defaults to the web host port so CORS stays in sync with WEB_PORT
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:${WEB_PORT:-5173}}
-      DB_HOST: db
-      DB_PORT: 5432
+      API_PORT: ${API_PORT}
+      NODE_ENV: ${NODE_ENV}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      # never enable synchronize in production — use migrations
-      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE:-false}
-      DB_LOGGING: ${DB_LOGGING:-false}
+      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE}
+      DB_LOGGING: ${DB_LOGGING}
       ACCESS_SECRET: ${ACCESS_SECRET}
       REFRESH_SECRET: ${REFRESH_SECRET}
-
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED}
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX}
+      GLOBAL_RATE_LIMIT_MAX: ${GLOBAL_RATE_LIMIT_MAX}
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${PORT:-3000}/health || exit 1"]
-      interval: 10s
-      timeout: 3s
-      start_period: 15s
-      retries: 5
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${API_PORT}/health || exit 1"]
+      interval: ${API_HEALTH_INTERVAL}
+      timeout: ${API_HEALTH_TIMEOUT}
+      start_period: ${API_HEALTH_START_PERIOD}
+      retries: ${API_HEALTH_RETRIES}
 
   web:
     build:
       context: .
       dockerfile: packages/web/Dockerfile
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/api}
-    restart: unless-stopped
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        WEB_CONTAINER_PORT: ${WEB_CONTAINER_PORT}
+    restart: ${RESTART_POLICY}
     ports:
-      - "${WEB_PORT:-5173}:80"
+      - "${WEB_PORT}:${WEB_CONTAINER_PORT}"
     depends_on:
       api:
         condition: service_healthy
     environment:
-      API_HOST: api
-      API_PORT: ${PORT:-3000}
+      API_HOST: ${API_HOST}
+      API_PORT: ${API_PORT}
 
 volumes:
   pgdata:

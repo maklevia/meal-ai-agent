@@ -1,11 +1,9 @@
 import { randomUUID } from "crypto";
-import { env } from "src/config/env";
 import { UseCase } from "src/core/UseCase.base";
-import { NotFoundError } from "src/errors/AppError";
+import { NotFoundError } from "src/errors/http/NotFoundError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { RESET_CODE_EXPIRES_IN_HOURS } from "src/modules/auth/constants";
 import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type CreatePasswordResetLinkOptions = {
   email: string;
@@ -21,7 +19,6 @@ export class CreatePasswordResetLinkUseCase extends UseCase<
 > {
     private readonly authService: AuthService = new AuthService();
     private readonly passwordResetLinkRepository: PasswordResetCodeRepository = new PasswordResetCodeRepository();
-    private readonly userRepository: UserRepository = new UserRepository();
 
     async execute(options: CreatePasswordResetLinkOptions): Promise<CreatePasswordResetLinkResult> {
         const { email } = options;
@@ -40,7 +37,7 @@ export class CreatePasswordResetLinkUseCase extends UseCase<
         await this.passwordResetLinkRepository.deleteAllUserResetCodes(user.id);
         await this.passwordResetLinkRepository.createPasswordResetCode({codeHash: hashedResetCode, expiresAt, userId: user.id});
 
-        const resetLink = `${env.WEB_ORIGIN}/resetPassword?token=${rawResetCode}`;
+        const resetLink = `${this.env.CLIENT_ORIGIN}/resetPassword?token=${rawResetCode}`;
         return {passwordResetLink: resetLink};
     }
 }

@@ -1,7 +1,6 @@
 import { UseCase } from "src/core/UseCase.base";
-import { ValidationError } from "src/errors/AppError";
+import { ValidationError } from "src/errors/http/ValidationError";
 import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
 import { UserRole } from "src/modules/user/typedefs";
 
 type ValidateInvitationOptions = {
@@ -19,7 +18,6 @@ export class ValidateInvitationUseCase extends UseCase<
 > {
   private readonly invitationRepository: InvitationRepository =
     new InvitationRepository();
-  private readonly userRepository: UserRepository = new UserRepository();
 
   async execute(
     options: ValidateInvitationOptions,
