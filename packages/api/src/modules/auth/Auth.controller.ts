@@ -20,7 +20,7 @@ import {
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase";
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
-import { BootstrapAdminUseCase } from "src/modules/invitation/useCases/BootstrapAdmin.useCase";
+import { BootstrapAdminUseCase } from "src/modules/auth/useCases/BootstrapAdmin.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
