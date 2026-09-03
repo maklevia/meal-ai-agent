@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authMiddleware } from "src/middlewares/auth.middleware";
 import { requireAdmin } from "src/middlewares/requireAdmin.middleware";
+import { authMiddleware } from "src/middlewares/auth.middleware";
 import { validate } from "src/middlewares/validate.middleware";
 import { AuthController } from "src/modules/auth/Auth.controller";
 import {
