@@ -1,8 +1,8 @@
-import { env } from "src/config/env.js";
-import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
-import { ConflictError } from "src/errors/http/ConflictError.js";
-import { User } from "src/modules/user/entities/User.entity.js";
-import { UserRepository } from "src/modules/user/repositories/User.repository.js";
+import { env } from "src/config/env";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
+import { ConflictError } from "src/errors/http/ConflictError";
+import { User } from "src/modules/user/entities/User.entity";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 export abstract class UseCase<Options, Result> {
     protected readonly env = env;

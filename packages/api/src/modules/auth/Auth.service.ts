@@ -1,10 +1,13 @@
 import { compare, genSalt, hash } from "bcrypt-ts";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
-import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
-import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants.js";
-import { UserRole } from "src/modules/user/typedefs.js";
-import { AppJwtPayload } from "src/modules/auth/typedefs.js";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
+import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants";
+import { UserRole } from "src/modules/user/typedefs";
+import { AppJwtPayload } from "src/modules/auth/typedefs";
+import { createHash } from "crypto";
+import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
+import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
 import { Service } from "src/core/Service.base";
 
 type ComparePasswordsOptions = {
@@ -25,6 +28,8 @@ type HandleTokenCreationsOptions = {
 export class AuthService extends Service {
   private readonly refreshTokenRepository: RefreshTokenRepository =
     new RefreshTokenRepository();
+  private readonly passwordResetCodeRepository: PasswordResetCodeRepository =
+    new PasswordResetCodeRepository();
 
   async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(SALT_ROUNDS);
@@ -117,5 +122,27 @@ export class AuthService extends Service {
     });
 
     return { accessToken, refreshToken };
+  }
+
+  hashString(str: string): string {
+    const hash = createHash("sha256").update(str).digest("hex");
+
+    return hash;
+  }
+
+  async assertValidResetCode(resetCode: string): Promise<PasswordResetCode> {
+    const codeHash = this.hashString(resetCode);
+
+    const codeRecord =
+      await this.passwordResetCodeRepository.findResetCode(codeHash);
+    if (!codeRecord) {
+      throw new AuthenticationError("Invalid reset code");
+    }
+
+    if (codeRecord.expiresAt < new Date()) {
+      throw new AuthenticationError("Reset code has expired");
+    }
+
+    return codeRecord;
   }
 }

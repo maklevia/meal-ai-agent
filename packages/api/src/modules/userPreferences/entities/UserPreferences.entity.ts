@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { SpecialDiet } from "src/modules/userPreferences/typedefs.js";
-import { User } from "src/modules/user/entities/User.entity.js";
+import { SpecialDiet } from "src/modules/userPreferences/typedefs";
+import { User } from "src/modules/user/entities/User.entity";
 
 @Entity("user_preferences")
 @Check("CHK_age_range", '"age" > 14 AND "age" < 99')

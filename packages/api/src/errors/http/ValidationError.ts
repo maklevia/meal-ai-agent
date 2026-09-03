@@ -1,4 +1,4 @@
-import { AppError } from "../AppError.js";
+import { AppError } from "../AppError";
 
 export type ValidationIssue = { path: string; message: string };
 

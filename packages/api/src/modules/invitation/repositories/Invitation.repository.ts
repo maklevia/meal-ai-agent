@@ -1,7 +1,7 @@
-import { AppDataSource } from "src/db/data-source.js";
-import { Invitation } from "src/modules/invitation/entities/Invitation.entity.js";
-import { UserRole } from "src/modules/user/typedefs.js";
-import { User } from "src/modules/user/entities/User.entity.js";
+import { AppDataSource } from "src/db/data-source";
+import { Invitation } from "src/modules/invitation/entities/Invitation.entity";
+import { UserRole } from "src/modules/user/typedefs";
+import { User } from "src/modules/user/entities/User.entity";
 
 type CreateInvitationOptions = {
   email: string;

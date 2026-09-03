@@ -12,7 +12,7 @@ RUN npm ci --workspace=@meal/api
 # Copy API source code
 COPY packages/api/ packages/api/
 
-# Build TypeScript (tsc + tsc-alias rewrites src/... imports)
+# Type-check with tsc, then bundle with esbuild (handles path aliases + extensionless imports)
 RUN npm run build --workspace=@meal/api
 
 

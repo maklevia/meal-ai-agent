@@ -1,8 +1,8 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { ValidationError } from "src/errors/http/ValidationError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
-import { toUserDto, UserDto } from "src/modules/user/typedefs.js";
+import { UseCase } from "src/core/UseCase.base";
+import { ValidationError } from "src/errors/http/ValidationError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { toUserDto, UserDto } from "src/modules/user/typedefs";
 
 type RegisterOptions = {
   invitationCode: string;

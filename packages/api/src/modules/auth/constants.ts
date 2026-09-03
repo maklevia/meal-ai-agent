@@ -1,8 +1,10 @@
 import { CookieOptions } from "express"
 import type { StringValue } from 'ms';
-import { env } from "src/config/env.js";
+import { env } from "src/config/env";
 
 export const SALT_ROUNDS = 10;
+
+export const RESET_CODE_EXPIRES_IN_HOURS = 2;
 
 export const AUTH_CONSTANTS = {
     ACCESS_TOKEN_EXPIRES_IN: "5m" as StringValue,

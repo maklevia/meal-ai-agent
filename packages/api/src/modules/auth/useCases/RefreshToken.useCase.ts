@@ -1,7 +1,7 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository.js";
+import { UseCase } from "src/core/UseCase.base";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 
 type RefreshOptions = {
   refreshToken: string;

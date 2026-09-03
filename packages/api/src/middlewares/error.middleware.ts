@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "src/errors/AppError.js";
-import { ValidationError } from "src/errors/http/ValidationError.js";
+import { AppError } from "src/errors/AppError";
+import { ValidationError } from "src/errors/http/ValidationError";
 
 export class ErrorMiddleware {
   handle = (

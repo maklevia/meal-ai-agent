@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidationError } from "src/errors/http/ValidationError.js";
+import { ValidationError } from "src/errors/http/ValidationError";
 import { z } from "zod";
 
 interface ValidationSchemas {

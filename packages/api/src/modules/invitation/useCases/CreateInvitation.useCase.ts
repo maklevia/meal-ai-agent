@@ -1,7 +1,7 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository.js";
-import { UserRole } from "src/modules/user/typedefs.js";
-import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants.js";
+import { UseCase } from "src/core/UseCase.base";
+import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { UserRole } from "src/modules/user/typedefs";
+import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants";
 
 type CreateInvitationOptions = {
   email: string;

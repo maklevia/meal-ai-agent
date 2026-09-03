@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { ForbiddenError } from "src/errors/http/ForbiddenError.js";
-import { UserRole } from "src/modules/user/typedefs.js";
+import { ForbiddenError } from "src/errors/http/ForbiddenError";
+import { UserRole } from "src/modules/user/typedefs";
 
 export class RequireAdminMiddleware {
   handle = (req: Request, _res: Response, next: NextFunction): void => {

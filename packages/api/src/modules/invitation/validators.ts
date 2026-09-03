@@ -1,4 +1,4 @@
-import { UserRole } from "src/modules/user/typedefs.js";
+import { UserRole } from "src/modules/user/typedefs";
 import { z } from "zod";
 
 export const createInvitationBodySchema = z.object({

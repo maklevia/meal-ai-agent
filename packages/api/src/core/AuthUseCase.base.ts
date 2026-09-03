@@ -1,6 +1,6 @@
-import { UseCase } from "src/core/UseCase.base.js";
-import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
-import { User } from "src/modules/user/entities/User.entity.js";
+import { UseCase } from "src/core/UseCase.base";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
+import { User } from "src/modules/user/entities/User.entity";
 
 export abstract class AuthUseCase<
   Options extends { userId: number },

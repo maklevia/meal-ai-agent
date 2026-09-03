@@ -1,2 +1,2 @@
-export * from "./AppError.js";
-export * from "./http/index.js";
+export * from "./AppError";
+export * from "./http/index";

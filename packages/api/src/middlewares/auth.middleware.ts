@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthenticationError } from "src/errors/http/AuthenticationError.js";
-import { AuthService } from "src/modules/auth/Auth.service.js";
-import { COOKIE_NAMES } from "src/modules/auth/constants.js";
+import { AuthenticationError } from "src/errors/http/AuthenticationError";
+import { AuthService } from "src/modules/auth/Auth.service";
+import { COOKIE_NAMES } from "src/modules/auth/constants";
 
 export class AuthMiddleware {
   constructor(private readonly authService: AuthService = new AuthService()) {}
