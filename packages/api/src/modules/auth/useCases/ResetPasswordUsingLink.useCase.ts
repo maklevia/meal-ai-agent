@@ -2,7 +2,6 @@ import { UseCase } from "src/core/UseCase.base";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { PasswordResetCodeRepository } from "src/modules/auth/repositories/PasswordResetCode.repository";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
-import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type ResetPasswordOptions = {
   resetCode: string;

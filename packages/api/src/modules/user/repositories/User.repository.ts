@@ -1,5 +1,4 @@
 import { AppDataSource } from "src/db/data-source";
-import { ConflictError } from "src/errors/AppError";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserRole } from "src/modules/user/typedefs";
 
