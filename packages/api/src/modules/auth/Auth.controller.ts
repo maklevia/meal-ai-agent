@@ -16,11 +16,13 @@ import {
   CreatePasswordResetLinkBody,
   ResetPasswordUsingLinkBody,
   BootstrapAdminBody,
+  ValidatePasswordResetCodeParams,
 } from "src/modules/auth/validators";
 import { ChangePasswordUseCase } from "src/modules/auth/useCases/ChangePassword.useCase";
 import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/CreatePasswordResetLink.useCase";
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
 import { BootstrapAdminUseCase } from "src/modules/auth/useCases/BootstrapAdmin.useCase";
+import { ValidatePasswordResetCodeUseCase } from "src/modules/auth/useCases/ValidatePasswordResetCode.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();
@@ -36,6 +38,7 @@ export class AuthController {
     new ResetPasswordUsingLinkUseCase();
   private readonly bootstrapAdminUseCase: BootstrapAdminUseCase =
     new BootstrapAdminUseCase();
+    private readonly validatePasswordResetCodeUseCase: ValidatePasswordResetCodeUseCase = new ValidatePasswordResetCodeUseCase();
 
   login = async (req: Request<unknown, unknown, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -121,17 +124,18 @@ export class AuthController {
     res.status(200).json({ passwordResetLink });
   };
 
-  resetPasswordUsingLink = async (
-    req: Request<unknown, unknown, ResetPasswordUsingLinkBody>,
-    res: Response,
-  ) => {
-    const { newPassword, resetCode } = req.body;
+  validatePasswordResetCode = async (req: Request<ValidatePasswordResetCodeParams>, res: Response) => {
+    const { resetCode } = req.params;
 
-    const { accessToken, refreshToken } =
-      await this.resetPasswordUsingLinkUseCase.execute({
-        newPassword,
-        resetCode,
-      });
+    await this.validatePasswordResetCodeUseCase.execute({resetCode});
+
+    res.status(204).send();
+  }
+
+  resetPasswordUsingLink = async (req: Request<object, any, ResetPasswordUsingLinkBody>, res: Response) => {
+    const {newPassword, resetCode} = req.body;
+
+    const {accessToken, refreshToken} = await this.resetPasswordUsingLinkUseCase.execute({newPassword, resetCode});
 
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
     res.cookie(
