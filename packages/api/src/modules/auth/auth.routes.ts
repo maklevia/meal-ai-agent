@@ -14,6 +14,7 @@ authRouter.post("/bootstrap", validate({body: bootstrapAdminBodySchema}), authCo
 authRouter.post("/login", validate({body: loginBodySchema}), authController.login);
 authRouter.post("/logout", authMiddleware, validate({cookies: tokenCookiesSchema}), authController.logout);
 authRouter.post("/refresh", validate({cookies: tokenCookiesSchema}), authController.refresh);
-authRouter.patch("/change-password", authMiddleware, validate({body: changePasswordBodySchema}), authController.changePassword);
-authRouter.post("/create-reset-link", validate({body: createPasswordResetLinkBodySchema}), authMiddleware, requireAdmin, authController.createPasswordResetLink);
-authRouter.patch("/reset-password-using-link", validate({body: resetPasswordUsingLinkBodySchema}), authController.resetPasswordUsingLink)
+authRouter.patch("/changePassword", authMiddleware, validate({body: changePasswordBodySchema}), authController.changePassword);
+authRouter.post("/createResetLink", validate({body: createPasswordResetLinkBodySchema}), authMiddleware, requireAdmin, authController.createPasswordResetLink);
+authRouter.get("/reset-code/:resetCode/validate", validate({params: validatePasswordResetCodeParamsSchema}), authController.validatePasswordResetCode)
+authRouter.patch("/resetPasswordUsingLink", validate({body: resetPasswordUsingLinkBodySchema}), authController.resetPasswordUsingLink)

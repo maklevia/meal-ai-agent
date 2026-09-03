@@ -41,6 +41,12 @@ export type CreatePasswordResetLinkBody = z.infer<
   typeof createPasswordResetLinkBodySchema
 >;
 
+export const validatePasswordResetCodeParamsSchema = z.object({
+  resetCode: z.string().uuid(),
+})
+
+export type ValidatePasswordResetCodeParams = z.infer<typeof validatePasswordResetCodeParamsSchema>;
+
 export const resetPasswordUsingLinkBodySchema = z.object({
   newPassword: z.string().min(8),
   resetCode: z.string().uuid(),

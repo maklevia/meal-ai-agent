@@ -36,6 +36,8 @@ export class AuthController {
     new ResetPasswordUsingLinkUseCase();
   private readonly bootstrapAdminUseCase: BootstrapAdminUseCase =
     new BootstrapAdminUseCase();
+    private readonly validatePasswordResetCodeUseCase: ValidatePasswordResetCodeUseCase = new ValidatePasswordResetCodeUseCase();
+  private readonly resetPasswordUsingLinkUseCase: ResetPasswordUsingLinkUseCase = new ResetPasswordUsingLinkUseCase();
 
   login = async (req: Request<unknown, unknown, LoginBody>, res: Response) => {
     const { email, password } = req.body;
@@ -121,17 +123,16 @@ export class AuthController {
     res.status(200).json({ passwordResetLink });
   };
 
-  resetPasswordUsingLink = async (
-    req: Request<unknown, unknown, ResetPasswordUsingLinkBody>,
-    res: Response,
-  ) => {
-    const { newPassword, resetCode } = req.body;
+  validatePasswordResetCode = async (req: Request<ValidatePasswordResetCodeParams>, res: Response) => {
+    const { resetCode } = req.params;
 
-    const { accessToken, refreshToken } =
-      await this.resetPasswordUsingLinkUseCase.execute({
-        newPassword,
-        resetCode,
-      });
+    await this.validatePasswordResetCodeUseCase.execute({resetCode});
+
+    res.status(204).send();
+  }
+
+  resetPasswordUsingLink = async (req: Request<object, any, ResetPasswordUsingLinkBody>, res: Response) => {
+    const {newPassword, resetCode} = req.body;
 
     res.cookie(COOKIE_NAMES.ACCESS_TOKEN, accessToken, ACCESS_COOKIE_OPTIONS);
     res.cookie(

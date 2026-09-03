@@ -28,20 +28,10 @@ export class ResetPasswordUsingLinkUseCase extends UseCase<
   async execute(options: ResetPasswordOptions): Promise<ResetPasswordResult> {
     const { resetCode, newPassword } = options;
 
-    const codeHash = this.authService.hashString(resetCode);
+    const codeRecord = await this.authService.assertValidResetCode(resetCode);
 
-    const codeRecord =
-      await this.passwordResetCodeRepository.findResetCode(codeHash);
-    if (!codeRecord) {
-      throw new AuthenticationError("Invalid reset code");
-    }
-
-    if (codeRecord.expiresAt < new Date()) {
-      throw new AuthenticationError("Reset code has expired")
-    }
-
-    const userId = codeRecord.user.id
-    const userRole = codeRecord.user.role; 
+    const userId = codeRecord.user.id;
+    const userRole = codeRecord.user.role;
     const newPasswordHash = await this.authService.hashPassword(newPassword);
 
     await this.userRepository.updatePassword({newPasswordHash, userId });

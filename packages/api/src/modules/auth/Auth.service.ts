@@ -21,6 +21,8 @@ type UserPayloadInfo = {
 export class AuthService {
   private readonly refreshTokenRepository: RefreshTokenRepository =
     new RefreshTokenRepository();
+  private readonly passwordResetCodeRepository: PasswordResetCodeRepository =
+    new PasswordResetCodeRepository();
 
   async hashPassword(password: string): Promise<string> {
     const salt = await genSalt(SALT_ROUNDS);
@@ -119,5 +121,21 @@ export class AuthService {
     const hash = createHash("sha256").update(str).digest("hex");
 
     return hash;
+  }
+
+  async assertValidResetCode(resetCode: string): Promise<PasswordResetCode> {
+    const codeHash = this.hashString(resetCode);
+
+    const codeRecord =
+      await this.passwordResetCodeRepository.findResetCode(codeHash);
+    if (!codeRecord) {
+      throw new AuthenticationError("Invalid reset code");
+    }
+
+    if (codeRecord.expiresAt < new Date()) {
+      throw new AuthenticationError("Reset code has expired");
+    }
+
+    return codeRecord;
   }
 }
