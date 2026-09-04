@@ -6,6 +6,8 @@ export const SALT_ROUNDS = 10;
 
 export const RESET_CODE_EXPIRES_IN_HOURS = 2;
 
+export const INVITATION_VALID_HOURS = 24;
+
 export const AUTH_CONSTANTS = {
     ACCESS_TOKEN_EXPIRES_IN: "5m" as StringValue,
     REFRESH_TOKEN_EXPIRES_IN: "7d" as StringValue,

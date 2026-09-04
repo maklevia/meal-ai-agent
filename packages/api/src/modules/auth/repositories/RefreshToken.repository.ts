@@ -1,7 +1,7 @@
-import { AppDataSource } from "src/db/data-source";
+import { BaseRepository } from "src/db/BaseRepository";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 import { User } from "src/modules/user/entities/User.entity";
-import { Not } from "typeorm";
+import { EntityManager, Not } from "typeorm";
 
 type StoreTokenOptions = {
   userId: number;
@@ -14,8 +14,14 @@ type DeleteAllTokensExceptOptions = {
   tokenToKeep: string;
 };
 
-export class RefreshTokenRepository {
-  private readonly repo = AppDataSource.getRepository(RefreshToken);
+export class RefreshTokenRepository extends BaseRepository<RefreshToken> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
+
+  protected get entity() {
+    return RefreshToken;
+  }
 
   async storeToken(options: StoreTokenOptions): Promise<void> {
     const { userId, refreshToken, expiresAt } = options;

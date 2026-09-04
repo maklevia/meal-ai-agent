@@ -1,26 +1,26 @@
 import { UseCase } from "src/core/UseCase.base";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { RegistrationInvitationRepository } from "src/modules/auth/repositories/RegistrationInvitation.repository";
 import { UserRole } from "src/modules/user/typedefs";
-import { INVITATION_VALID_HOURS } from "src/modules/invitation/constants";
+import { INVITATION_VALID_HOURS } from "src/modules/auth/constants";
 
-type CreateInvitationOptions = {
+type CreateRegistrationInvitationOptions = {
   email: string;
   role: UserRole;
   invitedByUserId: number;
 };
 
-type CreateInvitationResult = {
+type CreateRegistrationInvitationResult = {
   invitationLink: string;
 };
-export class CreateInvitationUseCase extends UseCase<
-  CreateInvitationOptions,
-  CreateInvitationResult
+export class CreateRegistrationInvitationUseCase extends UseCase<
+  CreateRegistrationInvitationOptions,
+  CreateRegistrationInvitationResult
 > {
-  private readonly invitationRepository: InvitationRepository = new InvitationRepository();
+  private readonly registrationInvitationRepository: RegistrationInvitationRepository = new RegistrationInvitationRepository();
 
   async execute(
-    options: CreateInvitationOptions,
-  ): Promise<CreateInvitationResult> {
+    options: CreateRegistrationInvitationOptions,
+  ): Promise<CreateRegistrationInvitationResult> {
     const { email, role, invitedByUserId } = options;
 
     await this.ensureEmailAvailable(email);
@@ -29,7 +29,7 @@ export class CreateInvitationUseCase extends UseCase<
     invitationExpiresAt.setHours(invitationExpiresAt.getHours() + INVITATION_VALID_HOURS);
 
     const invitationCode: string =
-      await this.invitationRepository.createInvitation({
+      await this.registrationInvitationRepository.createInvitation({
         email,
         role,
         expiresAt: invitationExpiresAt,

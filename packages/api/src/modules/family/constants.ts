@@ -1,0 +1,1 @@
+export const INVITATION_EXPIRES_IN_HOURS = 3;

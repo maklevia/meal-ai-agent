@@ -1,18 +1,22 @@
-import { AppDataSource } from "src/db/data-source";
+import { BaseRepository } from "src/db/BaseRepository";
+import { Family } from "src/modules/family/entities/Family.entity";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserRole } from "src/modules/user/typedefs";
+import { EntityManager } from "typeorm";
 
 interface CreateUserOptions {
   name: string;
   email: string;
   passwordHash: string;
   role: UserRole;
+  familyId: number;
 }
 
 interface CreateFirstAdminOptions {
   name: string;
   email: string;
   passwordHash: string;
+  familyId: number
 }
 
 interface UpdatePasswordOptions {
@@ -20,17 +24,24 @@ interface UpdatePasswordOptions {
   newPasswordHash: string;
 }
 
-export class UserRepository {
-  private readonly repo = AppDataSource.getRepository(User);
+export class UserRepository extends BaseRepository<User> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
+
+  protected get entity() {
+    return User;
+  }
 
   async createUser(options: CreateUserOptions): Promise<User> {
-    const { name, email, passwordHash, role } = options;
+    const { name, email, passwordHash, role, familyId } = options;
 
     const newUser = new User();
     newUser.name = name;
     newUser.email = email;
     newUser.passwordHash = passwordHash;
     newUser.role = role;
+    newUser.family = {id: familyId} as Family;
 
     const savedUser = await this.repo.save(newUser);
     return savedUser;
@@ -89,13 +100,14 @@ export class UserRepository {
   }
 
   async createAdmin(options: CreateFirstAdminOptions): Promise<User> {
-    const { name, email, passwordHash } = options;
+    const { name, email, passwordHash, familyId } = options;
 
     const newAdmin = this.repo.create({
       name,
       email,
       passwordHash,
       role: UserRole.Admin,
+      family: {id: familyId}
     });
 
     return this.repo.save(newAdmin);

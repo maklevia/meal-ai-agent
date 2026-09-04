@@ -1,6 +1,7 @@
-import { AppDataSource } from "src/db/data-source";
+import { BaseRepository } from "src/db/BaseRepository";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
 import { User } from "src/modules/user/entities/User.entity";
+import { EntityManager } from "typeorm";
 
 interface CreatePasswordResetCodeOptions {
     userId: number,
@@ -8,8 +9,14 @@ interface CreatePasswordResetCodeOptions {
     codeHash: string,
 }
 
-export class PasswordResetCodeRepository {
-    private readonly repo = AppDataSource.getRepository(PasswordResetCode);
+export class PasswordResetCodeRepository extends BaseRepository<PasswordResetCode> {
+    constructor(manager?: EntityManager) {
+        super(manager);
+    }
+
+    protected get entity() {
+        return PasswordResetCode;
+    }
 
     async createPasswordResetCode(options: CreatePasswordResetCodeOptions): Promise<PasswordResetCode> {
         const { userId, expiresAt, codeHash } = options;

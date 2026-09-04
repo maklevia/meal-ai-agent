@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { UserRole } from "src/modules/user/typedefs";
 
 export const loginBodySchema = z.object({
   email: z.string().email(),
@@ -63,3 +64,16 @@ export const bootstrapAdminBodySchema = z.object({
 });
 
 export type BootstrapAdminBody = z.infer<typeof bootstrapAdminBodySchema>;
+
+export const createRegistrationInvitationBodySchema = z.object({
+  email: z.string().email(),
+  role: z.nativeEnum(UserRole),
+});
+
+export type CreateRegistrationInvitationBody = z.infer<typeof createRegistrationInvitationBodySchema>;
+
+export const validateRegistrationInvitationParamsSchema = z.object({
+  invitationCode: z.string().uuid(),
+});
+
+export type ValidateRegistrationInvitationParams = z.infer<typeof validateRegistrationInvitationParamsSchema>;

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { authMiddleware } from "src/middlewares/auth.middleware";
 import { requireAdmin } from "src/middlewares/requireAdmin.middleware";
+import { authMiddleware } from "src/middlewares/auth.middleware";
 import { validate } from "src/middlewares/validate.middleware";
 import { AuthController } from "src/modules/auth/Auth.controller";
 import {
@@ -12,6 +12,8 @@ import {
   resetPasswordUsingLinkBodySchema,
   bootstrapAdminBodySchema,
   validatePasswordResetCodeParamsSchema,
+  createRegistrationInvitationBodySchema,
+  validateRegistrationInvitationParamsSchema,
 } from "src/modules/auth/validators";
 
 export const authRouter = Router();
@@ -66,4 +68,16 @@ authRouter.patch(
   "/resetPasswordUsingLink",
   validate({ body: resetPasswordUsingLinkBodySchema }),
   authController.resetPasswordUsingLink,
+);
+authRouter.post(
+  "/invitation",
+  authMiddleware,
+  requireAdmin,
+  validate({ body: createRegistrationInvitationBodySchema }),
+  authController.createRegistrationInvitation,
+);
+authRouter.get(
+  "/invitation/:invitationCode/validate",
+  validate({ params: validateRegistrationInvitationParamsSchema }),
+  authController.validateRegistrationInvitation,
 );

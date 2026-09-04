@@ -4,8 +4,8 @@ import { env } from "src/config/env";
 import { errorMiddleware } from "src/middlewares/error.middleware";
 import { authLimiter, globalLimiter } from "src/middlewares/rateLimit.middleware";
 import { authRouter } from "src/modules/auth/Auth.routes";
-import { invitationRouter } from "src/modules/invitation/Invitation.routes";
 import { healthRouter } from "src/routes/Health.routes";
+import { familyRouter } from "src/modules/family/Family.routes";
 
 export function createApp() {
   const app = express();
@@ -34,9 +34,9 @@ export function createApp() {
 
   app.use("/health", healthRouter);
   app.use("/auth", authLimiter, authRouter);
-  
+
   app.use(globalLimiter);
-  app.use("/invitation", invitationRouter);
+  app.use("/family", familyRouter);
 
   app.use(errorMiddleware);
 
