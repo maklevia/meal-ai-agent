@@ -1,6 +1,7 @@
-import { AppDataSource } from "src/db/data-source";
+import { BaseRepository } from "src/db/BaseRepository";
 import { Family } from "src/modules/family/entities/Family.entity";
-import { FamilyInvitation } from "src/modules/family/entities/FamilyInvitation.entiry";
+import { FamilyInvitation } from "src/modules/family/entities/FamilyInvitation.entity";
+import { EntityManager } from "typeorm";
 
 type CreateInvitation = {
   email: string;
@@ -8,8 +9,14 @@ type CreateInvitation = {
   expiresAt: Date;
 };
 
-export class FamilyInvitationRepository {
-  private readonly repo = AppDataSource.getRepository(FamilyInvitation);
+export class FamilyInvitationRepository extends BaseRepository<FamilyInvitation> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
+
+  protected get entity() {
+    return FamilyInvitation;
+  }
 
   async createInvitation(options: CreateInvitation): Promise<FamilyInvitation> {
     const { email, familyId, expiresAt } = options;

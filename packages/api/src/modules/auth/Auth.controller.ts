@@ -25,8 +25,8 @@ import { CreatePasswordResetLinkUseCase } from "src/modules/auth/useCases/Create
 import { ResetPasswordUsingLinkUseCase } from "src/modules/auth/useCases/ResetPasswordUsingLink.useCase";
 import { BootstrapAdminUseCase } from "src/modules/auth/useCases/BootstrapAdmin.useCase";
 import { ValidatePasswordResetCodeUseCase } from "src/modules/auth/useCases/ValidatePasswordResetCode.useCase";
-import { CreateRegistrationInvitationUseCase } from "src/modules/registrationInvitation/useCases/CreateRegistrationInvitation.useCase";
-import { ValidateRegistrationInvitationUseCase } from "src/modules/registrationInvitation/useCases/ValidateRegistrationInvitation.useCase";
+import { CreateRegistrationInvitationUseCase } from "src/modules/auth/useCases/CreateRegistrationInvitation.useCase";
+import { ValidateRegistrationInvitationUseCase } from "src/modules/auth/useCases/ValidateRegistrationInvitation.useCase";
 
 export class AuthController {
   private readonly loginUseCase: LoginUserUseCase = new LoginUserUseCase();

@@ -1,7 +1,7 @@
 import { UseCase } from "src/core/UseCase.base";
-import { RegistrationInvitationRepository } from "src/modules/registrationInvitation/repositories/RegistrationInvitation.repository";
+import { RegistrationInvitationRepository } from "src/modules/auth/repositories/RegistrationInvitation.repository";
 import { UserRole } from "src/modules/user/typedefs";
-import { INVITATION_VALID_HOURS } from "src/modules/registrationInvitation/constants";
+import { INVITATION_VALID_HOURS } from "src/modules/auth/constants";
 
 type CreateRegistrationInvitationOptions = {
   email: string;

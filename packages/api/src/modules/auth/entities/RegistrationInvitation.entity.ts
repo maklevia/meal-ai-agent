@@ -2,7 +2,7 @@ import { UserRole } from "src/modules/user/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
 import { Check, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
 
-@Entity("invitations")
+@Entity("registration_invitations")
 @Check('"expires_at" > "created_at"')
 export class RegistrationInvitation{
     @PrimaryGeneratedColumn("uuid")

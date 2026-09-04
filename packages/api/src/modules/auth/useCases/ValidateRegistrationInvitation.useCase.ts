@@ -1,6 +1,6 @@
 import { UseCase } from "src/core/UseCase.base";
 import { ValidationError } from "src/errors/http/ValidationError";
-import { RegistrationInvitationRepository } from "src/modules/registrationInvitation/repositories/RegistrationInvitation.repository";
+import { RegistrationInvitationRepository } from "src/modules/auth/repositories/RegistrationInvitation.repository";
 import { UserRole } from "src/modules/user/typedefs";
 
 type ValidateRegistrationInvitationOptions = {

@@ -1,7 +1,8 @@
-import { AppDataSource } from "src/db/data-source";
-import { RegistrationInvitation } from "src/modules/registrationInvitation/entities/RegistrationInvitation.entity";
+import { BaseRepository } from "src/db/BaseRepository";
+import { RegistrationInvitation } from "src/modules/auth/entities/RegistrationInvitation.entity";
 import { UserRole } from "src/modules/user/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
+import { EntityManager } from "typeorm";
 
 type CreateInvitationOptions = {
   email: string;
@@ -10,8 +11,14 @@ type CreateInvitationOptions = {
   invitedByUserId: number;
 };
 
-export class RegistrationInvitationRepository {
-  private readonly repo = AppDataSource.getRepository(RegistrationInvitation)
+export class RegistrationInvitationRepository extends BaseRepository<RegistrationInvitation> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
+
+  protected get entity() {
+    return RegistrationInvitation;
+  }
 
   async createInvitation(options: CreateInvitationOptions): Promise<string> {
     const { email, role, expiresAt, invitedByUserId } = options;

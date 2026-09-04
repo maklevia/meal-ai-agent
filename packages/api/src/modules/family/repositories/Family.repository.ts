@@ -1,19 +1,29 @@
-import { AppDataSource } from "src/db/data-source";
+import { BaseRepository } from "src/db/BaseRepository";
 import { Family } from "src/modules/family/entities/Family.entity";
+import { EntityManager } from "typeorm";
 
-type CreateFamilyOptions = {
-  userId: number;
-  name: string;
-};
+export class FamilyRepository extends BaseRepository<Family> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
 
-export class FamilyRepository {
-  private readonly repo = AppDataSource.getRepository(Family);
+  protected get entity() {
+    return Family;
+  }
 
+  async createFamily(): Promise<Family> {
+    const newFamily = new Family();
+
+    const createdFamily = await this.repo.save(newFamily);
+    return createdFamily;
+  }
 
   async findFamilyByUser(userId: number): Promise<Family | null> {
-    const family = await this.repo.findOne({where: {
-      users: {id: userId}
-    }})
+    const family = await this.repo.findOne({
+      where: {
+        users: { id: userId },
+      },
+    });
 
     return family;
   }
