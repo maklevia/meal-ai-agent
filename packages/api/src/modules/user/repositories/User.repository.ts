@@ -86,6 +86,10 @@ export class UserRepository extends BaseRepository<User> {
     return foundUser;
   }
 
+  async countFamilyMembers(familyId: number): Promise<number> {
+    return this.repo.countBy({ family: { id: familyId } });
+  }
+
   async findFamilyMemberByEmail(
     email: string,
     familyId: number,

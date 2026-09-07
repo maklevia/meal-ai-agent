@@ -2,8 +2,10 @@ import { LoginUserUseCase } from "src/modules/auth/useCases/LoginUser.useCase";
 import { RegisterUserUseCase } from "src/modules/auth/useCases/RegisterUser.useCase";
 import { Request, Response } from "express";
 import {
+  ACCESS_COOKIE_CLEAR_OPTIONS,
   ACCESS_COOKIE_OPTIONS,
   COOKIE_NAMES,
+  REFRESH_COOKIE_CLEAR_OPTIONS,
   REFRESH_COOKIE_OPTIONS,
 } from "src/modules/auth/constants";
 import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase";
@@ -80,9 +82,9 @@ export class AuthController {
   };
 
   logout = async (req: Request & { cookies: TokenCookies }, res: Response) => {
-    res.clearCookie(COOKIE_NAMES.ACCESS_TOKEN, ACCESS_COOKIE_OPTIONS);
+    res.clearCookie(COOKIE_NAMES.ACCESS_TOKEN, ACCESS_COOKIE_CLEAR_OPTIONS);
     const token = req.cookies[COOKIE_NAMES.REFRESH_TOKEN];
-    res.clearCookie(COOKIE_NAMES.REFRESH_TOKEN, REFRESH_COOKIE_OPTIONS);
+    res.clearCookie(COOKIE_NAMES.REFRESH_TOKEN, REFRESH_COOKIE_CLEAR_OPTIONS);
 
     await this.logoutUseCase.execute({
       userId: req.userId,

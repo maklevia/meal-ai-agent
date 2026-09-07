@@ -71,12 +71,4 @@ export class FamilyRepository extends BaseRepository<Family> {
     const { familyId, newOwnerId } = options;
     await this.repo.update({ id: familyId }, { owner: { id: newOwnerId } });
   }
-
-  async countMembers(familyId: number): Promise<number> {
-    return this.repo
-      .createQueryBuilder("family")
-      .innerJoin("family.users", "user")
-      .where("family.id = :familyId", { familyId })
-      .getCount();
-  }
 }

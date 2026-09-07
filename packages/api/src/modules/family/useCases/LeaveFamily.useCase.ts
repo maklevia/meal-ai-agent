@@ -29,7 +29,7 @@ export class LeaveFamilyUseCase extends AuthUseCase<
       throw new NotFoundError("User does not have family");
     }
 
-    const memberCount = await this.familyRepository.countMembers(family.id)
+    const memberCount = await this.userRepository.countFamilyMembers(family.id)
 
     if (memberCount === 1) {
       await this.uow.run(async (tx: TxContext) => {

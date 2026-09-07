@@ -30,6 +30,7 @@ const BASE_COOKIE_OPTIONS: CookieOptions = {
 
 export const ACCESS_COOKIE_OPTIONS: CookieOptions = {
     ...BASE_COOKIE_OPTIONS,
+    path: '/',
     maxAge: AUTH_CONSTANTS.ACCESS_TOKEN_MAX_AGE
 }
 
@@ -37,4 +38,16 @@ export const REFRESH_COOKIE_OPTIONS: CookieOptions = {
     ...BASE_COOKIE_OPTIONS,
     path: '/auth',
     maxAge: AUTH_CONSTANTS.REFRESH_TOKEN_MAX_AGE,
+}
+
+export const ACCESS_COOKIE_CLEAR_OPTIONS: CookieOptions = {
+    ...ACCESS_COOKIE_OPTIONS,
+    maxAge: undefined,
+    expires: undefined,
+}
+
+export const REFRESH_COOKIE_CLEAR_OPTIONS: CookieOptions = {
+    ...REFRESH_COOKIE_OPTIONS,
+    maxAge: undefined,
+    expires: undefined,
 }
