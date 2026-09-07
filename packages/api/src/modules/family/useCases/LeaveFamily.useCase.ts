@@ -29,44 +29,65 @@ export class LeaveFamilyUseCase extends AuthUseCase<
       throw new NotFoundError("User does not have family");
     }
 
-    const memberCount = await this.userRepository.countFamilyMembers(family.id)
-
-    if (memberCount === 1) {
-      await this.uow.run(async (tx: TxContext) => {
-        const users = tx.get(UserRepository);
-        const families = tx.get(FamilyRepository);
-
-        await users.updateUserFamily({ userId, familyId: null });
-        await families.deleteFamilyById(family.id);
-      });
-
+    if (await this.isLastMember(family.id)) {
+      await this.leaveAsLastMember(userId, family.id);
       return;
     }
 
-    const ownerId = family.owner.id;
+    if (family.owner.id === userId) {
+      await this.leaveAsOwner(userId, family.id, newOwnerEmail);
+      return;
+    }
 
-    if (ownerId === userId) {
-      if (!newOwnerEmail) {
-        throw new ValidationError("You must provide new owner of the family");
+    await this.userRepository.updateUserFamily({ userId, familyId: null });
+  }
+
+  private async isLastMember(familyId: number): Promise<boolean> {
+    const memberCount =
+      await this.userRepository.countFamilyMembers(familyId);
+
+    return memberCount === 1;
+  }
+
+  private async leaveAsLastMember(
+    userId: number,
+    familyId: number,
+  ): Promise<void> {
+    await this.uow.run(async (tx: TxContext) => {
+      const users = tx.get(UserRepository);
+      const families = tx.get(FamilyRepository);
+
+      await users.updateUserFamily({ userId, familyId: null });
+      await families.deleteFamilyById(familyId);
+    });
+  }
+
+  private async leaveAsOwner(
+    userId: number,
+    familyId: number,
+    newOwnerEmail?: string,
+  ): Promise<void> {
+    if (!newOwnerEmail) {
+      throw new ValidationError("You must provide new owner of the family");
+    }
+
+    await this.uow.run(async (tx: TxContext) => {
+      const users = tx.get(UserRepository);
+      const families = tx.get(FamilyRepository);
+
+      const newOwner = await users.findFamilyMemberByEmail(
+        newOwnerEmail,
+        familyId,
+      );
+      if (!newOwner) {
+        throw new NotFoundError("User with provided email does not exist");
       }
 
-      await this.uow.run(async (tx: TxContext) => {
-        const users = tx.get(UserRepository);
-        const families = tx.get(FamilyRepository);
-
-        const newOwner = await users.findFamilyMemberByEmail(newOwnerEmail, family.id);
-        if (!newOwner) {
-          throw new NotFoundError("User with provided email does not exist");
-        }
-
-        await users.updateUserFamily({ userId, familyId: null });
-      
-        await families.updateFamilyOwner({newOwnerId: newOwner.id, familyId: family.id});
+      await users.updateUserFamily({ userId, familyId: null });
+      await families.updateFamilyOwner({
+        newOwnerId: newOwner.id,
+        familyId,
       });
-
-      return;
-    }
-
-    await this.userRepository.updateUserFamily({userId, familyId: null});
+    });
   }
 }
