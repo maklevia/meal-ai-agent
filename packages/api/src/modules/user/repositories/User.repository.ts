@@ -9,19 +9,22 @@ interface CreateUserOptions {
   email: string;
   passwordHash: string;
   role: UserRole;
-  familyId: number;
 }
 
 interface CreateFirstAdminOptions {
   name: string;
   email: string;
   passwordHash: string;
-  familyId: number
 }
 
 interface UpdatePasswordOptions {
   userId: number;
   newPasswordHash: string;
+}
+
+interface UpdateUserFamilyOptions {
+  userId: number;
+  familyId: number;
 }
 
 export class UserRepository extends BaseRepository<User> {
@@ -34,14 +37,13 @@ export class UserRepository extends BaseRepository<User> {
   }
 
   async createUser(options: CreateUserOptions): Promise<User> {
-    const { name, email, passwordHash, role, familyId } = options;
+    const { name, email, passwordHash, role } = options;
 
     const newUser = new User();
     newUser.name = name;
     newUser.email = email;
     newUser.passwordHash = passwordHash;
     newUser.role = role;
-    newUser.family = {id: familyId} as Family;
 
     const savedUser = await this.repo.save(newUser);
     return savedUser;
@@ -100,16 +102,20 @@ export class UserRepository extends BaseRepository<User> {
   }
 
   async createAdmin(options: CreateFirstAdminOptions): Promise<User> {
-    const { name, email, passwordHash, familyId } = options;
+    const { name, email, passwordHash } = options;
 
     const newAdmin = this.repo.create({
       name,
       email,
       passwordHash,
       role: UserRole.Admin,
-      family: {id: familyId}
     });
 
     return this.repo.save(newAdmin);
+  }
+
+  async updateUserFamily(options: UpdateUserFamilyOptions): Promise<void> {
+    const { userId, familyId } = options;
+    await this.repo.update({ id: userId }, { family: { id: familyId } });
   }
 }

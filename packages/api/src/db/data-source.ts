@@ -14,7 +14,6 @@ import { ChatMessage } from "src/modules/chatMessage/entities/ChatMessage.entity
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 import { RegistrationInvitation } from "src/modules/auth/entities/RegistrationInvitation.entity";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
-import { FamilyInvitation } from "src/modules/family/entities/FamilyInvitation.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -37,7 +36,6 @@ export const AppDataSource = new DataSource({
     RefreshToken,
     RegistrationInvitation,
     PasswordResetCode,
-    FamilyInvitation,
   ],
   migrations: [
     path.join(

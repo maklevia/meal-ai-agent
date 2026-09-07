@@ -3,7 +3,6 @@ import { UseCase } from "src/core/UseCase.base";
 import { UnitOfWork } from "src/db/UnitOfWork";
 import { ConflictError } from "src/errors/http/ConflictError";
 import { AuthService } from "src/modules/auth/Auth.service";
-import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
 import { UserRepository } from "src/modules/user/repositories/User.repository";
 import { toUserDto, UserDto } from "src/modules/user/typedefs";
 
@@ -38,15 +37,12 @@ export class BootstrapAdminUseCase extends UseCase<
 
     const user = await this.uow.run(async (tx) => {
       const users = tx.get(UserRepository);
-      const families = tx.get(FamilyRepository);
 
       if (await users.existsAny()) {
         throw new ConflictError("System already initialized");
       }
 
-      const family = await families.createFamily();
-
-      const createdUser = await users.createAdmin({email, passwordHash, name, familyId: family.id});
+      const createdUser = await users.createAdmin({email, passwordHash, name});
 
       return createdUser;
     })

@@ -1,7 +1,13 @@
 import z from "zod";
 
-export const createInvitationLinkBodySchema = z.object({
-    invitedUserEmail: z.string().email()
-})
+export const createFamilyBodySchema = z.object({
+    familyName: z.string().trim().min(1).max(100),
+});
 
-export type CreateInvitationLinkBody = z.infer<typeof createInvitationLinkBodySchema>;
+export type CreateFamilyBody = z.infer<typeof createFamilyBodySchema>;
+
+export const joinFamilyBodySchema = z.object({
+    invitationToken: z.string().uuid(),
+});
+
+export type JoinFamilyBody = z.infer<typeof joinFamilyBodySchema>;
