@@ -2,7 +2,7 @@ import { GenerateFamilyInvitationLinkUseCase } from "src/modules/family/useCases
 import { Request, Response } from "express";
 import { CreateFamilyBody, JoinFamilyBody } from "src/modules/family/validators";
 import { CreateFamilyUseCase } from "src/modules/family/useCases/CreateFamily.useCase";
-import { GetFamilyInvitationLinkUseCase } from "src/modules/family/useCases/GetFamilyInvitationLink";
+import { GetFamilyInvitationLinkUseCase } from "src/modules/family/useCases/GetFamilyInvitationLink.useCase";
 import { JoinFamilyByInvitationLinkUseCase } from "src/modules/family/useCases/JoinFamilyByInvitationLink.useCase";
 
 export class FamilyController {
@@ -21,11 +21,7 @@ export class FamilyController {
   ) => {
     const userId = req.userId;
 
-    const { invitationLink } = await this.generateInvitationLinkUseCase.execute(
-      {
-        userId,
-      },
-    );
+    const { invitationLink } = await this.generateInvitationLinkUseCase.execute({userId});
 
     res.status(201).json({ invitationLink });
   };

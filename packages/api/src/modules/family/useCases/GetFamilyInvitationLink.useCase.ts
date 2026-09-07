@@ -1,5 +1,4 @@
 import { AuthUseCase } from "src/core/AuthUseCase.base";
-import { ForbiddenError } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { FamilyService } from "src/modules/family/Family.service";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
@@ -22,21 +21,16 @@ export class GetFamilyInvitationLinkUseCase extends AuthUseCase<
   async executeAuth(
     options: GetFamilyInvitationLinkOptions,
   ): Promise<GetFamilyInvitationLinkResult> {
-    const { userId } = options;
+    const { userId } = options;    
 
     const family = await this.familyRepository.findFamilyByUser(userId);
-    if (!family) {
-      throw new NotFoundError("Family for the user does not exists");
-    }
-
-    if (family.owner.id !== userId) {
-      throw new ForbiddenError("User has to be family owner");
+    if(!family) {
+      throw new NotFoundError("User does not have a family")
     }
 
     if (!family.invitationToken) {
-      throw new NotFoundError("Family does not have invitation");
+      throw new NotFoundError("The invitation for the family does not exist.")
     }
-
     const invitationLink = this.familyService.createFamilyInvitationLink(
       family.invitationToken,
     );

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "src/middlewares/auth.middleware";
+import { requireFamilyOwner } from "src/middlewares/requireFamilyOwner.middleware";
 import { validate } from "src/middlewares/validate.middleware";
 import { FamilyController } from "src/modules/family/Family.controller";
 import { createFamilyBodySchema, joinFamilyBodySchema } from "src/modules/family/validators";
@@ -18,12 +19,14 @@ familyRouter.post(
 familyRouter.put(
   "/invitation",
   authMiddleware,
+  requireFamilyOwner,
   familyController.generateInvitationLink,
 );
 
 familyRouter.get(
   "/invitation",
   authMiddleware,
+  requireFamilyOwner,
   familyController.getInvitationLink,
 );
 
