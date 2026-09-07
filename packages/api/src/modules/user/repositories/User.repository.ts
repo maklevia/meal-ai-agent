@@ -24,7 +24,7 @@ interface UpdatePasswordOptions {
 
 interface UpdateUserFamilyOptions {
   userId: number;
-  familyId: number;
+  familyId: number | null;
 }
 
 export class UserRepository extends BaseRepository<User> {
@@ -86,6 +86,27 @@ export class UserRepository extends BaseRepository<User> {
     return foundUser;
   }
 
+  async findFamilyMemberByEmail(
+    email: string,
+    familyId: number,
+  ): Promise<User | null> {
+    return this.repo.findOneBy({ email, family: { id: familyId } });
+  }
+
+  async removeUserFromFamily(
+    userId: number,
+    familyId: number,
+  ): Promise<boolean> {
+    const result = await this.repo
+      .createQueryBuilder()
+      .update(User)
+      .set({ family: null })
+      .where("id = :userId AND familyId = :familyId", { userId, familyId })
+      .execute();
+
+    return (result.affected ?? 0) > 0;
+  }
+
   async updatePassword(options: UpdatePasswordOptions): Promise<void> {
     const { userId, newPasswordHash } = options;
     await this.repo.update(
@@ -116,6 +137,9 @@ export class UserRepository extends BaseRepository<User> {
 
   async updateUserFamily(options: UpdateUserFamilyOptions): Promise<void> {
     const { userId, familyId } = options;
-    await this.repo.update({ id: userId }, { family: { id: familyId } });
+    await this.repo.update(
+      { id: userId },
+      familyId === null ? { family: null } : { family: { id: familyId } },
+    );
   }
 }

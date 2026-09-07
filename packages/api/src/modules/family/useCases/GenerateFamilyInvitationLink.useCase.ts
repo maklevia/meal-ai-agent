@@ -32,7 +32,10 @@ export class GenerateFamilyInvitationLinkUseCase extends AuthUseCase<
     }
 
     const invitationToken = randomUUID();
-    await this.familyRepository.setInvitationToken(family.id, invitationToken);
+    await this.familyRepository.setInvitationToken({
+      familyId: family.id,
+      invitationToken,
+    });
 
     const invitationLink =
       this.familyService.createFamilyInvitationLink(invitationToken);

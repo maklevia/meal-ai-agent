@@ -30,7 +30,10 @@ export class CreateFamilyUseCase extends AuthUseCase<
         throw new ConflictError("User already has a family");
       }
 
-      const createdFamily = await families.createFamily(familyName, userId);
+      const createdFamily = await families.createFamily({
+        name: familyName,
+        ownerId: userId,
+      });
       await users.updateUserFamily({
         userId,
         familyId: createdFamily.id,

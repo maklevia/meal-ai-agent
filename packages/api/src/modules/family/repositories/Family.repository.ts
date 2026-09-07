@@ -3,6 +3,21 @@ import { Family } from "src/modules/family/entities/Family.entity";
 import { User } from "src/modules/user/entities/User.entity";
 import { EntityManager } from "typeorm";
 
+type UpdateFamilyOwnerOptions = {
+  familyId: number;
+  newOwnerId: number;
+};
+
+type CreateFamilyOptions = {
+  name: string;
+  ownerId: number;
+};
+
+type SetInvitationTokenOptions = {
+  familyId: number;
+  invitationToken: string;
+};
+
 export class FamilyRepository extends BaseRepository<Family> {
   constructor(manager?: EntityManager) {
     super(manager);
@@ -12,7 +27,8 @@ export class FamilyRepository extends BaseRepository<Family> {
     return Family;
   }
 
-  async createFamily(name: string, ownerId: number): Promise<Family> {
+  async createFamily(options: CreateFamilyOptions): Promise<Family> {
+    const { name, ownerId } = options;
     const newFamily = new Family();
     newFamily.name = name;
     newFamily.owner = { id: ownerId } as User;
@@ -26,29 +42,41 @@ export class FamilyRepository extends BaseRepository<Family> {
       where: {
         users: { id: userId },
       },
-      relations: ["owner"],
+      relations: ["owner", "users"],
     });
 
     return family;
   }
 
-  async setInvitationToken(
-    familyId: number,
-    invitationToken: string,
-  ): Promise<void> {
-    await this.repo.update(
-      { id: familyId },
-      { invitationToken },
-    );
+  async setInvitationToken(options: SetInvitationTokenOptions): Promise<void> {
+    const { familyId, invitationToken } = options;
+    await this.repo.update({ id: familyId }, { invitationToken });
   }
 
   async findInvitationByToken(token: string): Promise<Family | null> {
     const foundFamily = await this.repo.findOne({
       where: {
-        invitationToken: token
+        invitationToken: token,
       },
-    })
+    });
 
     return foundFamily;
+  }
+
+  async deleteFamilyById(familyId: number): Promise<void> {
+    await this.repo.delete({ id: familyId });
+  }
+
+  async updateFamilyOwner(options: UpdateFamilyOwnerOptions): Promise<void> {
+    const { familyId, newOwnerId } = options;
+    await this.repo.update({ id: familyId }, { owner: { id: newOwnerId } });
+  }
+
+  async countMembers(familyId: number): Promise<number> {
+    return this.repo
+      .createQueryBuilder("family")
+      .innerJoin("family.users", "user")
+      .where("family.id = :familyId", { familyId })
+      .getCount();
   }
 }
