@@ -145,8 +145,4 @@ export class AuthService extends Service {
 
     return codeRecord;
   }
-
-  createFamilyInvitationLink(invitationToken: string): string {
-    return `${this.env.CLIENT_ORIGIN}/family/join?token=${invitationToken}`;
-  }
 }
