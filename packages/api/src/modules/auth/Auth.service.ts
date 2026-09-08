@@ -1,6 +1,7 @@
 import { compare, genSalt, hash } from "bcrypt-ts";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AUTH_CONSTANTS, SALT_ROUNDS } from "src/modules/auth/constants";
 import { UserRole } from "src/modules/user/typedefs";
@@ -77,7 +78,7 @@ export class AuthService extends Service {
         typeof decoded.userRole !== "string" ||
         !Object.values(UserRole).includes(decoded.userRole)
       ) {
-        throw new AuthenticationError("Invalid token payload");
+        throw new AuthenticationError(AuthErrorMessages.INVALID_TOKEN_PAYLOAD);
       }
 
       return {
@@ -86,9 +87,9 @@ export class AuthService extends Service {
       };
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError)
-        throw new AuthenticationError("Token expired");
+        throw new AuthenticationError(AuthErrorMessages.TOKEN_EXPIRED);
       if (err instanceof jwt.JsonWebTokenError)
-        throw new AuthenticationError("Invalid token");
+        throw new AuthenticationError(AuthErrorMessages.INVALID_TOKEN);
       throw err;
     }
   }
@@ -136,11 +137,11 @@ export class AuthService extends Service {
     const codeRecord =
       await this.passwordResetCodeRepository.findResetCode(codeHash);
     if (!codeRecord) {
-      throw new AuthenticationError("Invalid reset code");
+      throw new AuthenticationError(AuthErrorMessages.INVALID_RESET_CODE);
     }
 
     if (codeRecord.expiresAt < new Date()) {
-      throw new AuthenticationError("Reset code has expired");
+      throw new AuthenticationError(AuthErrorMessages.RESET_CODE_EXPIRED);
     }
 
     return codeRecord;

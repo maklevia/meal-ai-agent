@@ -1,0 +1,16 @@
+export enum AuthErrorMessages {
+  NOT_AUTHENTICATED = "Not authenticated",
+  USER_NOT_FOUND = "User not found",
+  INVALID_CREDENTIALS = "Invalid credentials",
+  OLD_PASSWORD_INVALID = "Old password is not valid",
+  EMAIL_ALREADY_TAKEN = "Email is already taken",
+  SYSTEM_ALREADY_INITIALIZED = "System already initialized",
+  INVALID_TOKEN = "Invalid token",
+  INVALID_TOKEN_PAYLOAD = "Invalid token payload",
+  TOKEN_EXPIRED = "Token expired",
+  INVALID_RESET_CODE = "Invalid reset code",
+  RESET_CODE_EXPIRED = "Reset code has expired",
+  USER_EMAIL_NOT_REGISTERED = "User with this email is not registered",
+  INVITATION_LINK_INVALID = "Invitation link is invalid",
+  ADMIN_PERMISSION_REQUIRED = "You need Admin permission to access resource",
+}

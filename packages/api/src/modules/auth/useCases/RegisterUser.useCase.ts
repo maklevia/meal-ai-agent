@@ -1,6 +1,7 @@
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { UseCase } from "src/core/UseCase.base";
 import { UnitOfWork } from "src/db/UnitOfWork";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { ConflictError } from "src/errors/http/ConflictError";
 import { ValidationError } from "src/errors/http/ValidationError";
 import { AuthService } from "src/modules/auth/Auth.service";
@@ -35,7 +36,7 @@ export class RegisterUserUseCase extends UseCase<
     const invitation =
       await this.invitations.findByValidInvitation(invitationCode);
     if (!invitation) {
-      throw new ValidationError("Invitation link is not valid");
+      throw new ValidationError(AuthErrorMessages.INVITATION_LINK_INVALID);
     }
 
     await this.ensureEmailAvailable(invitation.email);
@@ -47,7 +48,7 @@ export class RegisterUserUseCase extends UseCase<
       const invitations = tx.get(RegistrationInvitationRepository);
 
       if (await users.existsByEmail(invitation.email)) {
-        throw new ConflictError("Email is already taken");
+        throw new ConflictError(AuthErrorMessages.EMAIL_ALREADY_TAKEN);
       }
 
       const user = await users.createUser({

@@ -1,6 +1,7 @@
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { UseCase } from "src/core/UseCase.base";
 import { UnitOfWork } from "src/db/UnitOfWork";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { ConflictError } from "src/errors/http/ConflictError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { UserRepository } from "src/modules/user/repositories/User.repository";
@@ -30,7 +31,7 @@ export class BootstrapAdminUseCase extends UseCase<
 
     const existsAnyUser = await this.userRepository.existsAny();
     if (existsAnyUser) {
-      throw new ConflictError("System already initialized");
+      throw new ConflictError(AuthErrorMessages.SYSTEM_ALREADY_INITIALIZED);
     }
 
     const passwordHash = await this.authService.hashPassword(password);
@@ -39,7 +40,7 @@ export class BootstrapAdminUseCase extends UseCase<
       const users = tx.get(UserRepository);
 
       if (await users.existsAny()) {
-        throw new ConflictError("System already initialized");
+        throw new ConflictError(AuthErrorMessages.SYSTEM_ALREADY_INITIALIZED);
       }
 
       const createdUser = await users.createAdmin({email, passwordHash, name});

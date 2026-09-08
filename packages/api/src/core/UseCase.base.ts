@@ -1,4 +1,5 @@
 import { env } from "src/config/env";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { ConflictError } from "src/errors/http/ConflictError";
 import { User } from "src/modules/user/entities/User.entity";
@@ -16,14 +17,14 @@ export abstract class UseCase<Options, Result> {
 
     protected async ensureEmailAvailable(email: string): Promise<void> {
         if (await this.userRepository.existsByEmail(email)) {
-            throw new ConflictError("Email is already taken");
+            throw new ConflictError(AuthErrorMessages.EMAIL_ALREADY_TAKEN);
         }
     }
 
     protected async requireUserByEmail(email: string): Promise<User & { passwordHash: string }> {
         const user = await this.getUserWithPassword(email);
         if (!user || !user.passwordHash) {
-            throw new AuthenticationError("Invalid credentials.");
+            throw new AuthenticationError(AuthErrorMessages.INVALID_CREDENTIALS);
         }
         return user as User & { passwordHash: string };
     }

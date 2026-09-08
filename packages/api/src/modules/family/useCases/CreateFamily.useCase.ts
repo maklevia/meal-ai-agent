@@ -1,6 +1,7 @@
 import { AuthUseCase } from "src/core/AuthUseCase.base";
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { UnitOfWork } from "src/db/UnitOfWork";
+import { FamilyErrorMessages } from "src/errors/messages/family.messages";
 import { ConflictError } from "src/errors/http/ConflictError";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
 import { UserRepository } from "src/modules/user/repositories/User.repository";
@@ -27,7 +28,7 @@ export class CreateFamilyUseCase extends AuthUseCase<
 
       const existingFamily = await families.findFamilyByUser(userId);
       if (existingFamily) {
-        throw new ConflictError("User already has a family");
+        throw new ConflictError(FamilyErrorMessages.USER_ALREADY_HAS_FAMILY);
       }
 
       const createdFamily = await families.createFamily({

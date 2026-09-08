@@ -1,7 +1,14 @@
 import * as dotenv from "dotenv";
 import { z } from "zod";
 
-dotenv.config({ path: new URL("../../../../.env", import.meta.url).pathname });
+// Load order mirrors scripts/dev.sh priority: .env < .env.dev < .env.local.
+// dotenv does not override existing vars by default, so highest priority loads first.
+const rootFile = (name: string) =>
+  new URL(`../../../../${name}`, import.meta.url).pathname;
+
+dotenv.config({ path: rootFile(".env.local") });
+dotenv.config({ path: rootFile(".env.dev") });
+dotenv.config({ path: rootFile(".env") });
 dotenv.config();
 
 const stringBoolean = z.enum(["true", "false"]).transform((v) => v === "true");

@@ -1,4 +1,5 @@
 import { UseCase } from "src/core/UseCase.base";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { ValidationError } from "src/errors/http/ValidationError";
 import { RegistrationInvitationRepository } from "src/modules/auth/repositories/RegistrationInvitation.repository";
 import { UserRole } from "src/modules/user/typedefs";
@@ -28,7 +29,7 @@ export class ValidateRegistrationInvitationUseCase extends UseCase<
       await this.registrationInvitationRepository.findByValidInvitation(invitationCode);
 
     if (!recordByInvitation) {
-      throw new ValidationError("Invitation link is invalid.");
+      throw new ValidationError(AuthErrorMessages.INVITATION_LINK_INVALID);
     }
 
     return {
