@@ -5,7 +5,7 @@ import { UserRole } from "src/modules/user/typedefs";
 
 export class RequireAdminMiddleware {
   handle = (req: Request, _res: Response, next: NextFunction): void => {
-    if (req.userRole !== UserRole.Admin) {
+    if (req.user.role !== UserRole.Admin) {
       throw new ForbiddenError(AuthErrorMessages.ADMIN_PERMISSION_REQUIRED);
     }
 

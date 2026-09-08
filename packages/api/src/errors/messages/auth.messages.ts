@@ -13,4 +13,5 @@ export enum AuthErrorMessages {
   USER_EMAIL_NOT_REGISTERED = "User with this email is not registered",
   INVITATION_LINK_INVALID = "Invitation link is invalid",
   ADMIN_PERMISSION_REQUIRED = "You need Admin permission to access resource",
+  TOKEN_CLAIMS_OUTDATED = "Token claims are outdated. Please re-authenticate",
 }

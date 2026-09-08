@@ -1,13 +1,11 @@
-import { Family } from "src/modules/family/entities/Family.entity";
-import { UserRole } from "src/modules/user/typedefs";
+import { User } from "src/modules/user/entities/User.entity";
 
 export {};
 
 declare global {
   namespace Express {
     interface Request {
-      userId: number;
-      userRole: UserRole;
+      user: User
     }
   }
 }
