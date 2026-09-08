@@ -1,0 +1,12 @@
+# Development override: hot-reload for the API via `tsx watch`.
+services:
+  api:
+    build:
+      target: dev
+    command: npm run dev
+    working_dir: /app/packages/api
+    volumes:
+      - ./packages/api/src:/app/packages/api/src
+      - ./packages/api/tsconfig.json:/app/packages/api/tsconfig.json:ro
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
+    # ports, environment, depends_on, healthcheck are inherited from docker-compose.yml

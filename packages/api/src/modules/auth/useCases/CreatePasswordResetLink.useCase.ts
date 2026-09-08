@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { UseCase } from "src/core/UseCase.base";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { RESET_CODE_EXPIRES_IN_HOURS } from "src/modules/auth/constants";
@@ -25,7 +26,7 @@ export class CreatePasswordResetLinkUseCase extends UseCase<
 
         const user = await this.userRepository.findUserByEmail(email);
         if (!user) {
-            throw new NotFoundError('User with this email is not registered')
+            throw new NotFoundError(AuthErrorMessages.USER_EMAIL_NOT_REGISTERED)
         };
 
         const rawResetCode = randomUUID();

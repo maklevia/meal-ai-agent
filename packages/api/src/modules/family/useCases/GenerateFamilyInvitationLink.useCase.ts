@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { AuthUseCase } from "src/core/AuthUseCase.base";
 import { ForbiddenError } from "src/errors";
+import { FamilyErrorMessages } from "src/errors/messages/family.messages";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { FamilyService } from "src/modules/family/Family.service";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
@@ -27,11 +28,11 @@ export class GenerateFamilyInvitationLinkUseCase extends AuthUseCase<
 
     const family = await this.familyRepository.findFamilyByUser(userId);
     if (!family) {
-      throw new NotFoundError("User's family not found");
+      throw new NotFoundError(FamilyErrorMessages.FAMILY_NOT_FOUND);
     }
 
     if (family.owner.id !== userId) {
-      throw new ForbiddenError("User is not the owner of the family")
+      throw new ForbiddenError(FamilyErrorMessages.NOT_FAMILY_OWNER)
     }
 
     const invitationToken = randomUUID();
