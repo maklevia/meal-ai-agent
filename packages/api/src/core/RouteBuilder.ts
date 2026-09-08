@@ -13,15 +13,14 @@ function defaultResponseMapper<TResult>(result: TResult, res: Response): void {
     res.status(204).send();
     return;
   }
-
   res.status(200).json(result);
 }
 
-interface RouteConfig<
+export interface RouteDefinition<
   TOptions,
   TResult,
-  TBody = any,
   TParams = any,
+  TBody = any,
   TQuery = any,
   TCookies = any,
 > {
@@ -35,7 +34,6 @@ interface RouteConfig<
     query?: z.ZodSchema<TQuery>;
     cookies?: z.ZodSchema<TCookies>;
   };
-
   useCase: UseCaseFactory<TOptions, TResult>;
   map: (
     req: Request<TParams, unknown, TBody, TQuery> & { cookies: TCookies },
@@ -43,7 +41,7 @@ interface RouteConfig<
   respond?: ResponseMapper<TResult>;
 }
 
-export function registerRoute<
+export function defineRoute<
   TOptions,
   TResult,
   TParams = any,
@@ -51,33 +49,42 @@ export function registerRoute<
   TQuery = any,
   TCookies = any,
 >(
-  router: Router,
-  config: RouteConfig<TOptions, TResult, TParams, TBody, TQuery, TCookies>,
-): void {
-  const handlers: RequestHandler[] = [];
+  config: RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies>,
+): RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies> {
+  return config;
+}
 
-  if (config.auth) handlers.push(authMiddleware);
-  if (config.middlewares) handlers.push(...config.middlewares);
-  if (config.validators) handlers.push(validate(config.validators));
+export function registerRoutes(router: Router, routes: RouteDefinition<any, any, any, any, any, any>[]): void {
+  for (const config of routes) {
+    const handlers: RequestHandler[] = [];
 
-  const handler: RequestHandler = async (req, res, next) => {
-    try {
-      const useCase = config.useCase();
+    if (config.auth) handlers.push(authMiddleware);
+    if (config.middlewares) handlers.push(...config.middlewares);
+    if (config.validators) handlers.push(validate(config.validators));
 
-      if (config.auth && useCase instanceof AuthUseCase) {
-        useCase.setAuthUser(req.user);
+    const handler: RequestHandler = async (req, res, next) => {
+      try {
+        const useCase = config.useCase();
+
+        if (config.auth && useCase instanceof AuthUseCase) {
+          useCase.setAuthUser(req.user);
+        }
+
+        const options = config.map(
+          req as unknown as Request<any, unknown, any, any> & {
+            cookies: any;
+          },
+        );
+        const result = await useCase.execute(options);
+
+        const respond = config.respond ?? defaultResponseMapper;
+        respond(result, res);
+      } catch (err) {
+        next(err);
       }
+    };
 
-      const options = config.map(req as any);
-      const result = await useCase.execute(options);
-
-      const respond = config.respond ?? defaultResponseMapper;
-      respond(result, res);
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  handlers.push(handler);
-  router[config.method](config.path, ...handlers);
+    handlers.push(handler);
+    router[config.method](config.path, ...handlers);
+  }
 }
