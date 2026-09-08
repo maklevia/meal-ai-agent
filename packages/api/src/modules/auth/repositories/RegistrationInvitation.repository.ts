@@ -1,7 +1,8 @@
-import { AppDataSource } from "src/db/data-source";
-import { Invitation } from "src/modules/invitation/entities/Invitation.entity";
+import { BaseRepository } from "src/db/BaseRepository";
+import { RegistrationInvitation } from "src/modules/auth/entities/RegistrationInvitation.entity";
 import { UserRole } from "src/modules/user/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
+import { EntityManager } from "typeorm";
 
 type CreateInvitationOptions = {
   email: string;
@@ -10,13 +11,19 @@ type CreateInvitationOptions = {
   invitedByUserId: number;
 };
 
-export class InvitationRepository {
-  private readonly repo = AppDataSource.getRepository(Invitation)
+export class RegistrationInvitationRepository extends BaseRepository<RegistrationInvitation> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
+
+  protected get entity() {
+    return RegistrationInvitation;
+  }
 
   async createInvitation(options: CreateInvitationOptions): Promise<string> {
     const { email, role, expiresAt, invitedByUserId } = options;
 
-    const newInvitation = new Invitation();
+    const newInvitation = new RegistrationInvitation();
     newInvitation.email = email;
     newInvitation.role = role;
     newInvitation.expiresAt = expiresAt;
@@ -26,7 +33,7 @@ export class InvitationRepository {
     return createdInvitation.id;
   }
 
-  async findByValidInvitation(invitationCode: string): Promise<Invitation | null> {
+  async findByValidInvitation(invitationCode: string): Promise<RegistrationInvitation | null> {
     const validInvitation = await this.repo.findOneBy({id: invitationCode});
 
     if (!validInvitation || validInvitation.expiresAt < new Date()) {

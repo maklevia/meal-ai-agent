@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { COOKIE_NAMES } from "src/modules/auth/constants";
@@ -9,7 +10,7 @@ export class AuthMiddleware {
   handle = (req: Request, _res: Response, next: NextFunction): void => {
     const accessToken = req.cookies?.[COOKIE_NAMES.ACCESS_TOKEN];
     if (!accessToken) {
-      throw new AuthenticationError("Not authenticated");
+      throw new AuthenticationError(AuthErrorMessages.NOT_AUTHENTICATED);
     }
 
     const { userId, userRole } = this.authService.validateAccessToken(accessToken);

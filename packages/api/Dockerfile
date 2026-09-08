@@ -1,3 +1,21 @@
+# ---- Stage 0: Development (hot reload via tsx watch) ----
+FROM node:22-alpine AS dev
+WORKDIR /app
+
+# Copy workspace root files needed for npm workspaces
+COPY package.json package-lock.json tsconfig.base.json ./
+COPY packages/api/package.json packages/api/
+
+# Install all dependencies (including dev: tsx, typescript)
+RUN npm ci --workspace=@meal/api
+
+# Copy API source (overlaid by a bind mount in docker-compose.dev.yml)
+COPY packages/api/ packages/api/
+
+WORKDIR /app/packages/api
+CMD ["npm", "run", "dev"]
+
+
 # ---- Stage 1: Build ----
 FROM node:22-alpine AS builder
 WORKDIR /app

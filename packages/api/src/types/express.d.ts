@@ -1,3 +1,4 @@
+import { Family } from "src/modules/family/entities/Family.entity";
 import { UserRole } from "src/modules/user/typedefs";
 
 export {};

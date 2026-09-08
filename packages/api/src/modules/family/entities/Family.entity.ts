@@ -1,7 +1,9 @@
 import {
+  Column,
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -16,14 +18,24 @@ export class Family {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: "varchar", length: 100 })
+  name: string;
+
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;
 
   @UpdateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   updatedAt: Date;
 
+  @Column({ type: "uuid", nullable: true, unique: true })
+  invitationToken: string | null;
+
   @OneToMany(() => User, (user) => user.family)
   users: Relation<User[]>;
+
+  @ManyToOne(() => User, { nullable: false, onDelete: "RESTRICT" })
+  @JoinColumn()
+  owner: Relation<User>;
 
   @OneToOne(() => ProductsInventory, (inventory) => inventory.family, {
     nullable: true,

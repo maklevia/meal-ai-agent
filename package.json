@@ -7,7 +7,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n api,web -c blue,green \"npm run dev -w @meal/api\" \"npm run dev -w @meal/web\"",
+    "dev": "bash scripts/dev.sh",
+    "dev:local": "concurrently -n api,web -c blue,green \"npm run dev -w @meal/api\" \"npm run dev -w @meal/web\"",
+    "dev:down": "docker compose down",
     "dev:api": "npm run dev -w @meal/api",
     "dev:web": "npm run dev -w @meal/web",
     "build": "npm run build --workspaces --if-present",

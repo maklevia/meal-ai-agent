@@ -1,6 +1,8 @@
-import { AppDataSource } from "src/db/data-source";
+import { BaseRepository } from "src/db/BaseRepository";
+import { Family } from "src/modules/family/entities/Family.entity";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserRole } from "src/modules/user/typedefs";
+import { EntityManager } from "typeorm";
 
 interface CreateUserOptions {
   name: string;
@@ -20,8 +22,19 @@ interface UpdatePasswordOptions {
   newPasswordHash: string;
 }
 
-export class UserRepository {
-  private readonly repo = AppDataSource.getRepository(User);
+interface UpdateUserFamilyOptions {
+  userId: number;
+  familyId: number | null;
+}
+
+export class UserRepository extends BaseRepository<User> {
+  constructor(manager?: EntityManager) {
+    super(manager);
+  }
+
+  protected get entity() {
+    return User;
+  }
 
   async createUser(options: CreateUserOptions): Promise<User> {
     const { name, email, passwordHash, role } = options;
@@ -73,6 +86,31 @@ export class UserRepository {
     return foundUser;
   }
 
+  async countFamilyMembers(familyId: number): Promise<number> {
+    return this.repo.countBy({ family: { id: familyId } });
+  }
+
+  async findFamilyMemberByEmail(
+    email: string,
+    familyId: number,
+  ): Promise<User | null> {
+    return this.repo.findOneBy({ email, family: { id: familyId } });
+  }
+
+  async removeUserFromFamily(
+    userId: number,
+    familyId: number,
+  ): Promise<boolean> {
+    const result = await this.repo
+      .createQueryBuilder()
+      .update(User)
+      .set({ family: null })
+      .where("id = :userId AND familyId = :familyId", { userId, familyId })
+      .execute();
+
+    return (result.affected ?? 0) > 0;
+  }
+
   async updatePassword(options: UpdatePasswordOptions): Promise<void> {
     const { userId, newPasswordHash } = options;
     await this.repo.update(
@@ -99,5 +137,13 @@ export class UserRepository {
     });
 
     return this.repo.save(newAdmin);
+  }
+
+  async updateUserFamily(options: UpdateUserFamilyOptions): Promise<void> {
+    const { userId, familyId } = options;
+    await this.repo.update(
+      { id: userId },
+      familyId === null ? { family: null } : { family: { id: familyId } },
+    );
   }
 }

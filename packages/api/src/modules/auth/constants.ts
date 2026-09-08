@@ -1,38 +1,53 @@
-import { CookieOptions } from "express"
-import type { StringValue } from 'ms';
+import { CookieOptions } from "express";
+import type { StringValue } from "ms";
 import { env } from "src/config/env";
 
 export const SALT_ROUNDS = 10;
 
 export const RESET_CODE_EXPIRES_IN_HOURS = 2;
 
-export const AUTH_CONSTANTS = {
-    ACCESS_TOKEN_EXPIRES_IN: "5m" as StringValue,
-    REFRESH_TOKEN_EXPIRES_IN: "7d" as StringValue,
-    REFRESH_TOKEN_EXPIRES_IN_DAYS: 7,
+export const INVITATION_VALID_HOURS = 24;
 
-    ACCESS_TOKEN_MAX_AGE: 5 * 60 * 1000,
-    REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60 * 1000,
-}
+export const AUTH_CONSTANTS = {
+  ACCESS_TOKEN_EXPIRES_IN: "5m" as StringValue,
+  REFRESH_TOKEN_EXPIRES_IN: "7d" as StringValue,
+  REFRESH_TOKEN_EXPIRES_IN_DAYS: 7,
+
+  ACCESS_TOKEN_MAX_AGE: 5 * 60 * 1000,
+  REFRESH_TOKEN_MAX_AGE: 7 * 24 * 60 * 60 * 1000,
+};
 
 export const COOKIE_NAMES = {
-    ACCESS_TOKEN: "accessToken",
-    REFRESH_TOKEN: "refreshToken",
+  ACCESS_TOKEN: "accessToken",
+  REFRESH_TOKEN: "refreshToken",
 } as const;
 
 const BASE_COOKIE_OPTIONS: CookieOptions = {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'strict',
-}
+  httpOnly: true,
+  secure: env.NODE_ENV === "production",
+  sameSite: "strict",
+};
 
 export const ACCESS_COOKIE_OPTIONS: CookieOptions = {
-    ...BASE_COOKIE_OPTIONS,
-    maxAge: AUTH_CONSTANTS.ACCESS_TOKEN_MAX_AGE
-}
+  ...BASE_COOKIE_OPTIONS,
+  path: "/",
+  maxAge: AUTH_CONSTANTS.ACCESS_TOKEN_MAX_AGE,
+};
 
 export const REFRESH_COOKIE_OPTIONS: CookieOptions = {
-    ...BASE_COOKIE_OPTIONS,
-    path: '/auth',
-    maxAge: AUTH_CONSTANTS.REFRESH_TOKEN_MAX_AGE,
-}
+  ...BASE_COOKIE_OPTIONS,
+  path: "/auth",
+  maxAge: AUTH_CONSTANTS.REFRESH_TOKEN_MAX_AGE,
+};
+
+export const ACCESS_COOKIE_CLEAR_OPTIONS: CookieOptions = {
+  ...ACCESS_COOKIE_OPTIONS,
+  maxAge: undefined,
+  expires: undefined,
+};
+
+export const REFRESH_COOKIE_CLEAR_OPTIONS: CookieOptions = {
+  ...REFRESH_COOKIE_OPTIONS,
+  maxAge: undefined,
+  expires: undefined,
+};

@@ -1,1 +1,0 @@
-export const INVITATION_VALID_HOURS = 24

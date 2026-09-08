@@ -1,7 +1,12 @@
+import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { UseCase } from "src/core/UseCase.base";
+import { UnitOfWork } from "src/db/UnitOfWork";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
+import { ConflictError } from "src/errors/http/ConflictError";
 import { ValidationError } from "src/errors/http/ValidationError";
 import { AuthService } from "src/modules/auth/Auth.service";
-import { InvitationRepository } from "src/modules/invitation/repositories/Invitation.repository";
+import { RegistrationInvitationRepository } from "src/modules/auth/repositories/RegistrationInvitation.repository";
+import { UserRepository } from "src/modules/user/repositories/User.repository";
 import { toUserDto, UserDto } from "src/modules/user/typedefs";
 
 type RegisterOptions = {
@@ -21,30 +26,48 @@ export class RegisterUserUseCase extends UseCase<
   RegisterResult
 > {
   private readonly authService: AuthService = new AuthService();
-  private readonly invitationRepository: InvitationRepository = new InvitationRepository();
+  private readonly uow: IUnitOfWork = new UnitOfWork();
+  private readonly invitations: RegistrationInvitationRepository =
+    new RegistrationInvitationRepository();
 
   async execute(options: RegisterOptions): Promise<RegisterResult> {
     const { invitationCode, password, name } = options;
 
-    const invitation = await this.invitationRepository.findByValidInvitation(invitationCode);
+    const invitation =
+      await this.invitations.findByValidInvitation(invitationCode);
     if (!invitation) {
-      throw new ValidationError("Invitation link is not valid");
+      throw new ValidationError(AuthErrorMessages.INVITATION_LINK_INVALID);
     }
 
     await this.ensureEmailAvailable(invitation.email);
 
     const passwordHash = await this.authService.hashPassword(password);
-    const createdUser = await this.userRepository.createUser({
-      email: invitation.email,
-      passwordHash,
-      name,
-      role: invitation.role,
+
+    const createdUser = await this.uow.run(async (tx) => {
+      const users = tx.get(UserRepository);
+      const invitations = tx.get(RegistrationInvitationRepository);
+
+      if (await users.existsByEmail(invitation.email)) {
+        throw new ConflictError(AuthErrorMessages.EMAIL_ALREADY_TAKEN);
+      }
+
+      const user = await users.createUser({
+        email: invitation.email,
+        passwordHash,
+        name,
+        role: invitation.role,
+      });
+
+      await invitations.deleteInvitation(invitationCode);
+
+      return user;
     });
 
-    await this.invitationRepository.deleteInvitation(invitationCode);
-
     const { accessToken, refreshToken } =
-      await this.authService.handleTokenCreations({ userId: createdUser.id, userRole: createdUser.role });
+      await this.authService.handleTokenCreations({
+        userId: createdUser.id,
+        userRole: createdUser.role,
+      });
 
     return { user: toUserDto(createdUser), accessToken, refreshToken };
   }

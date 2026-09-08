@@ -1,4 +1,5 @@
 import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AuthService } from "src/modules/auth/Auth.service";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
@@ -26,7 +27,7 @@ export class ChangePasswordUseCase extends AuthUseCase<
       await this.userRepository.findUserForPasswordChange(userId);
 
     if (!existingUser || !existingUser.passwordHash) {
-      throw new AuthenticationError("Invalid credentials");
+      throw new AuthenticationError(AuthErrorMessages.INVALID_CREDENTIALS);
     }
 
     const doPasswordsMatch = await this.authService.comparePasswords({
@@ -35,7 +36,7 @@ export class ChangePasswordUseCase extends AuthUseCase<
     });
 
     if (!doPasswordsMatch) {
-      throw new AuthenticationError("Old password is not valid");
+      throw new AuthenticationError(AuthErrorMessages.OLD_PASSWORD_INVALID);
     }
 
     const newPasswordHash = await this.authService.hashPassword(newPassword);

@@ -1,7 +1,9 @@
 import { z } from "zod";
+import { emailSchema } from "src/validation/schemas";
+import { UserRole } from "src/modules/user/typedefs";
 
 export const loginBodySchema = z.object({
-  email: z.string().email(),
+  email: emailSchema,
   password: z.string().min(8),
 });
 
@@ -34,7 +36,7 @@ export const changePasswordBodySchema = z
 export type ChangePasswordBody = z.infer<typeof changePasswordBodySchema>;
 
 export const createPasswordResetLinkBodySchema = z.object({
-  email: z.string().email(),
+  email: emailSchema,
 });
 
 export type CreatePasswordResetLinkBody = z.infer<
@@ -47,19 +49,29 @@ export const validatePasswordResetCodeParamsSchema = z.object({
 
 export type ValidatePasswordResetCodeParams = z.infer<typeof validatePasswordResetCodeParamsSchema>;
 
-export const resetPasswordUsingLinkBodySchema = z.object({
+export const resetPasswordBodySchema = z.object({
   newPassword: z.string().min(8),
-  resetCode: z.string().uuid(),
 });
 
-export type ResetPasswordUsingLinkBody = z.infer<
-  typeof resetPasswordUsingLinkBodySchema
->;
+export type ResetPasswordBody = z.infer<typeof resetPasswordBodySchema>;
 
 export const bootstrapAdminBodySchema = z.object({
-  email: z.string().email(),
+  email: emailSchema,
   password: z.string().min(8),
   name: z.string().trim().min(1).max(25),
 });
 
 export type BootstrapAdminBody = z.infer<typeof bootstrapAdminBodySchema>;
+
+export const createRegistrationInvitationBodySchema = z.object({
+  email: emailSchema,
+  role: z.nativeEnum(UserRole),
+});
+
+export type CreateRegistrationInvitationBody = z.infer<typeof createRegistrationInvitationBodySchema>;
+
+export const validateRegistrationInvitationParamsSchema = z.object({
+  invitationCode: z.string().uuid(),
+});
+
+export type ValidateRegistrationInvitationParams = z.infer<typeof validateRegistrationInvitationParamsSchema>;
