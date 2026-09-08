@@ -9,11 +9,11 @@ import {
   tokenCookiesSchema,
   registerBodySchema,
   createPasswordResetLinkBodySchema,
-  resetPasswordUsingLinkBodySchema,
   bootstrapAdminBodySchema,
   validatePasswordResetCodeParamsSchema,
   createRegistrationInvitationBodySchema,
   validateRegistrationInvitationParamsSchema,
+  resetPasswordBodySchema,
 } from "src/modules/auth/validators";
 
 export const authRouter = Router();
@@ -47,27 +47,30 @@ authRouter.post(
   authController.refresh,
 );
 authRouter.patch(
-  "/changePassword",
+  "/password",
   authMiddleware,
   validate({ body: changePasswordBodySchema }),
   authController.changePassword,
 );
 authRouter.post(
-  "/createResetLink",
+  "/password-reset-code",
   validate({ body: createPasswordResetLinkBodySchema }),
   authMiddleware,
   requireAdmin,
   authController.createPasswordResetLink,
 );
 authRouter.get(
-  "/reset-code/:resetCode/validate",
+  "/password-reset-code/:resetCode",
   validate({ params: validatePasswordResetCodeParamsSchema }),
   authController.validatePasswordResetCode,
 );
-authRouter.patch(
-  "/resetPasswordUsingLink",
-  validate({ body: resetPasswordUsingLinkBodySchema }),
-  authController.resetPasswordUsingLink,
+authRouter.post(
+  "/password-reset-code/:resetCode",
+  validate({
+    params: validatePasswordResetCodeParamsSchema,
+    body: resetPasswordBodySchema,
+  }),
+  authController.resetPassword,
 );
 authRouter.post(
   "/invitation",

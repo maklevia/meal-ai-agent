@@ -1,9 +1,16 @@
 import { GenerateFamilyInvitationLinkUseCase } from "src/modules/family/useCases/GenerateFamilyInvitationLink.useCase";
 import { Request, Response } from "express";
-import { CreateFamilyBody, JoinFamilyBody } from "src/modules/family/validators";
+import {
+  CreateFamilyBody,
+  JoinFamilyBody,
+  KickMemberParams,
+  LeaveFamilyBody,
+} from "src/modules/family/validators";
 import { CreateFamilyUseCase } from "src/modules/family/useCases/CreateFamily.useCase";
-import { GetFamilyInvitationLinkUseCase } from "src/modules/family/useCases/GetFamilyInvitationLink";
+import { GetFamilyInvitationLinkUseCase } from "src/modules/family/useCases/GetFamilyInvitationLink.useCase";
 import { JoinFamilyByInvitationLinkUseCase } from "src/modules/family/useCases/JoinFamilyByInvitationLink.useCase";
+import { KickFamilyMemberUseCase } from "src/modules/family/useCases/KickFamilyMember.useCase";
+import { LeaveFamilyUseCase } from "src/modules/family/useCases/LeaveFamily.useCase";
 
 export class FamilyController {
   private readonly generateInvitationLinkUseCase: GenerateFamilyInvitationLinkUseCase =
@@ -14,6 +21,9 @@ export class FamilyController {
     new GetFamilyInvitationLinkUseCase();
   private readonly joinFamilyByInvitationLinkUseCase: JoinFamilyByInvitationLinkUseCase =
     new JoinFamilyByInvitationLinkUseCase();
+  private readonly kickFamilyMemberUseCase: KickFamilyMemberUseCase =
+    new KickFamilyMemberUseCase();
+  private readonly leaveFamilyUseCase: LeaveFamilyUseCase = new LeaveFamilyUseCase();
 
   generateInvitationLink = async (
     req: Request<unknown, unknown>,
@@ -21,11 +31,7 @@ export class FamilyController {
   ) => {
     const userId = req.userId;
 
-    const { invitationLink } = await this.generateInvitationLinkUseCase.execute(
-      {
-        userId,
-      },
-    );
+    const { invitationLink } = await this.generateInvitationLinkUseCase.execute({userId});
 
     res.status(201).json({ invitationLink });
   };
@@ -62,4 +68,22 @@ export class FamilyController {
 
     res.status(204).send();
   };
+
+  kickMember = async (req: Request<KickMemberParams>, res: Response) => {
+    const { email } = req.params;
+    const userId = req.userId;
+
+    await this.kickFamilyMemberUseCase.execute({ userId, memberEmail: email });
+
+    res.status(204).send();
+  };
+
+  leaveFamily = async (req: Request<unknown, unknown, LeaveFamilyBody>, res: Response) => {
+    const {newOwnerEmail} = req.body;
+    const userId = req.userId;
+
+    await this.leaveFamilyUseCase.execute({userId, newOwnerEmail});
+
+    res.status(204).send()
+  }
 }
