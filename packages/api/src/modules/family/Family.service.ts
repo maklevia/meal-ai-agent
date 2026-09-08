@@ -11,16 +11,4 @@ private readonly familyRepository: FamilyRepository = new FamilyRepository();
     return `${this.env.CLIENT_ORIGIN}/family/join?token=${invitationToken}`;
   }
 
-  async requireFamilyOwner(userId: number): Promise<Family> {
-    const family = await this.familyRepository.findFamilyByUser(userId);
-    if (!family) {
-      throw new NotFoundError("User does not have a family");
-    }
-
-    if(family.owner.id !== userId) {
-      throw new ForbiddenError("User is not the owner of the family")
-    }
-
-    return family;
-  }
 }

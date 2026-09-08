@@ -29,7 +29,9 @@ export class LeaveFamilyUseCase extends AuthUseCase<
       throw new NotFoundError("User does not have family");
     }
 
-    if (await this.isLastMember(family.id)) {
+    const isLastMember = await this.checkIfLastMemberOfFamily(family.id);
+
+    if (isLastMember) {
       await this.leaveAsLastMember(userId, family.id);
       return;
     }
@@ -42,7 +44,7 @@ export class LeaveFamilyUseCase extends AuthUseCase<
     await this.userRepository.updateUserFamily({ userId, familyId: null });
   }
 
-  private async isLastMember(familyId: number): Promise<boolean> {
+  private async checkIfLastMemberOfFamily(familyId: number): Promise<boolean> {
     const memberCount =
       await this.userRepository.countFamilyMembers(familyId);
 
