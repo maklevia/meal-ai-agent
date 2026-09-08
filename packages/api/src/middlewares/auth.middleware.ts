@@ -12,13 +12,18 @@ export class AuthMiddleware {
     private readonly userRepository: UserRepository = new UserRepository(),
   ) {}
 
-  handle: RequestHandler = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
+  handle: RequestHandler = async (
+    req: Request,
+    _res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
     const accessToken = req.cookies?.[COOKIE_NAMES.ACCESS_TOKEN];
     if (!accessToken) {
       throw new AuthenticationError(AuthErrorMessages.NOT_AUTHENTICATED);
     }
 
-    const { userId, userRole } = this.authService.validateAccessToken(accessToken);
+    const { userId, userRole } =
+      this.authService.validateAccessToken(accessToken);
 
     const user = await this.userRepository.findUserById(userId);
     if (!user) {

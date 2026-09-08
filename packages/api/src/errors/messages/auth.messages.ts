@@ -14,4 +14,5 @@ export enum AuthErrorMessages {
   INVITATION_LINK_INVALID = "Invitation link is invalid",
   ADMIN_PERMISSION_REQUIRED = "You need Admin permission to access resource",
   TOKEN_CLAIMS_OUTDATED = "Token claims are outdated. Please re-authenticate",
+  USER_NOT_INJECTED = "User not injected. Ensure route uses auth: true",
 }
