@@ -2,7 +2,6 @@ import { AuthUseCase } from "src/core/AuthUseCase.base";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 
 type LogoutOptions = {
-  userId: number;
   refreshToken: string;
 };
 
@@ -12,8 +11,8 @@ export class LogoutUseCase extends AuthUseCase<LogoutOptions, LogoutResult> {
   private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async executeAuth(options: LogoutOptions): Promise<LogoutResult> {
-    const { userId, refreshToken } = options;
+    const { refreshToken } = options;
 
-    await this.refreshTokenRepository.deleteTokenForUser(userId, refreshToken);
+    await this.refreshTokenRepository.deleteTokenForUser(this.user.id, refreshToken);
   }
 }

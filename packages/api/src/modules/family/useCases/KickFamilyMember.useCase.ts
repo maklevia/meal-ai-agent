@@ -9,7 +9,6 @@ import { FamilyRepository } from "src/modules/family/repositories/Family.reposit
 import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type KickFamilyMemberOptions = {
-  userId: number;
   memberEmail: string;
 };
 
@@ -25,9 +24,9 @@ export class KickFamilyMemberUseCase extends AuthUseCase<
   async executeAuth(
     options: KickFamilyMemberOptions,
   ): Promise<KickFamilyMemberResult> {
-    const { userId, memberEmail } = options;
+    const { memberEmail } = options;
 
-    const family = await this.familyRepository.findFamilyByUser(userId);
+    const family = await this.familyRepository.findFamilyByUser(this.user.id);
     if (!family) {
       throw new NotFoundError("User does not have a family");
     }
@@ -40,7 +39,7 @@ export class KickFamilyMemberUseCase extends AuthUseCase<
       throw new NotFoundError("User is not a member of this family");
     }
 
-    if (member.id === userId) {
+    if (member.id === this.user.id) {
       throw new ForbiddenError("Owner cannot kick themselves from the family");
     }
 

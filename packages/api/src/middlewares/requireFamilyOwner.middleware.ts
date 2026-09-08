@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express"
+import { Request, Response, NextFunction, RequestHandler } from "express"
 import { ForbiddenError } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
@@ -6,16 +6,16 @@ import { FamilyRepository } from "src/modules/family/repositories/Family.reposit
 export class RequireFamilyOwner {
     constructor(private readonly familyRepository = new FamilyRepository()) {}
 
-    handle = async (req: Request, _res: Response, next: NextFunction) => {
-        const userId = req.userId;
+    handle: RequestHandler = async (req: Request, _res: Response, next: NextFunction) => {
+        const user = req.user;
 
-        const family =  await this.familyRepository.findFamilyByUser(userId);
+        const family =  await this.familyRepository.findFamilyByUser(user.id);
 
         if (!family) {
             throw new NotFoundError("User does not have a family")
         }
 
-        if (family.owner.id !== userId) {
+        if (family.owner.id !== user.id) {
             throw new ForbiddenError("User has to be the owner of the family")
         }
 

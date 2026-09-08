@@ -9,7 +9,6 @@ import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type LeaveFamilyOptions = {
   newOwnerEmail?: string;
-  userId: number;
 };
 
 type LeaveFamilyResult = void;
@@ -22,9 +21,9 @@ export class LeaveFamilyUseCase extends AuthUseCase<
   private readonly uow: IUnitOfWork = new UnitOfWork();
 
   async executeAuth(options: LeaveFamilyOptions): Promise<LeaveFamilyResult> {
-    const { userId, newOwnerEmail } = options;
+    const { newOwnerEmail } = options;
 
-    const family = await this.familyRepository.findFamilyByUser(userId);
+    const family = await this.familyRepository.findFamilyByUser(this.user.id);
     if (!family) {
       throw new NotFoundError("User does not have family");
     }
@@ -32,16 +31,16 @@ export class LeaveFamilyUseCase extends AuthUseCase<
     const isLastMember = await this.checkIfLastMemberOfFamily(family.id);
 
     if (isLastMember) {
-      await this.leaveAsLastMember(userId, family.id);
+      await this.leaveAsLastMember(this.user.id, family.id);
       return;
     }
 
-    if (family.owner.id === userId) {
-      await this.leaveAsOwner(userId, family.id, newOwnerEmail);
+    if (family.owner.id === this.user.id) {
+      await this.leaveAsOwner(this.user.id, family.id, newOwnerEmail);
       return;
     }
 
-    await this.userRepository.updateUserFamily({ userId, familyId: null });
+    await this.userRepository.updateUserFamily({ userId: this.user.id, familyId: null });
   }
 
   private async checkIfLastMemberOfFamily(familyId: number): Promise<boolean> {

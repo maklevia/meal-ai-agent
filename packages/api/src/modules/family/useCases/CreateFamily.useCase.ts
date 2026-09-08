@@ -7,7 +7,6 @@ import { FamilyRepository } from "src/modules/family/repositories/Family.reposit
 import { UserRepository } from "src/modules/user/repositories/User.repository";
 
 type CreateFamilyOptions = {
-  userId: number;
   familyName: string;
 };
 
@@ -20,23 +19,23 @@ export class CreateFamilyUseCase extends AuthUseCase<
   private readonly uow: IUnitOfWork = new UnitOfWork();
 
   async executeAuth(options: CreateFamilyOptions): Promise<CreateFamilyResult> {
-    const { userId, familyName } = options;
+    const { familyName } = options;
 
     await this.uow.run(async (tx) => {
       const families = tx.get(FamilyRepository);
       const users = tx.get(UserRepository);
 
-      const existingFamily = await families.findFamilyByUser(userId);
+      const existingFamily = await families.findFamilyByUser(this.user.id);
       if (existingFamily) {
         throw new ConflictError(FamilyErrorMessages.USER_ALREADY_HAS_FAMILY);
       }
 
       const createdFamily = await families.createFamily({
         name: familyName,
-        ownerId: userId,
+        ownerId: this.user.id,
       });
       await users.updateUserFamily({
-        userId,
+        userId: this.user.id,
         familyId: createdFamily.id,
       });
     });

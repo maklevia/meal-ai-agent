@@ -5,7 +5,6 @@ import { AuthService } from "src/modules/auth/Auth.service";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 
 type ChangePasswordOptions = {
-  userId: number;
   oldPassword: string;
   newPassword: string;
   currentRefreshToken: string
@@ -21,10 +20,10 @@ export class ChangePasswordUseCase extends AuthUseCase<
   private readonly refreshTokenRepository: RefreshTokenRepository = new RefreshTokenRepository();
 
   async executeAuth(options: ChangePasswordOptions): Promise<ChangePasswordResult> {
-    const { oldPassword, newPassword, userId, currentRefreshToken } = options;
+    const { oldPassword, newPassword, currentRefreshToken } = options;
 
     const existingUser =
-      await this.userRepository.findUserForPasswordChange(userId);
+      await this.userRepository.findUserForPasswordChange(this.user.id);
 
     if (!existingUser || !existingUser.passwordHash) {
       throw new AuthenticationError(AuthErrorMessages.INVALID_CREDENTIALS);
