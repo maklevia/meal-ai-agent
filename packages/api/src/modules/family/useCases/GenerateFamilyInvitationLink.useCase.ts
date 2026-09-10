@@ -1,13 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { AuthUseCase } from "src/core/AuthUseCase.base";
-import { FamilyErrorMessages, ForbiddenError } from "src/errors";
+import { FamilyErrorMessages } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
-import { Family } from "src/modules/family/entities/Family.entity";
 import { FamilyService } from "src/modules/family/Family.service";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
 
 type GenerateFamilyInvitationLinkOptions = {
-  userId: number;
 };
 
 type GenerateFamilyInvitationLinkResult = {
@@ -24,9 +22,8 @@ export class GenerateFamilyInvitationLinkUseCase extends AuthUseCase<
   async executeAuth(
     options: GenerateFamilyInvitationLinkOptions,
   ): Promise<GenerateFamilyInvitationLinkResult> {
-    const { userId } = options;
 
-    const family = await this.familyRepository.findFamilyByUser(userId);
+    const family = await this.familyRepository.findFamilyByUser(this.user.id);
 
     if (!family) {
       throw new NotFoundError(FamilyErrorMessages.FAMILY_NOT_FOUND);

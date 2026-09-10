@@ -6,7 +6,6 @@ import { FamilyRepository } from "src/modules/family/repositories/Family.reposit
 
 type JoinFamilyByInvitationLinkOptions = {
   invitationToken: string;
-  userId: number;
 };
 
 type JoinFamilyByInvitationLinkResult = void;
@@ -20,9 +19,9 @@ export class JoinFamilyByInvitationLinkUseCase extends AuthUseCase<
   async executeAuth(
     options: JoinFamilyByInvitationLinkOptions,
   ): Promise<JoinFamilyByInvitationLinkResult> {
-    const {invitationToken, userId} = options;
+    const {invitationToken} = options;
 
-    const familyByUser = await this.familyRepository.findFamilyByUser(userId);
+    const familyByUser = await this.familyRepository.findFamilyByUser(this.user.id);
     if (familyByUser) {
       throw new ConflictError(FamilyErrorMessages.USER_ALREADY_IN_FAMILY);
     }
@@ -32,6 +31,6 @@ export class JoinFamilyByInvitationLinkUseCase extends AuthUseCase<
       throw new NotFoundError(FamilyErrorMessages.INVITATION_LINK_INVALID)
     }
 
-    await this.userRepository.updateUserFamily({userId, familyId: familyByInvitation.id});
+    await this.userRepository.updateUserFamily({userId: this.user.id, familyId: familyByInvitation.id});
   }
 }

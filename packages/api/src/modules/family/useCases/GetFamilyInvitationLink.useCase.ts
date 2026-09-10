@@ -5,7 +5,6 @@ import { FamilyService } from "src/modules/family/Family.service";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
 
 type GetFamilyInvitationLinkOptions = {
-  userId: number;
 };
 
 type GetFamilyInvitationLinkResult = {
@@ -22,9 +21,7 @@ export class GetFamilyInvitationLinkUseCase extends AuthUseCase<
   async executeAuth(
     options: GetFamilyInvitationLinkOptions,
   ): Promise<GetFamilyInvitationLinkResult> {
-    const { userId } = options;    
-
-    const family = await this.familyRepository.findFamilyByUser(userId);
+    const family = await this.familyRepository.findFamilyByUser(this.user.id);
     if (!family) {
       throw new NotFoundError(FamilyErrorMessages.FAMILY_NOT_FOUND);
     }
