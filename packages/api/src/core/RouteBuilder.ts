@@ -16,18 +16,30 @@ function defaultResponseMapper<TResult>(result: TResult, res: Response): void {
   res.status(200).json(result);
 }
 
-export interface RouteDefinition<
-  TOptions,
-  TResult,
-  TParams = any,
-  TBody = any,
-  TQuery = any,
-  TCookies = any,
-> {
+export interface RouteConfig {
   method: "get" | "post" | "put" | "patch" | "delete";
   path: string;
   auth?: boolean;
   middlewares?: RequestHandler[];
+  validators?: {
+    body?: z.ZodSchema;
+    params?: z.ZodSchema;
+    query?: z.ZodSchema;
+    cookies?: z.ZodSchema;
+  };
+  useCase: () => UseCase<unknown, unknown>;
+  map: (req: any) => unknown;
+  respond?: (result: any, res: Response) => void;
+}
+
+export interface RouteDefinition<
+  TOptions,
+  TResult,
+  TParams = unknown,
+  TBody = unknown,
+  TQuery = unknown,
+  TCookies = unknown,
+> extends RouteConfig {
   validators?: {
     body?: z.ZodSchema<TBody>;
     params?: z.ZodSchema<TParams>;
@@ -44,17 +56,17 @@ export interface RouteDefinition<
 export function defineRoute<
   TOptions,
   TResult,
-  TParams = any,
-  TBody = any,
-  TQuery = any,
-  TCookies = any,
+  TParams = unknown,
+  TBody = unknown,
+  TQuery = unknown,
+  TCookies = unknown,
 >(
   config: RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies>,
 ): RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies> {
   return config;
 }
 
-export function registerRoutes(router: Router, routes: RouteDefinition<any, any, any, any, any, any>[]): void {
+export function registerRoutes(router: Router, routes: RouteConfig[]): void {
   for (const config of routes) {
     const handlers: RequestHandler[] = [];
 
@@ -70,11 +82,7 @@ export function registerRoutes(router: Router, routes: RouteDefinition<any, any,
           useCase.setAuthUser(req.user);
         }
 
-        const options = config.map(
-          req as unknown as Request<any, unknown, any, any> & {
-            cookies: any;
-          },
-        );
+        const options = config.map(req);
         const result = await useCase.execute(options);
 
         const respond = config.respond ?? defaultResponseMapper;
