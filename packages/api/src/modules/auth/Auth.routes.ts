@@ -4,4 +4,4 @@ import * as authEndpoints from "./endpoints";
 
 export const authRouter = Router();
 
-registerRoutes(authRouter, Object.values(authEndpoints))//will delete, need for commiting
+registerRoutes(authRouter, Object.values(authEndpoints))
