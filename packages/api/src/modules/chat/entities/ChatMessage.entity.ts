@@ -8,8 +8,8 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity";
-import { ChatMessageRole } from "src/modules/chatMessage/typedefs";
+import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
+import { ChatMessageRole } from "src/modules/chat/typedefs";
 
 @Entity("chat_messages")
 @Check("CHK_token_count_positive", '"token_count" >= 0')

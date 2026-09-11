@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import { env } from "src/config/env";
 import { errorMiddleware } from "src/middlewares/error.middleware";
 import { authLimiter, globalLimiter } from "src/middlewares/rateLimit.middleware";
-import { authRouter } from "src/modules/auth/Auth.routes";
+import { authRouter } from "src/modules/auth/Auth.route";
 import { healthRouter } from "src/routes/Health.routes";
 import { familyRouter } from "src/modules/family/Family.routes";
 

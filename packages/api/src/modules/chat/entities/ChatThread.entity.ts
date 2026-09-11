@@ -10,8 +10,8 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 import { User } from "src/modules/user/entities/User.entity";
-import { ChatMessage } from "src/modules/chatMessage/entities/ChatMessage.entity";
-import { ChatThreadStatus } from "src/modules/chatThread/typedefs";
+import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
+import { ChatThreadStatus } from "src/modules/chat/typedefs";
 
 @Entity("chat_threads")
 export class ChatThread {
