@@ -1,7 +1,11 @@
 import { defineRoute } from "src/core/RouteBuilder";
 import { tokenCookiesSchema } from "src/modules/auth/validators";
 import { LogoutUseCase } from "src/modules/auth/useCases/LogoutUser.useCase";
-import { COOKIE_NAMES, ACCESS_COOKIE_CLEAR_OPTIONS, REFRESH_COOKIE_CLEAR_OPTIONS } from "src/modules/auth/constants";
+import {
+  COOKIE_NAMES,
+  ACCESS_COOKIE_CLEAR_OPTIONS,
+  REFRESH_COOKIE_CLEAR_OPTIONS,
+} from "src/modules/auth/constants";
 
 export const logoutRoute = defineRoute({
   method: "post",

@@ -1,4 +1,4 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/AuthUseCase.base";
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { TxContext } from "src/core/TxContext";
 import { UnitOfWork } from "src/db/UnitOfWork";
@@ -13,40 +13,35 @@ type LeaveFamilyOptions = {
 
 type LeaveFamilyResult = void;
 
-export class LeaveFamilyUseCase extends AuthUseCase<
+export class LeaveFamilyUseCase extends FamilyUseCase<
   LeaveFamilyOptions,
   LeaveFamilyResult
 > {
-  private readonly familyRepository: FamilyRepository = new FamilyRepository();
   private readonly uow: IUnitOfWork = new UnitOfWork();
 
   async executeAuth(options: LeaveFamilyOptions): Promise<LeaveFamilyResult> {
     const { newOwnerEmail } = options;
+    const familyId = this.user.family.id;
+    const ownerId = this.user.family.owner.id;
 
-    const family = await this.familyRepository.findFamilyByUser(this.user.id);
-    if (!family) {
-      throw new NotFoundError("User does not have family");
-    }
-
-    const isLastMember = await this.checkIfLastMemberOfFamily(family.id);
-
-    if (isLastMember) {
-      await this.leaveAsLastMember(this.user.id, family.id);
+    if (await this.isLastMemberOfFamily(familyId)) {
+      await this.leaveAsLastMember(this.user.id, familyId);
       return;
     }
 
-    if (family.owner.id === this.user.id) {
-      await this.leaveAsOwner(this.user.id, family.id, newOwnerEmail);
+    if (ownerId === this.user.id) {
+      await this.leaveAsOwner(this.user.id, familyId, newOwnerEmail);
       return;
     }
 
-    await this.userRepository.updateUserFamily({ userId: this.user.id, familyId: null });
+    await this.userRepository.updateUserFamily({
+      userId: this.user.id,
+      familyId: null,
+    });
   }
 
-  private async checkIfLastMemberOfFamily(familyId: number): Promise<boolean> {
-    const memberCount =
-      await this.userRepository.countFamilyMembers(familyId);
-
+  private async isLastMemberOfFamily(familyId: number): Promise<boolean> {
+    const memberCount = await this.userRepository.countFamilyMembers(familyId);
     return memberCount === 1;
   }
 

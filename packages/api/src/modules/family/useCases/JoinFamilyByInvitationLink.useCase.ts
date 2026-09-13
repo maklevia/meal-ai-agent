@@ -14,23 +14,26 @@ export class JoinFamilyByInvitationLinkUseCase extends AuthUseCase<
   JoinFamilyByInvitationLinkOptions,
   JoinFamilyByInvitationLinkResult
 > {
-    private readonly familyRepository: FamilyRepository = new FamilyRepository();
+  private readonly familyRepository: FamilyRepository = new FamilyRepository();
 
-  async executeAuth(
+  override async executeAuth(
     options: JoinFamilyByInvitationLinkOptions,
   ): Promise<JoinFamilyByInvitationLinkResult> {
-    const {invitationToken} = options;
+    const { invitationToken } = options;
 
-    const familyByUser = await this.familyRepository.findFamilyByUser(this.user.id);
-    if (familyByUser) {
+    if (this.user.family) {
       throw new ConflictError(FamilyErrorMessages.USER_ALREADY_IN_FAMILY);
     }
 
-    const familyByInvitation = await this.familyRepository.findInvitationByToken(invitationToken);
+    const familyByInvitation =
+      await this.familyRepository.findInvitationByToken(invitationToken);
     if (!familyByInvitation) {
-      throw new NotFoundError(FamilyErrorMessages.INVITATION_LINK_INVALID)
+      throw new NotFoundError(FamilyErrorMessages.INVITATION_LINK_INVALID);
     }
 
-    await this.userRepository.updateUserFamily({userId: this.user.id, familyId: familyByInvitation.id});
+    await this.userRepository.updateUserFamily({
+      userId: this.user.id,
+      familyId: familyByInvitation.id,
+    });
   }
 }

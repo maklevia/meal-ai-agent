@@ -1,5 +1,4 @@
 import { BaseRepository } from "src/db/BaseRepository";
-import { Family } from "src/modules/family/entities/Family.entity";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserRole } from "src/modules/user/typedefs";
 import { EntityManager } from "typeorm";
@@ -75,9 +74,10 @@ export class UserRepository extends BaseRepository<User> {
   }
 
   async findUserById(id: number): Promise<User | null> {
-    const foundUser = await this.repo.findOneBy({ id: id });
-
-    return foundUser;
+    return this.repo.findOne({
+      where: { id },
+      relations: { family: { owner: true } },
+    });
   }
 
   async findUserByEmail(email: string): Promise<User | null> {

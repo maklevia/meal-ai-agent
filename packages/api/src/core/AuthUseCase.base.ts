@@ -1,6 +1,7 @@
 import { UseCase } from "src/core/UseCase.base";
 import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { AuthenticationError } from "src/errors/http/AuthenticationError";
+import { Family } from "src/modules/family/entities/Family.entity";
 import { User } from "src/modules/user/entities/User.entity";
 
 export abstract class AuthUseCase<
@@ -23,3 +24,11 @@ export abstract class AuthUseCase<
     return this.executeAuth(options);
   }
 }
+
+export abstract class FamilyUseCase<
+  Options,
+  Result,
+> extends AuthUseCase<Options, Result> {
+  declare protected user: User & { family: Family };
+}
+

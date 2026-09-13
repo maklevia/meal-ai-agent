@@ -37,17 +37,6 @@ export class FamilyRepository extends BaseRepository<Family> {
     return createdFamily;
   }
 
-  async findFamilyByUser(userId: number): Promise<Family | null> {
-    const family = await this.repo.findOne({
-      where: {
-        users: { id: userId },
-      },
-      relations: ["owner", "users"],
-    });
-
-    return family;
-  }
-
   async setInvitationToken(options: SetInvitationTokenOptions): Promise<void> {
     const { familyId, invitationToken } = options;
     await this.repo.update({ id: familyId }, { invitationToken });

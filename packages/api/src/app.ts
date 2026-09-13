@@ -6,6 +6,7 @@ import { authLimiter, globalLimiter } from "src/middlewares/rateLimit.middleware
 import { authRouter } from "src/modules/auth/Auth.routes";
 import { healthRouter } from "src/routes/Health.routes";
 import { familyRouter } from "src/modules/family/Family.routes";
+import { productRouter } from "src/modules/product/Product.routes";
 
 export function createApp() {
   const app = express();
@@ -37,6 +38,7 @@ export function createApp() {
 
   app.use(globalLimiter);
   app.use("/family", familyRouter);
+  app.use("/products", productRouter);
 
   app.use(errorMiddleware);
 

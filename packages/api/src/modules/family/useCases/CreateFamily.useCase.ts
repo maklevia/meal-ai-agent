@@ -21,14 +21,13 @@ export class CreateFamilyUseCase extends AuthUseCase<
   async executeAuth(options: CreateFamilyOptions): Promise<CreateFamilyResult> {
     const { familyName } = options;
 
+    if (this.user.family) {
+      throw new ConflictError(FamilyErrorMessages.USER_ALREADY_HAS_FAMILY);
+    }
+
     await this.uow.run(async (tx) => {
       const families = tx.get(FamilyRepository);
       const users = tx.get(UserRepository);
-
-      const existingFamily = await families.findFamilyByUser(this.user.id);
-      if (existingFamily) {
-        throw new ConflictError(FamilyErrorMessages.USER_ALREADY_HAS_FAMILY);
-      }
 
       const createdFamily = await families.createFamily({
         name: familyName,

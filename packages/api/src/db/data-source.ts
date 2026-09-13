@@ -8,7 +8,7 @@ import { User } from "src/modules/user/entities/User.entity";
 import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity";
 import { Family } from "src/modules/family/entities/Family.entity";
 import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity";
-import { ProductsInventory } from "src/modules/productsInventory/entities/ProductsInventory.entity";
+import { Product } from "src/modules/product/entities/Product.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
@@ -30,7 +30,7 @@ export const AppDataSource = new DataSource({
     UserPreferences,
     Family,
     MealHistory,
-    ProductsInventory,
+    Product,
     ChatThread,
     ChatMessage,
     RefreshToken,

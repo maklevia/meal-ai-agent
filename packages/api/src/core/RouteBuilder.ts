@@ -22,13 +22,13 @@ export interface RouteConfig {
   auth?: boolean;
   middlewares?: RequestHandler[];
   validators?: {
-    body?: z.ZodSchema;
-    params?: z.ZodSchema;
-    query?: z.ZodSchema;
-    cookies?: z.ZodSchema;
+    body?: z.ZodTypeAny;
+    params?: z.ZodTypeAny;
+    query?: z.ZodTypeAny;
+    cookies?: z.ZodTypeAny;
   };
   useCase: () => UseCase<unknown, unknown>;
-  map: (req: any) => unknown;
+  map?: (req: any) => unknown;
   respond?: (result: any, res: Response) => void;
 }
 
@@ -41,13 +41,13 @@ export interface RouteDefinition<
   TCookies = unknown,
 > extends RouteConfig {
   validators?: {
-    body?: z.ZodSchema<TBody>;
-    params?: z.ZodSchema<TParams>;
-    query?: z.ZodSchema<TQuery>;
-    cookies?: z.ZodSchema<TCookies>;
+    body?: z.ZodType<TBody, z.ZodTypeDef, unknown>;
+    params?: z.ZodType<TParams, z.ZodTypeDef, unknown>;
+    query?: z.ZodType<TQuery, z.ZodTypeDef, unknown>;
+    cookies?: z.ZodType<TCookies, z.ZodTypeDef, unknown>;
   };
   useCase: UseCaseFactory<TOptions, TResult>;
-  map: (
+  map?: (
     req: Request<TParams, unknown, TBody, TQuery> & { cookies: TCookies },
   ) => TOptions;
   respond?: ResponseMapper<TResult>;
@@ -82,7 +82,7 @@ export function registerRoutes(router: Router, routes: RouteConfig[]): void {
           useCase.setAuthUser(req.user);
         }
 
-        const options = config.map(req);
+        const options = config.map?.(req);
         const result = await useCase.execute(options);
 
         const respond = config.respond ?? defaultResponseMapper;
