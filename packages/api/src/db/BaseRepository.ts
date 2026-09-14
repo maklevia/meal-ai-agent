@@ -18,3 +18,4 @@ export abstract class BaseRepository<TEntity extends ObjectLiteral> {
     return AppDataSource.getRepository(this.entity);
   }
 }
+

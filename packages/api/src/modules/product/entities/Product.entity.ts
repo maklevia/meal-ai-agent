@@ -2,15 +2,16 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToOne,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Relation,
   UpdateDateColumn,
 } from "typeorm";
 import { Family } from "src/modules/family/entities/Family.entity";
 
-@Entity("products_inventories")
-export class ProductsInventory {
+@Entity("products")
+export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -29,6 +30,10 @@ export class ProductsInventory {
   @Column({ type: "timestamptz", nullable: true })
   finishedAt: Date | null;
 
-  @OneToOne(() => Family, (family) => family.productsInventory)
+  @ManyToOne(() => Family, (family) => family.products, {
+    nullable: false,
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
   family: Relation<Family>;
 }

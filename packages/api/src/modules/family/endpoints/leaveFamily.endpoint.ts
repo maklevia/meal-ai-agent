@@ -6,7 +6,10 @@ export const leaveFamilyRoute = defineRoute({
   method: "post",
   path: "/leave",
   auth: true,
+  family: true,
   validators: { body: leaveFamilyBodySchema },
   useCase: () => new LeaveFamilyUseCase(),
-  map: (req) => ({ newOwnerEmail: req.body.newOwnerEmail }),
+  map: (req) => ({
+    newOwnerEmail: req.body.newOwnerEmail,
+  }),
 });

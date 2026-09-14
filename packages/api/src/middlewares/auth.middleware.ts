@@ -33,7 +33,6 @@ export class AuthMiddleware {
     if (user.role !== userRole) {
       throw new AuthenticationError(AuthErrorMessages.TOKEN_CLAIMS_OUTDATED);
     }
-
     req.user = user;
 
     next();

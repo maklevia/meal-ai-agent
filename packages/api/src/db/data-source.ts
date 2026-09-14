@@ -8,9 +8,9 @@ import { User } from "src/modules/user/entities/User.entity";
 import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity";
 import { Family } from "src/modules/family/entities/Family.entity";
 import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity";
-import { ProductsInventory } from "src/modules/productsInventory/entities/ProductsInventory.entity";
-import { ChatThread } from "src/modules/chatThread/entities/ChatThread.entity";
-import { ChatMessage } from "src/modules/chatMessage/entities/ChatMessage.entity";
+import { Product } from "src/modules/product/entities/Product.entity";
+import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
+import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 import { RegistrationInvitation } from "src/modules/auth/entities/RegistrationInvitation.entity";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
@@ -30,7 +30,7 @@ export const AppDataSource = new DataSource({
     UserPreferences,
     Family,
     MealHistory,
-    ProductsInventory,
+    Product,
     ChatThread,
     ChatMessage,
     RefreshToken,

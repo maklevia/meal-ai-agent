@@ -1,37 +1,27 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { FamilyErrorMessages } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { FamilyService } from "src/modules/family/Family.service";
-import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
-
-type GetFamilyInvitationLinkOptions = {
-};
 
 type GetFamilyInvitationLinkResult = {
   invitationLink: string;
 };
 
-export class GetFamilyInvitationLinkUseCase extends AuthUseCase<
-  GetFamilyInvitationLinkOptions,
+export class GetFamilyInvitationLinkUseCase extends FamilyUseCase<
+  void,
   GetFamilyInvitationLinkResult
 > {
-  private readonly familyRepository: FamilyRepository = new FamilyRepository();
   private readonly familyService: FamilyService = new FamilyService();
 
-  async executeAuth(
-    options: GetFamilyInvitationLinkOptions,
-  ): Promise<GetFamilyInvitationLinkResult> {
-    const family = await this.familyRepository.findFamilyByUser(this.user.id);
-    if (!family) {
-      throw new NotFoundError(FamilyErrorMessages.FAMILY_NOT_FOUND);
-    }
+  async executeFamily(): Promise<GetFamilyInvitationLinkResult> {
+    const { invitationToken } = this.user.family;
 
-    if (!family.invitationToken) {
+    if (!invitationToken) {
       throw new NotFoundError(FamilyErrorMessages.FAMILY_INVITATION_NOT_FOUND);
     }
-    const invitationLink = this.familyService.createFamilyInvitationLink(
-      family.invitationToken,
-    );
+
+    const invitationLink =
+      this.familyService.createFamilyInvitationLink(invitationToken);
 
     return { invitationLink };
   }
