@@ -30,6 +30,19 @@ type RouteRequirements<TUseCase> = TUseCase extends FamilyUseCase<any, any>
     ? { auth: true }
     : { auth?: boolean; family?: boolean };
 
+type RouteRequest<TParams, TBody, TQuery, TCookies> = Request<
+  TParams,
+  unknown,
+  TBody,
+  TQuery
+> & { cookies: TCookies };
+
+type MapRequirement<TOptions, TParams, TBody, TQuery, TCookies> = [
+  TOptions,
+] extends [void]
+  ? { map?: (req: RouteRequest<TParams, TBody, TQuery, TCookies>) => TOptions }
+  : { map: (req: RouteRequest<TParams, TBody, TQuery, TCookies>) => TOptions };
+
 export interface RouteConfig {
   method: "get" | "post" | "put" | "patch" | "delete";
   path: string;
@@ -65,7 +78,7 @@ export interface RouteDefinition<
   };
   useCase: () => TUseCase;
   map?: (
-    req: Request<TParams, unknown, TBody, TQuery> & { cookies: TCookies },
+    req: RouteRequest<TParams, TBody, TQuery, TCookies>,
   ) => TOptions;
   respond?: ResponseMapper<TResult>;
 }
@@ -81,10 +94,11 @@ export function defineRoute<
 >(
   config: Omit<
     RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies>,
-    "useCase"
+    "useCase" | "map"
   > & {
     useCase: UseCaseFactory<TOptions, TResult> & (() => TUseCase);
-  } & RouteRequirements<TUseCase>,
+  } & RouteRequirements<TUseCase> &
+    MapRequirement<TOptions, TParams, TBody, TQuery, TCookies>,
 ): RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies> {
   return config;
 }
