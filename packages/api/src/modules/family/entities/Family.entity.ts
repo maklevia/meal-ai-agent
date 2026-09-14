@@ -11,6 +11,7 @@ import {
 } from "typeorm";
 import { User } from "src/modules/user/entities/User.entity";
 import { Product } from "src/modules/product/entities/Product.entity";
+import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 
 @Entity("families")
 export class Family {
@@ -40,4 +41,9 @@ export class Family {
     cascade: true,
   })
   products: Relation<Product[]>;
+
+  @OneToMany(() => ChatThread, (thread) => thread.family, {
+    cascade: true,
+  })
+  chatThreads: Relation<ChatThread[]>;
 }
