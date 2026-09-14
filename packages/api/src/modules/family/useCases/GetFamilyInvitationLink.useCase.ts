@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { FamilyErrorMessages } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { FamilyService } from "src/modules/family/Family.service";
@@ -13,7 +13,7 @@ export class GetFamilyInvitationLinkUseCase extends FamilyUseCase<
 > {
   private readonly familyService: FamilyService = new FamilyService();
 
-  async executeAuth(): Promise<GetFamilyInvitationLinkResult> {
+  async executeFamily(): Promise<GetFamilyInvitationLinkResult> {
     const { invitationToken } = this.user.family;
 
     if (!invitationToken) {

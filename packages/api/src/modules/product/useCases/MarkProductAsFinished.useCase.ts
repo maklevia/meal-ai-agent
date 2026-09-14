@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 
 type MarkProductOptions = {
@@ -14,7 +14,7 @@ export class MarkProductsAsFinishedUseCase extends FamilyUseCase<
   private readonly productRepository: ProductRepository =
     new ProductRepository();
 
-  async executeAuth(options: MarkProductOptions): Promise<MarkProductResult> {
+  async executeFamily(options: MarkProductOptions): Promise<MarkProductResult> {
     const { productId } = options;
 
     await this.productRepository.markProductAsFinished({

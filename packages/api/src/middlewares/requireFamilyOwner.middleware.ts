@@ -2,9 +2,6 @@ import { RequestHandler } from "express";
 import { ForbiddenError } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 
-/**
- * Must run after `requireFamily`, which guarantees the family is present.
- */
 export class RequireFamilyOwner {
   handle: RequestHandler = (req, _res, next) => {
     const { family } = req.user;

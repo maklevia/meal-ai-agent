@@ -1,7 +1,10 @@
 import { Router, Request, Response, RequestHandler } from "express";
 import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { UseCase } from "src/core/UseCase.base";
 import { authMiddleware } from "src/middlewares/auth.middleware";
+import { requireFamily } from "src/middlewares/requireFamily.middleware";
+import { requireFamilyOwner } from "src/middlewares/requireFamilyOwner.middleware";
 import { validate } from "src/middlewares/validate.middleware";
 import z from "zod";
 
@@ -16,10 +19,23 @@ function defaultResponseMapper<TResult>(result: TResult, res: Response): void {
   res.status(200).json(result);
 }
 
+/**
+ * Routes declare their requirements:
+ * - `AuthUseCase`   -> `auth: true`   -> `authMiddleware` sets `req.user`
+ * - `FamilyUseCase` -> `family: true` -> `requireFamily` guarantees a family
+ */
+type RouteRequirements<TUseCase> = TUseCase extends FamilyUseCase<any, any>
+  ? { auth: true; family: true }
+  : TUseCase extends AuthUseCase<any, any>
+    ? { auth: true }
+    : { auth?: boolean; family?: boolean };
+
 export interface RouteConfig {
   method: "get" | "post" | "put" | "patch" | "delete";
   path: string;
   auth?: boolean;
+  family?: boolean;
+  owner?: boolean;
   middlewares?: RequestHandler[];
   validators?: {
     body?: z.ZodTypeAny;
@@ -39,6 +55,7 @@ export interface RouteDefinition<
   TBody = unknown,
   TQuery = unknown,
   TCookies = unknown,
+  TUseCase extends UseCase<TOptions, TResult> = UseCase<TOptions, TResult>,
 > extends RouteConfig {
   validators?: {
     body?: z.ZodType<TBody, z.ZodTypeDef, unknown>;
@@ -46,7 +63,7 @@ export interface RouteDefinition<
     query?: z.ZodType<TQuery, z.ZodTypeDef, unknown>;
     cookies?: z.ZodType<TCookies, z.ZodTypeDef, unknown>;
   };
-  useCase: UseCaseFactory<TOptions, TResult>;
+  useCase: () => TUseCase;
   map?: (
     req: Request<TParams, unknown, TBody, TQuery> & { cookies: TCookies },
   ) => TOptions;
@@ -60,8 +77,14 @@ export function defineRoute<
   TBody = unknown,
   TQuery = unknown,
   TCookies = unknown,
+  TUseCase extends UseCase<TOptions, TResult> = UseCase<TOptions, TResult>,
 >(
-  config: RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies>,
+  config: Omit<
+    RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies>,
+    "useCase"
+  > & {
+    useCase: UseCaseFactory<TOptions, TResult> & (() => TUseCase);
+  } & RouteRequirements<TUseCase>,
 ): RouteDefinition<TOptions, TResult, TParams, TBody, TQuery, TCookies> {
   return config;
 }
@@ -69,8 +92,23 @@ export function defineRoute<
 export function registerRoutes(router: Router, routes: RouteConfig[]): void {
   for (const config of routes) {
     const handlers: RequestHandler[] = [];
+    const requiresFamily = Boolean(config.family || config.owner);
+
+    const useCaseForGuard = config.useCase();
+    if (useCaseForGuard instanceof FamilyUseCase && !config.family) {
+      throw new Error(
+        `Route "${config.method.toUpperCase()} ${config.path}" uses a FamilyUseCase but does not set "family: true".`,
+      );
+    }
+    if (useCaseForGuard instanceof AuthUseCase && !config.auth) {
+      throw new Error(
+        `Route "${config.method.toUpperCase()} ${config.path}" uses an AuthUseCase but does not set "auth: true".`,
+      );
+    }
 
     if (config.auth) handlers.push(authMiddleware);
+    if (requiresFamily) handlers.push(requireFamily);
+    if (config.owner) handlers.push(requireFamilyOwner);
     if (config.middlewares) handlers.push(...config.middlewares);
     if (config.validators) handlers.push(validate(config.validators));
 
@@ -78,7 +116,7 @@ export function registerRoutes(router: Router, routes: RouteConfig[]): void {
       try {
         const useCase = config.useCase();
 
-        if (config.auth && useCase instanceof AuthUseCase) {
+        if (useCase instanceof AuthUseCase) {
           useCase.setAuthUser(req.user);
         }
 

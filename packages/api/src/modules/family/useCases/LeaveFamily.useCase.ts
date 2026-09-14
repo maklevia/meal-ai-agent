@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { TxContext } from "src/core/TxContext";
 import { UnitOfWork } from "src/db/UnitOfWork";
@@ -19,7 +19,7 @@ export class LeaveFamilyUseCase extends FamilyUseCase<
 > {
   private readonly uow: IUnitOfWork = new UnitOfWork();
 
-  async executeAuth(options: LeaveFamilyOptions): Promise<LeaveFamilyResult> {
+  async executeFamily(options: LeaveFamilyOptions): Promise<LeaveFamilyResult> {
     const { newOwnerEmail } = options;
     const familyId = this.user.family.id;
     const ownerId = this.user.family.owner.id;

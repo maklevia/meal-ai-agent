@@ -1,14 +1,13 @@
 import { defineRoute } from "src/core/RouteBuilder";
 import { kickMemberParamsSchema } from "src/modules/family/validators";
 import { KickFamilyMemberUseCase } from "src/modules/family/useCases/KickFamilyMember.useCase";
-import { requireFamily } from "src/middlewares/requireFamily.middleware";
-import { requireFamilyOwner } from "src/middlewares/requireFamilyOwner.middleware";
 
 export const kickMemberRoute = defineRoute({
   method: "delete",
   path: "/members/:email",
   auth: true,
-  middlewares: [requireFamily, requireFamilyOwner],
+  family: true,
+  owner: true,
   validators: { params: kickMemberParamsSchema },
   useCase: () => new KickFamilyMemberUseCase(),
   map: (req) => ({

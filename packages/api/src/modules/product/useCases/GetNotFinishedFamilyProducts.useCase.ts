@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { Product } from "src/modules/product/entities/Product.entity";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 
@@ -13,7 +13,7 @@ export class GetNotFinishedFamilyProducts extends FamilyUseCase<
   private readonly productRepository: ProductRepository =
     new ProductRepository();
 
-  async executeAuth(): Promise<GetNotFinishedProductsResult> {
+  async executeFamily(): Promise<GetNotFinishedProductsResult> {
     const products = await this.productRepository.getNotFinishedFamilyProducts(
       this.user.family.id,
     );

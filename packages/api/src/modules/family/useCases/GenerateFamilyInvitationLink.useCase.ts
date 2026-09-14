@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { FamilyUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { FamilyService } from "src/modules/family/Family.service";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
 
@@ -14,7 +14,7 @@ export class GenerateFamilyInvitationLinkUseCase extends FamilyUseCase<
   private readonly familyService: FamilyService = new FamilyService();
   private readonly familyRepository: FamilyRepository = new FamilyRepository();
 
-  async executeAuth(): Promise<GenerateFamilyInvitationLinkResult> {
+  async executeFamily(): Promise<GenerateFamilyInvitationLinkResult> {
     const invitationToken = randomUUID();
 
     await this.familyRepository.setInvitationToken({

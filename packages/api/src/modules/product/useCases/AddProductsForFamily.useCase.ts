@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/FamilyUseCase.base";
 import { Product } from "src/modules/product/entities/Product.entity";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 import { DeepPartial } from "typeorm";
@@ -16,7 +16,7 @@ export class AddProductsForFamily extends FamilyUseCase<
   private readonly productRepository: ProductRepository =
     new ProductRepository();
 
-  async executeAuth(options: AddProductsOptions): Promise<AddProductsResult> {
+  async executeFamily(options: AddProductsOptions): Promise<AddProductsResult> {
     const { products } = options;
 
     await this.productRepository.addProductsToFamily({
