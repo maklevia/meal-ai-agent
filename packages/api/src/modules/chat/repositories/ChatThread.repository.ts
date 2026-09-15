@@ -23,6 +23,15 @@ export class ChatThreadRepository extends BaseRepository<ChatThread> {
     return ChatThread;
   }
 
+  async findThreadById(threadId: number): Promise<ChatThread | null> {
+    const chatThread = await this.repo.findOne({
+      where: {id: threadId},
+      relations: {user: true, family: true}
+    })
+
+    return chatThread;
+  }
+
   async findAllUserThreads(userId: number): Promise<ChatThread[]> {
     const chatThreads = await this.repo.find({
       where: {
