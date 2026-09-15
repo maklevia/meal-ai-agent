@@ -3,19 +3,7 @@ import { Server } from "socket.io";
 import { env } from "src/config/env";
 import { SocketAuthMiddleware } from "src/sockets/auth";
 import { familyRoom, userRoom } from "src/sockets/rooms";
-import {
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
-} from "src/sockets/typedefs";
-
-export type AppSocketServer = Server<
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData
->;
+import { AppSocketServer } from "src/sockets/typedefs";
 
 export function createSocketServer(httpServer: HttpServer): AppSocketServer {
   const io: AppSocketServer = new Server(httpServer, {
@@ -25,7 +13,7 @@ export function createSocketServer(httpServer: HttpServer): AppSocketServer {
     },
   });
 
-  io.use(new SocketAuthMiddleware().handle)
+  io.use(new SocketAuthMiddleware().handle);
 
   io.on("connection", (socket) => {
     const { user, expiresAt } = socket.data;
@@ -36,8 +24,8 @@ export function createSocketServer(httpServer: HttpServer): AppSocketServer {
       socket.join(familyRoom(user.family.id));
     }
 
-    //auth session emit here?
-
+    socket.emit("auth:session", { expiresAt });
+    
     console.log(
       `API: socket ${socket.id} connected user=${user.id} rooms=[${[...socket.rooms].join(", ")}]`,
     );

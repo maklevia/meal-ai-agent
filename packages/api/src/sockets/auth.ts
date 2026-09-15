@@ -1,7 +1,5 @@
 import { parse } from "cookie";
-import { Socket } from "socket.io";
 import {
-    AppError,
   AuthenticationError,
   AuthErrorMessages,
   NotFoundError,
@@ -10,19 +8,10 @@ import { AuthService } from "src/modules/auth/Auth.service";
 import { COOKIE_NAMES } from "src/modules/auth/constants";
 import { UserRepository } from "src/modules/user/repositories/User.repository";
 import {
-  ClientToServerEvents,
-  InterServerEvents,
-  ServerToClientEvents,
-  SocketData,
+    AppSocket,
 } from "src/sockets/typedefs";
 import jwt from "jsonwebtoken";
-
-export type AppSocket = Socket<
-  ClientToServerEvents,
-  ServerToClientEvents,
-  InterServerEvents,
-  SocketData
->;
+import { toHandshakeError } from "src/sockets/error";
 
 export class SocketAuthMiddleware {
   constructor(
@@ -54,7 +43,7 @@ export class SocketAuthMiddleware {
 
       next();
     } catch (error) {
-      next(this.toHandshakeError(error));
+      next(toHandshakeError(error));
     }
   };
 
@@ -83,16 +72,4 @@ export class SocketAuthMiddleware {
     }
     return null;
   }
-
-   private toHandshakeError(err: unknown): Error {                                                                                       
-       const isAuthFailure =                                                                                                               
-         err instanceof AuthenticationError || err instanceof NotFoundError;                                                               
-                                                                                                                                           
-       const error = new Error(err instanceof AppError ? err.message : "Unauthorized");                                                    
-       (error as Error & { data?: unknown }).data = {                                                                                      
-         code: isAuthFailure ? "UNAUTHENTICATED" : "INTERNAL",                                                                             
-       };                                                                                                                                  
-                                                                                                                                           
-       return error;                                                                                                                       
-     }    
 }

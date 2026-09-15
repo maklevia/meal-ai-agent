@@ -9,7 +9,7 @@ async function bootstrap() {
   console.log("API: Database connected");
 
   const app = createApp();
-  const httpServer = createServer();
+  const httpServer = createServer(app);
   const io = createSocketServer(httpServer);
 
   httpServer.listen(env.API_PORT, () => {
