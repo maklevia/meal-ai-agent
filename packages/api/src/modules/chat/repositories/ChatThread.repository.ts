@@ -24,11 +24,15 @@ export class ChatThreadRepository extends BaseRepository<ChatThread> {
     return ChatThread;
   }
 
+  async touchThread(threadId: number): Promise<void> {
+    await this.repo.update({ id: threadId }, { updatedAt: new Date() });
+  }
+
   async findThreadById(threadId: number): Promise<ChatThread | null> {
     const chatThread = await this.repo.findOne({
-      where: {id: threadId},
-      relations: {user: true, family: true}
-    })
+      where: { id: threadId },
+      relations: { user: true, family: true },
+    });
 
     return chatThread;
   }
@@ -69,7 +73,7 @@ export class ChatThreadRepository extends BaseRepository<ChatThread> {
   }
 
   async findAllFamilyThreads(familyId: number): Promise<ChatThread[]> {
-     const chatThreads = await this.repo.find({
+    const chatThreads = await this.repo.find({
       where: {
         family: {
           id: familyId,
@@ -81,24 +85,28 @@ export class ChatThreadRepository extends BaseRepository<ChatThread> {
     return chatThreads;
   }
 
-  async createUserThread(options: CreateUserThreadOptions): Promise<ChatThread> {
-    const {userId, title} = options;
+  async createUserThread(
+    options: CreateUserThreadOptions,
+  ): Promise<ChatThread> {
+    const { userId, title } = options;
 
     const newThread = new ChatThread();
-    newThread.user = {id: userId} as User;
+    newThread.user = { id: userId } as User;
     newThread.title = title;
-    
+
     const createdThread = await this.repo.save(newThread);
     return createdThread;
   }
 
-  async createFamilyThread(options: CreateFamilyThreadOptions): Promise<ChatThread> {
-    const {familyId, title} = options;
+  async createFamilyThread(
+    options: CreateFamilyThreadOptions,
+  ): Promise<ChatThread> {
+    const { familyId, title } = options;
 
     const newThread = new ChatThread();
-    newThread.family = {id: familyId} as Family;
+    newThread.family = { id: familyId } as Family;
     newThread.title = title;
-    
+
     const createdThread = await this.repo.save(newThread);
     return createdThread;
   }

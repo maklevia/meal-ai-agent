@@ -25,8 +25,6 @@ export abstract class ThreadUseCase<TOptions extends {threadId: number}, TResult
 
     private ensureAccess(thread: ChatThread): void {
         const isOwner = thread.user?.id === this.user.id;
-        // `!= null` guard is required: without it, two users with no family
-        // would match through `undefined === undefined`.
         const isFamilyMember =
             thread.family != null && thread.family.id === this.user.family?.id;
 
