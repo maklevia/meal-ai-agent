@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { AuthUseCase } from "src/core/AuthUseCase.base";
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { UseCase } from "src/core/UseCase.base";
 import { AuthenticationError, AuthErrorMessages } from "src/errors";
 import { serializeAppError } from "src/sockets/error";
