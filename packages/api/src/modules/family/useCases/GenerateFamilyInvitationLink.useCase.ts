@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { FamilyService } from "src/modules/family/Family.service";
 import { FamilyRepository } from "src/modules/family/repositories/Family.repository";
 

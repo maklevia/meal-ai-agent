@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { FamilyErrorMessages } from "src/errors";
 import { NotFoundError } from "src/errors/http/NotFoundError";
 import { FamilyService } from "src/modules/family/Family.service";

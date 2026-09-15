@@ -1,4 +1,4 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
 import { ConflictError } from "src/errors";
 import { FamilyErrorMessages } from "src/errors/messages/family.messages";
 import { NotFoundError } from "src/errors/http/NotFoundError";

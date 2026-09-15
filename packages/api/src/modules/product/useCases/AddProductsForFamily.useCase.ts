@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { Product } from "src/modules/product/entities/Product.entity";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 import { DeepPartial } from "typeorm";

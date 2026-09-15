@@ -24,11 +24,13 @@ export abstract class ThreadUseCase<TOptions extends {threadId: number}, TResult
     } 
 
     private ensureAccess(thread: ChatThread): void {
-        let isAccessEnsured: boolean = false;
-        if (thread.user?.id === this.user.id) isAccessEnsured = true;
-        if (thread.family?.id === this.user.family?.id) isAccessEnsured = true;
+        const isOwner = thread.user?.id === this.user.id;
+        // `!= null` guard is required: without it, two users with no family
+        // would match through `undefined === undefined`.
+        const isFamilyMember =
+            thread.family != null && thread.family.id === this.user.family?.id;
 
-        if (!isAccessEnsured) {
+        if (!isOwner && !isFamilyMember) {
             throw new ForbiddenError(ChatErrorMessages.CHAT_THREAD_ACCESS_FORBIDDEN);
         }
     }

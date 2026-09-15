@@ -1,6 +1,6 @@
 import { Router, Request, Response, RequestHandler } from "express";
-import { AuthUseCase } from "src/core/AuthUseCase.base";
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { UseCase } from "src/core/UseCase.base";
 import { authMiddleware } from "src/middlewares/auth.middleware";
 import { requireFamily } from "src/middlewares/requireFamily.middleware";

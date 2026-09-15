@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { TxContext } from "src/core/TxContext";
 import { UnitOfWork } from "src/db/UnitOfWork";

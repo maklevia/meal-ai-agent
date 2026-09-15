@@ -1,4 +1,4 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
 import { ForbiddenError } from "src/errors";
 import { FamilyErrorMessages } from "src/errors/messages/family.messages";
 import { Family } from "src/modules/family/entities/Family.entity";

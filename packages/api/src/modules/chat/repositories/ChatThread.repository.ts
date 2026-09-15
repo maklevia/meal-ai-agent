@@ -1,8 +1,9 @@
 import { BaseRepository } from "src/db/BaseRepository";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
+import { ChatThreadStatus } from "src/modules/chat/typedefs";
 import { Family } from "src/modules/family/entities/Family.entity";
 import { User } from "src/modules/user/entities/User.entity";
-import { EntityManager } from "typeorm";
+import { EntityManager, FindOptionsWhere } from "typeorm";
 
 type CreateUserThreadOptions = {
   userId: number;
@@ -30,6 +31,28 @@ export class ChatThreadRepository extends BaseRepository<ChatThread> {
     })
 
     return chatThread;
+  }
+
+  async findVisibleThreads(options: {
+    userId: number;
+    familyId: number | null;
+  }): Promise<ChatThread[]> {
+    const { userId, familyId } = options;
+
+    const where: FindOptionsWhere<ChatThread>[] = [
+      { user: { id: userId }, status: ChatThreadStatus.Active },
+    ];
+    if (familyId !== null) {
+      where.push({ family: { id: familyId }, status: ChatThreadStatus.Active });
+    }
+
+    const chatThreads = await this.repo.find({
+      where,
+      relations: { user: true, family: true },
+      order: { updatedAt: "DESC" },
+    });
+
+    return chatThreads;
   }
 
   async findAllUserThreads(userId: number): Promise<ChatThread[]> {

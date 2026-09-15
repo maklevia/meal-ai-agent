@@ -1,4 +1,4 @@
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 
 type MarkProductOptions = {
