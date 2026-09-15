@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { registerRoutes } from "src/core/RouteBuilder";
-import { addProductsRoute } from "src/modules/product/endpoints/addProducts.endpoint";
-import { getProductsRoute } from "src/modules/product/endpoints/getProducts.endpoint";
-import { markProductFinishedRoute } from "src/modules/product/endpoints/markProductFinished.endpoint";
+import { addProductsRoute } from "src/modules/product/routes/addProducts.route";
+import { getProductsRoute } from "src/modules/product/routes/getProducts.route";
+import { markProductFinishedRoute } from "src/modules/product/routes/markProductFinished.route";
 
 const router = Router();
 
