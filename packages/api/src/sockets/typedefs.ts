@@ -51,6 +51,12 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
   "auth:session": (payload: { expiresAt: number | null }) => void;
   "message:created": (payload: { message: ChatMessage }) => void;
+  "thread:notify": (payload: {                                                                                                            
+     threadId: number;                                                                                                                     
+     messageId: number;                                                                                                                    
+     preview: string;                                                                                                                      
+     createdAt: Date;                                                                                                                      
+   }) => void;
 }
 
 export interface InterServerEvents {}
