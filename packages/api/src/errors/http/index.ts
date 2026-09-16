@@ -3,3 +3,4 @@ export * from "./AuthenticationError";
 export * from "./ForbiddenError";
 export * from "./ConflictError";
 export * from "./NotFoundError";
+export * from "./AgentBusyError"

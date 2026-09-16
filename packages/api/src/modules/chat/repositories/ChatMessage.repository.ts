@@ -49,6 +49,15 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
         return messages;
     }
 
+    async getThreadMessagesAscending(threadId: number): Promise<ChatMessage[]> {
+        const messages = await this.repo.find({
+            where: { thread: { id: threadId } },
+            order: { id: "ASC" },
+        });
+
+        return messages;
+    }
+
     async saveUserMessage(options: SaveMessageOptions): Promise<ChatMessage> {
         const {threadId, content} = options
         const newMessage = new ChatMessage();

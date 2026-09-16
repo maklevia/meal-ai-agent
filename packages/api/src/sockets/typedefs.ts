@@ -51,12 +51,12 @@ export interface ClientToServerEvents {
 export interface ServerToClientEvents {
   "auth:session": (payload: { expiresAt: number | null }) => void;
   "message:created": (payload: { message: ChatMessage }) => void;
-  "thread:notify": (payload: {                                                                                                            
-     threadId: number;                                                                                                                     
-     messageId: number;                                                                                                                    
-     preview: string;                                                                                                                      
-     createdAt: Date;                                                                                                                      
-   }) => void;
+  "thread:notify": (payload: {
+    threadId: number;
+    messageId: number;
+    preview: string;
+    createdAt: Date;
+  }) => void;
 }
 
 export interface InterServerEvents {}
@@ -74,3 +74,11 @@ export type AppSocketServer = Server<
   InterServerEvents,
   SocketData
 >;
+
+export enum AgentGenerationStatus {
+  Pending = "pending",
+  Streaming = "streaming",
+  Completed = "completed",
+  Failed = "failed",
+  Cancelled = "calcelled",
+}
