@@ -45,6 +45,12 @@ export class SendMessageUseCase extends ThreadUseCase<
       thread: toThreadRef(this.thread),
     });
 
+    // TODO(agent): this is the single integration point. Start the agent reply
+    // for this thread here (as a background job decoupled from this socket
+    // request), and stream it back through the notifier port. Once implemented,
+    // also return the generation's requestId from this use case.
+    // e.g. startAgentReply({ thread: this.thread, triggeredBy: this.user })
+
     return { message, clientMessageId };
   }
 }

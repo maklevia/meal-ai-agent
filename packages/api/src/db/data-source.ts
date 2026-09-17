@@ -11,7 +11,6 @@ import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity
 import { Product } from "src/modules/product/entities/Product.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
-import { ChatGeneration } from "src/modules/chat/entities/ChatGeneration.entity";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 import { RegistrationInvitation } from "src/modules/auth/entities/RegistrationInvitation.entity";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
@@ -34,7 +33,6 @@ export const AppDataSource = new DataSource({
     Product,
     ChatThread,
     ChatMessage,
-    ChatGeneration,
     RefreshToken,
     RegistrationInvitation,
     PasswordResetCode,

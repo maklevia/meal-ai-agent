@@ -13,11 +13,3 @@ export enum ChatThreadScope {
   User = "user",
   Family = "family",
 }
-
-export enum ChatGenerationStatus {
-  Pending = "pending",
-  Streaming = "streaming",
-  Completed = "completed",
-  Failed = "failed",
-  Cancelled = "cancelled",
-}

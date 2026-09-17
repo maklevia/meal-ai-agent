@@ -63,6 +63,8 @@ export function registerSocketEvents(
 
         const rawPayload = args[0];
 
+        console.log(rawPayload);
+
         try {
           if (config.auth !== false && !socket.data.user) {
             throw new AuthenticationError(AuthErrorMessages.NOT_AUTHENTICATED);
@@ -71,6 +73,8 @@ export function registerSocketEvents(
           const payload = config.schema
             ? config.schema.parse(rawPayload)
             : rawPayload;
+
+            console.log(payload);
 
           const useCase = config.useCase();
           if (useCase instanceof AuthUseCase) {

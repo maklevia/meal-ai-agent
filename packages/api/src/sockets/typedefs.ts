@@ -14,7 +14,6 @@ export type SocketErrorCode =
   | "NOT_FOUND"
   | "VALIDATION_FAILED"
   | "CONFLICT"
-  | "AGENT_BUSY"
   | "RATE_LIMITED"
   | "INTERNAL";
 
@@ -46,6 +45,9 @@ export interface ClientToServerEvents {
       r: SocketAck<{ message: ChatMessage; clientMessageId?: string }>,
     ) => void,
   ) => void;
+  // TODO(agent): extend `message:send`'s ack with `requestId: string` and
+  // `thread:join`'s ack with `generation: { requestId, status, contentSoFar } | null`
+  // once the agent can stream replies.
 }
 
 export interface ServerToClientEvents {
@@ -57,6 +59,12 @@ export interface ServerToClientEvents {
     preview: string;
     createdAt: Date;
   }) => void;
+  // TODO(agent): add the agent streaming events here once implemented:
+  //   "agent:started"   (p: { threadId; requestId })
+  //   "agent:delta"     (p: { threadId; requestId; delta })
+  //   "agent:completed" (p: { threadId; requestId; message })
+  //   "agent:failed"    (p: { threadId; requestId; reason })
+  // Emitted by SocketIOChatNotifier.agentStarted/Delta/Completed/Failed.
 }
 
 export interface InterServerEvents {}
@@ -74,11 +82,3 @@ export type AppSocketServer = Server<
   InterServerEvents,
   SocketData
 >;
-
-export enum AgentGenerationStatus {
-  Pending = "pending",
-  Streaming = "streaming",
-  Completed = "completed",
-  Failed = "failed",
-  Cancelled = "calcelled",
-}
