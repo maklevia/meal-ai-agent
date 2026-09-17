@@ -23,7 +23,12 @@ export const validate =
         req.cookies = schemas.cookies.parse(req.cookies);
       }
       if (schemas.query) {
-        req.query = schemas.query.parse(req.query);
+        Object.defineProperty(req, "query", {
+          value: schemas.query.parse(req.query),
+          writable: true,
+          configurable: true,
+          enumerable: true,
+        });
       }
 
       next();

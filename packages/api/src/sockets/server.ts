@@ -1,9 +1,14 @@
 import { Server as HttpServer } from "node:http";
 import { Server } from "socket.io";
+import { chatSocketEvents } from "src/modules/chat/Chat.sockets";
 import { env } from "src/config/env";
 import { SocketAuthMiddleware } from "src/sockets/auth";
+import { healthPingSocket } from "src/sockets/events/healthPing.socket";
 import { familyRoom, userRoom } from "src/sockets/rooms";
+import { registerSocketEvents } from "src/sockets/SocketBuilder";
 import { AppSocketServer } from "src/sockets/typedefs";
+import { setChatRealtimeNotifier } from "src/modules/chat/realTime/chatNotifier";
+import { SocketIOChatNotifier } from "src/modules/chat/sockets/SocketIOChatNotifier";
 
 export function createSocketServer(httpServer: HttpServer): AppSocketServer {
   const io: AppSocketServer = new Server(httpServer, {
@@ -13,7 +18,11 @@ export function createSocketServer(httpServer: HttpServer): AppSocketServer {
     },
   });
 
+  setChatRealtimeNotifier(new SocketIOChatNotifier(io));
+
   io.use(new SocketAuthMiddleware().handle);
+
+  registerSocketEvents(io, [healthPingSocket, ...chatSocketEvents]);
 
   io.on("connection", (socket) => {
     const { user, expiresAt } = socket.data;

@@ -1,4 +1,4 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
 import { AuthErrorMessages } from "src/errors/messages/auth.messages";
 import { AuthenticationError } from "src/errors/http/AuthenticationError";
 import { AuthService } from "src/modules/auth/Auth.service";

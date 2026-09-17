@@ -1,4 +1,4 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
 import { RefreshTokenRepository } from "src/modules/auth/repositories/RefreshToken.repository";
 
 type LogoutOptions = {

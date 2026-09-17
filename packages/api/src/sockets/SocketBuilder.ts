@@ -1,14 +1,16 @@
 import { Socket } from "socket.io";
-import { AuthUseCase } from "src/core/AuthUseCase.base";
-import { FamilyUseCase } from "src/core/FamilyUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
+import { FamilyUseCase } from "src/core/useCases/FamilyUseCase.base";
 import { UseCase } from "src/core/UseCase.base";
 import { AuthenticationError, AuthErrorMessages } from "src/errors";
 import { serializeAppError } from "src/sockets/error";
 import { AppSocket, AppSocketServer, SocketAck } from "src/sockets/typedefs";
 import { ZodType } from "zod";
+import { User } from "src/modules/user/entities/User.entity";
 
-interface SocketContext {
+export interface SocketContext {
   socket: AppSocket;
+  user: User;
 }
 
 export interface SocketEventConfig<TPayload, TOptions, TResult> {
@@ -18,6 +20,11 @@ export interface SocketEventConfig<TPayload, TOptions, TResult> {
   schema?: ZodType<TPayload>;
   useCase: () => UseCase<TOptions, TResult>;
   map: (payload: TPayload, ctx: SocketContext) => TOptions;
+  onSuccess?: (
+    result: TResult,
+    payload: TPayload,
+    ctx: SocketContext,
+  ) => void | Promise<void>;
 }
 
 export function defineSocketEvent<TPayload, TOptions, TResult>(
@@ -70,7 +77,9 @@ export function registerSocketEvents(
             useCase.setAuthUser(socket.data.user);
           }
 
-          const result = await useCase.execute(config.map(payload, { socket }));
+          const ctx = { socket, user: socket.data.user };
+          const result = await useCase.execute(config.map(payload, ctx));
+          await config.onSuccess?.(result, payload, ctx);
 
           if (typeof ack === "function") {
             ack({ ok: true, data: result ?? null });

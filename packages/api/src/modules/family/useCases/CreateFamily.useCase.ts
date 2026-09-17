@@ -1,4 +1,4 @@
-import { AuthUseCase } from "src/core/AuthUseCase.base";
+import { AuthUseCase } from "src/core/useCases/AuthUseCase.base";
 import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { UnitOfWork } from "src/db/UnitOfWork";
 import { FamilyErrorMessages } from "src/errors/messages/family.messages";
