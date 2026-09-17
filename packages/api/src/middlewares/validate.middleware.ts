@@ -23,8 +23,6 @@ export const validate =
         req.cookies = schemas.cookies.parse(req.cookies);
       }
       if (schemas.query) {
-        // Express 5 exposes req.query as a getter-only prototype property,
-        // so a plain assignment throws. Shadow it with an own data property.
         Object.defineProperty(req, "query", {
           value: schemas.query.parse(req.query),
           writable: true,

@@ -23,9 +23,9 @@ export type ThreadHistoryQuery = z.infer<typeof threadHistoryQuerySchema>;
 
 export const threadIdPayloadSchema = z.object({
   threadId: z.number().int().positive(),
-})
+});
 
-export type ThreadIdPayload = z.infer<typeof threadIdPayloadSchema>
+export type ThreadIdPayload = z.infer<typeof threadIdPayloadSchema>;
 
 export const sendMessagePayloadSchema = z.object({
   threadId: z.number().int().positive(),

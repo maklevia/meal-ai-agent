@@ -17,8 +17,6 @@ export class SocketIOChatNotifier implements ChatRealtimeNotifier {
         ? familyRoom(thread.familyId)
         : userRoom(thread.userId!);
 
-    // Only people NOT currently viewing the thread get the notification; those
-    // in the thread room receive the live `message:created` instead.
     this.io
       .to(ownerRoom)
       .except(threadRoom(thread.id))
