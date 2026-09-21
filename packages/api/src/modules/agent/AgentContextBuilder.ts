@@ -1,6 +1,8 @@
-import { ModelMessage } from "ai";
+import { ModelMessage, ToolSet } from "ai";
+import { createAgentToolDependencies } from "src/modules/agent/agentDependencies";
 import { buildSystemPrompt } from "src/modules/agent/prompts/system.prompt";
-import { AgentInput } from "src/modules/agent/typedefs";
+import { createAgentTools } from "src/modules/agent/tools";
+import { AgentInput, ToolContext } from "src/modules/agent/typedefs";
 import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
@@ -8,7 +10,7 @@ import { UserPreferencesRepository } from "src/modules/user/repositories/UserPre
 
 const HISTORY_LIMIT = 50;
 
-export class AgentContext {
+export class AgentContextBuilder {
   constructor(
     private readonly messageRepository: ChatMessageRepository = new ChatMessageRepository(),
     private readonly userPreferencesRepository: UserPreferencesRepository = new UserPreferencesRepository(),
@@ -18,6 +20,7 @@ export class AgentContext {
     const [messages, systemPrompt, tools] = await Promise.all([
       this.loadHistory(threadId),
       this.getSystemPrompt(user),
+      this.buildTools({ userId: user.id, familyId: user.family?.id ?? null }),
     ]);
 
     return { messages, systemPrompt, tools };
@@ -51,5 +54,10 @@ export class AgentContext {
     return systemPrompt;
   }
 
-  //build tools here
+  private buildTools(ctx: ToolContext): ToolSet {
+    const toolDependencies = createAgentToolDependencies();
+    const tools = createAgentTools(ctx, toolDependencies);
+
+    return tools;
+  }
 }

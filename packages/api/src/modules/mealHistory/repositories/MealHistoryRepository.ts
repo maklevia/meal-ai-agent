@@ -6,11 +6,11 @@ import { EntityManager } from "typeorm";
 
 type MealHistoryOptions = {
   name: string;
-  userFeedback: MealScore;
+  score: MealScore;
   userId: number;
 };
 
-export class MealHistoryRepositiry extends BaseRepository<MealHistory> {
+export class MealHistoryRepository extends BaseRepository<MealHistory> {
   constructor(manager?: EntityManager) {
     super(manager);
   }
@@ -22,11 +22,11 @@ export class MealHistoryRepositiry extends BaseRepository<MealHistory> {
   async createMealHistoryRecord(
     options: MealHistoryOptions,
   ): Promise<MealHistory> {
-    const { userFeedback, name, userId } = options;
+    const { score, name, userId } = options;
 
     const newRecord = new MealHistory();
     newRecord.name = name;
-    newRecord.score = userFeedback;
+    newRecord.score = score;
     newRecord.user = {id: userId} as User;
 
     return await this.repo.save(newRecord)

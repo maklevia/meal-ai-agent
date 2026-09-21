@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import z from "zod";
 
-export function createGeneratShoppingListTool(
+export function createGenerateShoppingListTool(
 ) {
   return tool({
     description:

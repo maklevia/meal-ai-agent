@@ -1,16 +1,14 @@
 import { tool } from "ai";
-import { ToolContext } from "src/modules/agent/typedefs";
-import { ProductRepository } from "src/modules/product/repositories/Product.repository";
+import { ToolContext, ToolDependencies } from "src/modules/agent/typedefs";
 import z from "zod";
 
-export function createGetUserProductsTool(ctx: ToolContext) {
+export function createGetUserProductsTool(ctx: ToolContext, dependencies: ToolDependencies) {
     return tool({
         description: "Get the list of product the user currently has.",
         inputSchema: z.object({}),
         execute: async () => {
             if (!ctx.familyId) return {products: []};
-            const productRepository = new ProductRepository();
-            const products = await productRepository.getNotFinishedFamilyProducts(ctx.familyId);
+            const products = await dependencies.products.getNotFinishedFamilyProducts(ctx.familyId);
 
             return {
                 products: products.map((product) => ({
