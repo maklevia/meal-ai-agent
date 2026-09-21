@@ -5,7 +5,7 @@ import { DataSource } from "typeorm";
 import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 import { env } from "src/config/env";
 import { User } from "src/modules/user/entities/User.entity";
-import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity";
+import { UserPreferences } from "src/modules/user/entities/UserPreferences.entity";
 import { Family } from "src/modules/family/entities/Family.entity";
 import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity";
 import { Product } from "src/modules/product/entities/Product.entity";
