@@ -18,12 +18,8 @@ export function toThreadRef(thread: ChatThread): ThreadRef {
 export interface ChatRealtimeNotifier {
   notifyNewMessage(input: { thread: ThreadRef; message: ChatMessage }): void;
 
-  // TODO(agent): when the agent is implemented, add its streaming lifecycle here:
-  //   agentStarted({ thread, requestId })
-  //   agentDelta({ thread, requestId, delta })
-  //   agentCompleted({ thread, requestId, message })
-  //   agentFailed({ thread, requestId, reason })
-  // Then implement them in SocketIOChatNotifier and declare the matching
-  // `agent:*` events in src/sockets/typedefs.ts. Routing stays in the adapter,
-  // so no use case or the agent itself needs to know about socket.io.
+  agentStarted(input: {thread: ThreadRef, requestId: string}): void;
+  agentDelta(input: {thread: ThreadRef, requestId: string, delta: string}): void;
+  agentCompleted(input: {thread: ThreadRef, requestId: string, message: ChatMessage}): void;
+  agentFailed(input: {thread: ThreadRef, requestId: string, reason: string}): void;
 }

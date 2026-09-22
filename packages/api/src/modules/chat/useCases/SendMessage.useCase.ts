@@ -1,10 +1,10 @@
 import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
-import { getChatRealtimeNotifier } from "src/modules/chat/realTime/chatNotifier";
+import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import {
   ChatRealtimeNotifier,
   toThreadRef,
-} from "src/modules/chat/realTime/ChatRealtimeNotifier";
+} from "src/modules/chat/realtime/ChatRealtimeNotifier";
 import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
 
 type SendMessageOptions = {
