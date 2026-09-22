@@ -30,7 +30,7 @@ export type ThreadIdPayload = z.infer<typeof threadIdPayloadSchema>;
 export const sendMessagePayloadSchema = z.object({
   threadId: z.number().int().positive(),
   content: z.string().trim().min(1).max(4000),
-  clientMessageId: z.string().uuid().optional(),
+  clientMessageId: z.string().uuid(),
 });
 
 export type SendMessagePayload = z.infer<typeof sendMessagePayloadSchema>;

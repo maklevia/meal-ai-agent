@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto";
-import e from "express";
 import { Service } from "src/core/Service.base";
 import { Agent } from "src/modules/agent/Agent";
 import { AgentContextBuilder } from "src/modules/agent/AgentContextBuilder";
@@ -15,6 +13,7 @@ import { User } from "src/modules/user/entities/User.entity";
 type StartAgentReplyOptions = {
   thread: ThreadRef;
   user: User;
+  requestId: string;
 };
 
 export class AgentService extends Service {
@@ -28,14 +27,12 @@ export class AgentService extends Service {
     super();
   }
 
-  startReply(options: StartAgentReplyOptions): string {
-    const requestId = randomUUID();
+  startReply(options: StartAgentReplyOptions): void {
+    const { requestId } = options;
 
     this.runGeneration(options, requestId).catch((error) => {
       console.error(`Agent generation ${requestId} unhandled error:`, error);
     });
-
-    return requestId;
   }
 
   private async runGeneration(
@@ -46,7 +43,7 @@ export class AgentService extends Service {
       this.notifier.agentStarted({ thread: options.thread, requestId });
       const agentInput = await this.agentContext.build(
         options.user,
-        options.thread.id,
+        options.thread,
       );
 
       for await (const event of this.agent.stream(agentInput)) {

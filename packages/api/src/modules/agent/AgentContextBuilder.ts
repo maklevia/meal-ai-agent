@@ -3,6 +3,7 @@ import { createAgentToolDependencies } from "src/modules/agent/agentDependencies
 import { buildSystemPrompt } from "src/modules/agent/prompts/system.prompt";
 import { createAgentTools } from "src/modules/agent/tools";
 import { AgentInput, ToolContext } from "src/modules/agent/typedefs";
+import { ThreadRef } from "src/modules/chat/realtime/ChatRealtimeNotifier";
 import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
@@ -16,11 +17,11 @@ export class AgentContextBuilder {
     private readonly userPreferencesRepository: UserPreferencesRepository = new UserPreferencesRepository(),
   ) {}
 
-  async build(user: User, threadId: number): Promise<AgentInput> {
+  async build(user: User, thread: ThreadRef): Promise<AgentInput> {
     const [messages, systemPrompt, tools] = await Promise.all([
-      this.loadHistory(threadId),
+      this.loadHistory(thread.id),
       this.getSystemPrompt(user),
-      this.buildTools({ userId: user.id, familyId: user.family?.id ?? null }),
+      this.buildTools({ userId: user.id, familyId: thread.familyId }),
     ]);
 
     return { messages, systemPrompt, tools };
@@ -34,8 +35,9 @@ export class AgentContextBuilder {
 
     const modelMessages: ModelMessage[] = rawMessages
       .reverse()
+      .filter(((message) => message.role !== ChatMessageRole.System))
       .map((message) => ({
-        role: message.role === ChatMessageRole.User ? "user" : "assistant",
+        role: message.role,
         content: message.content,
       }));
 

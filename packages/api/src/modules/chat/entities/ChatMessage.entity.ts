@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -13,6 +14,11 @@ import { ChatMessageRole } from "src/modules/chat/typedefs";
 
 @Entity("chat_messages")
 @Check("CHK_token_count_positive", '"token_count" >= 0')
+@Index(
+  "UQ_chat_messages_thread_client_message_id",
+  ["thread", "clientMessageId"],
+  { unique: true },
+)
 export class ChatMessage {
   @PrimaryGeneratedColumn()
   id: number;
@@ -25,6 +31,12 @@ export class ChatMessage {
 
   @Column({ type: "int" })
   tokenCount: number;
+
+  @Column({ type: "uuid", nullable: true })
+  clientMessageId: string | null;
+
+  @Column({ type: "uuid", nullable: true })
+  generationRequestId: string | null;
 
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;

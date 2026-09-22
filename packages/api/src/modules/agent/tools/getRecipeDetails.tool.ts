@@ -1,5 +1,4 @@
 import { tool } from "ai";
-import { sourceMapsEnabled } from "process";
 import z from "zod";
 
 export function createGetRecipeDetailsTool() {
@@ -11,7 +10,7 @@ export function createGetRecipeDetailsTool() {
         }),
         execute: async ({source, recipeId}) => {
             //TODO integration with external API
-            return {recipe: "Zhope", note: "Pashyha Zhopyha The Best Pisiuha"}
+            return {recipe: "", note: "External Api Integration awaiting"}
         }
     })
 }

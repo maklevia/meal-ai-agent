@@ -40,7 +40,7 @@ export interface ClientToServerEvents {
     ack: (r: SocketAck<null>) => void,
   ) => void;
   "message:send": (
-    payload: { threadId: number; content: string; clientMessageId?: string },
+    payload: { threadId: number; content: string; clientMessageId: string },
     ack: (
       r: SocketAck<{
         message: ChatMessage;
