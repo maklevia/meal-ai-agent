@@ -1,6 +1,5 @@
-import { randomUUID } from "crypto";
 import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
-import { AgentService } from "src/modules/agent/Agent.service";
+import { StartAgentReplyUseCase } from "src/modules/agent/useCases/StartAgentReply.useCase";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import {
@@ -17,7 +16,7 @@ type ReceiveUserMessageOptions = {
 
 type ReceiveUserMessageResult = {
   message: ChatMessage;
-  clientMessageId?: string;
+  clientMessageId: string;
   requestId: string;
 };
 
@@ -27,7 +26,7 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
 > {
   constructor(
     private readonly notifier: ChatRealtimeNotifier = getChatRealtimeNotifier(),
-    private readonly agentService: AgentService = new AgentService(),
+    private readonly startAgentReply = new StartAgentReplyUseCase(),
   ) {
     super();
   }
@@ -39,37 +38,29 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
     options: ReceiveUserMessageOptions,
   ): Promise<ReceiveUserMessageResult> {
     const { content, clientMessageId } = options;
-    const requestId = randomUUID();
 
     const { message, inserted } =
       await this.messageRepository.insertUserMessageIfAbsent({
         threadId: this.thread.id,
         content,
         clientMessageId,
-        generationRequestId: requestId,
       });
-
-    if (!inserted) {
-      return {
-        message,
-        clientMessageId,
-        requestId: message.generationRequestId ?? requestId,
-      };
-    }
-
-    await this.threadRepository.touchThread(this.thread.id);
 
     const threadRef = toThreadRef(this.thread);
 
-    this.notifier.notifyNewMessage({
-      message,
-      thread: threadRef,
-    });
+    if (inserted) {
+      await this.threadRepository.touchThread(this.thread.id);
 
-    this.agentService.startReply({
-      thread: threadRef,
+      this.notifier.notifyNewMessage({
+        message,
+        thread: threadRef,
+      });
+    }
+
+    const { requestId } = await this.startAgentReply.execute({
       user: this.user,
-      requestId,
+      thread: threadRef,
+      messageId: message.id,
     });
 
     return { message, clientMessageId, requestId };

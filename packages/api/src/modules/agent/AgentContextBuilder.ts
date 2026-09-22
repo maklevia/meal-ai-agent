@@ -1,8 +1,8 @@
 import { ModelMessage, ToolSet } from "ai";
-import { createAgentToolDependencies } from "src/modules/agent/agentDependencies";
+import { getAgentToolDependencies } from "src/modules/agent/agentDependencies";
 import { buildSystemPrompt } from "src/modules/agent/prompts/system.prompt";
 import { createAgentTools } from "src/modules/agent/tools";
-import { AgentInput, ToolContext } from "src/modules/agent/typedefs";
+import { AgentInput, ToolContext, ToolDependencies } from "src/modules/agent/typedefs";
 import { ThreadRef } from "src/modules/chat/realtime/ChatRealtimeNotifier";
 import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
@@ -15,6 +15,7 @@ export class AgentContextBuilder {
   constructor(
     private readonly messageRepository: ChatMessageRepository = new ChatMessageRepository(),
     private readonly userPreferencesRepository: UserPreferencesRepository = new UserPreferencesRepository(),
+    private readonly toolDependencies: ToolDependencies = getAgentToolDependencies(),
   ) {}
 
   async build(user: User, thread: ThreadRef): Promise<AgentInput> {
@@ -57,8 +58,7 @@ export class AgentContextBuilder {
   }
 
   private buildTools(ctx: ToolContext): ToolSet {
-    const toolDependencies = createAgentToolDependencies();
-    const tools = createAgentTools(ctx, toolDependencies);
+    const tools = createAgentTools(ctx, this.toolDependencies);
 
     return tools;
   }

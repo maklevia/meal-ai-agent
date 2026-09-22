@@ -28,19 +28,28 @@ export class AgentService extends Service {
   }
 
   startReply(options: StartAgentReplyOptions): void {
-    const { requestId } = options;
+    const { requestId, thread } = options;
 
-    this.runGeneration(options, requestId).catch((error) => {
+    // if (!tryAcquireAgentLock({ threadId: thread.id, requestId })) {
+    //   this.notifier.agentFailed({
+    //     thread,
+    //     requestId,
+    //     reason: "Agent generations is already in progress",
+    //   });
+    //   return;
+    // }
+
+    this.runGeneration(options).catch((error) => {
       console.error(`Agent generation ${requestId} unhandled error:`, error);
     });
   }
 
-  private async runGeneration(
-    options: StartAgentReplyOptions,
-    requestId: string,
-  ): Promise<void> {
+  private async runGeneration(options: StartAgentReplyOptions): Promise<void> {
     try {
-      this.notifier.agentStarted({ thread: options.thread, requestId });
+      this.notifier.agentStarted({
+        thread: options.thread,
+        requestId: options.requestId,
+      });
       const agentInput = await this.agentContext.build(
         options.user,
         options.thread,
@@ -51,7 +60,7 @@ export class AgentService extends Service {
           case "delta":
             this.notifier.agentDelta({
               thread: options.thread,
-              requestId,
+              requestId: options.requestId,
               delta: event.delta,
             });
             break;
@@ -68,7 +77,7 @@ export class AgentService extends Service {
 
             this.notifier.agentCompleted({
               thread: options.thread,
-              requestId,
+              requestId: options.requestId,
               message: savedMessage,
             });
             break;
@@ -76,7 +85,16 @@ export class AgentService extends Service {
       }
     } catch (error) {
       const reason = error instanceof Error ? error.message : "Unknow error";
-      this.notifier.agentFailed({ thread: options.thread, requestId, reason });
+      this.notifier.agentFailed({
+        thread: options.thread,
+        requestId: options.requestId,
+        reason,
+      });
+    // } finally {
+    //   releaseAgentLock({
+    //     threadId: options.thread.id,
+    //     requestId: options.requestId,
+    //   });
     }
   }
 }

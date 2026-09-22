@@ -3,10 +3,20 @@ import { MealHistoryRepository } from "src/modules/mealHistory/repositories/Meal
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 import { RecipeService } from "src/modules/recipe/Recipe.service";
 
-export function createAgentToolDependencies(): ToolDependencies {
+function buildAgentToolDependencies(): ToolDependencies {
   return {
     products: new ProductRepository(),
     recipes: new RecipeService(),
     meals: new MealHistoryRepository(),
   };
+}
+
+let instance: ToolDependencies | undefined;
+
+export function getAgentToolDependencies(): ToolDependencies {
+  return (instance ??= buildAgentToolDependencies())
+}
+
+export function setAgentToolDependencies(next: ToolDependencies): void {
+  instance = next;
 }

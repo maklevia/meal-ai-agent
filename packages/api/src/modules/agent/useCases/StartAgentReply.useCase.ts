@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { UseCase } from "src/core/UseCase.base";
-import { NotFoundError } from "src/errors";
+import { ConflictError } from "src/errors";
 import { AgentService } from "src/modules/agent/Agent.service";
 import { ThreadRef } from "src/modules/chat/realtime/ChatRealtimeNotifier";
 import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
@@ -41,7 +41,7 @@ export class StartAgentReplyUseCase extends UseCase<
       const existingUserMessage =
         await this.messageRepository.findMessageById(messageId);
       if (!existingUserMessage || !existingUserMessage.generationRequestId) {
-        throw new NotFoundError("Something went wrong during reply generation");
+        throw new ConflictError("Something went wrong during reply generation");
       }
 
       return { requestId: existingUserMessage.generationRequestId };
