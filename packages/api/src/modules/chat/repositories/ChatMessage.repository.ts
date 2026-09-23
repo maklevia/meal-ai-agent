@@ -21,6 +21,7 @@ type InsertUserMessageResult = {
 
 type SaveAssistantMessageOptions = SaveMessageOptions & {
   tokenCount: number;
+  generationRequestId?: string;
 };
 
 type FindUserMessageByClientMessageIdOptions = {
@@ -122,12 +123,13 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   async saveAssistantMessage(
     options: SaveAssistantMessageOptions,
   ): Promise<ChatMessage> {
-    const { threadId, content, tokenCount } = options;
+    const { threadId, content, tokenCount, generationRequestId } = options;
     const newMessage = new ChatMessage();
     newMessage.content = content;
     newMessage.thread = { id: threadId } as ChatThread;
     newMessage.role = ChatMessageRole.Assistant;
     newMessage.tokenCount = tokenCount;
+    newMessage.generationRequestId = generationRequestId ?? null;
 
     const savedMessage = await this.repo.save(newMessage);
     return savedMessage;

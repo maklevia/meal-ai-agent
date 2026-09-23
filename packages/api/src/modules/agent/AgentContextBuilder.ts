@@ -1,5 +1,6 @@
 import { ModelMessage, ToolSet } from "ai";
 import { getAgentToolDependencies } from "src/modules/agent/agentDependencies";
+import { HISTORY_LIMIT } from "src/modules/agent/constants";
 import { buildSystemPrompt } from "src/modules/agent/prompts/system.prompt";
 import { createAgentTools } from "src/modules/agent/tools";
 import { AgentInput, ToolContext, ToolDependencies } from "src/modules/agent/typedefs";
@@ -8,8 +9,6 @@ import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage
 import { ChatMessageRole } from "src/modules/chat/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
 import { UserPreferencesRepository } from "src/modules/user/repositories/UserPreferences.repository";
-
-const HISTORY_LIMIT = 50;
 
 export class AgentContextBuilder {
   constructor(

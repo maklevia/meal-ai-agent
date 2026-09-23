@@ -1,6 +1,7 @@
 import { Service } from "src/core/Service.base";
 import { Agent } from "src/modules/agent/Agent";
 import { AgentContextBuilder } from "src/modules/agent/AgentContextBuilder";
+import { AgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
 import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import {
   ChatRealtimeNotifier,
@@ -23,21 +24,13 @@ export class AgentService extends Service {
     private readonly threadRepository: ChatThreadRepository = new ChatThreadRepository(),
     private readonly agentContext = new AgentContextBuilder(),
     private readonly agent = new Agent(),
+    private readonly registry = new AgentGenerationRegistry(),
   ) {
     super();
   }
 
   startReply(options: StartAgentReplyOptions): void {
-    const { requestId, thread } = options;
-
-    // if (!tryAcquireAgentLock({ threadId: thread.id, requestId })) {
-    //   this.notifier.agentFailed({
-    //     thread,
-    //     requestId,
-    //     reason: "Agent generations is already in progress",
-    //   });
-    //   return;
-    // }
+    const { requestId } = options;
 
     this.runGeneration(options).catch((error) => {
       console.error(`Agent generation ${requestId} unhandled error:`, error);
@@ -45,22 +38,21 @@ export class AgentService extends Service {
   }
 
   private async runGeneration(options: StartAgentReplyOptions): Promise<void> {
-    try {
-      this.notifier.agentStarted({
-        thread: options.thread,
-        requestId: options.requestId,
-      });
-      const agentInput = await this.agentContext.build(
-        options.user,
-        options.thread,
-      );
+    const { user, thread, requestId } = options;
+    const signal = this.registry.getByRequest(requestId)?.abort.signal;
 
-      for await (const event of this.agent.stream(agentInput)) {
+    try {
+      this.notifier.agentStarted({ thread, requestId });
+
+      const agentInput = await this.agentContext.build(user, thread);
+
+      for await (const event of this.agent.stream(agentInput, signal)) {
         switch (event.type) {
           case "delta":
+            this.registry.appendDelta(requestId, event.delta);
             this.notifier.agentDelta({
-              thread: options.thread,
-              requestId: options.requestId,
+              thread,
+              requestId,
               delta: event.delta,
             });
             break;
@@ -68,33 +60,30 @@ export class AgentService extends Service {
           case "finish":
             const savedMessage =
               await this.messageRepository.saveAssistantMessage({
-                threadId: options.thread.id,
+                threadId: thread.id,
                 content: event.text,
                 tokenCount: event.completionTokens,
+                generationRequestId: requestId,
               });
 
-            await this.threadRepository.touchThread(options.thread.id);
-
+            await this.threadRepository.touchThread(thread.id);
+            this.registry.finish(requestId, "completed");
             this.notifier.agentCompleted({
-              thread: options.thread,
-              requestId: options.requestId,
+              thread,
+              requestId,
               message: savedMessage,
             });
             break;
         }
       }
     } catch (error) {
+      this.registry.finish(requestId, "failed");
       const reason = error instanceof Error ? error.message : "Unknow error";
       this.notifier.agentFailed({
-        thread: options.thread,
-        requestId: options.requestId,
+        thread,
+        requestId,
         reason,
       });
-    // } finally {
-    //   releaseAgentLock({
-    //     threadId: options.thread.id,
-    //     requestId: options.requestId,
-    //   });
     }
   }
 }

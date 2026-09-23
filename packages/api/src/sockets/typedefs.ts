@@ -45,7 +45,9 @@ export interface ClientToServerEvents {
       r: SocketAck<{
         message: ChatMessage;
         clientMessageId?: string;
-        requestId: string;
+        generation: 
+        | {status: "started"; requestId: string}
+        | {status: "busy", activeRequestId: string};
       }>,
     ) => void,
   ) => void;

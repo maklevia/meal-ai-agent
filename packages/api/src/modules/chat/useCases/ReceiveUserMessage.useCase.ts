@@ -17,7 +17,9 @@ type ReceiveUserMessageOptions = {
 type ReceiveUserMessageResult = {
   message: ChatMessage;
   clientMessageId: string;
-  requestId: string;
+  generation:
+    | { status: "started"; requestId: string }
+    | { status: "busy"; activeRequestId: string };
 };
 
 export class ReceiveUserMessageUseCase extends ThreadUseCase<
@@ -57,12 +59,12 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
       });
     }
 
-    const { requestId } = await this.startAgentReply.execute({
+    const generation = await this.startAgentReply.execute({
       user: this.user,
       thread: threadRef,
       messageId: message.id,
     });
 
-    return { message, clientMessageId, requestId };
+    return { message, clientMessageId, generation };
   }
 }
