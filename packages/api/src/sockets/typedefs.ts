@@ -35,7 +35,10 @@ export interface ClientToServerEvents {
   "thread:join": (
     payload: { threadId: number },
     ack: (
-      r: SocketAck<{ thread: ChatThread; generation: AgentGenerationSnapshot }>,
+      r: SocketAck<{
+        thread: ChatThread;
+        generation: AgentGenerationSnapshot | null;
+      }>,
     ) => void,
   ) => void;
   "thread:leave": (
@@ -47,10 +50,8 @@ export interface ClientToServerEvents {
     ack: (
       r: SocketAck<{
         message: ChatMessage;
-        clientMessageId?: string;
-        generation:
-          | { status: "started"; requestId: string }
-          | { status: "busy"; activeRequestId: string };
+        clientMessageId: string;
+        requestId: string;
         inserted: boolean;
       }>,
     ) => void,

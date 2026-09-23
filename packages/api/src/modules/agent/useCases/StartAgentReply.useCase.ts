@@ -1,123 +1,59 @@
 import { randomUUID } from "crypto";
-import { UseCase } from "src/core/UseCase.base";
-import { ConflictError, NotFoundError } from "src/errors";
 import { AgentService } from "src/modules/agent/Agent.service";
-import { AgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
-import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
+import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
 import { ThreadRef } from "src/modules/chat/realtime/ChatRealtimeNotifier";
-import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
 import { User } from "src/modules/user/entities/User.entity";
 
-type StartAgentReplyOptions = {
+export type ReservationResult =
+  | { acquired: true; requestId: string }
+  | { acquired: false; activeRequestId: string };
+
+type StartReservedOptions = {
   thread: ThreadRef;
-  messageId: number;
   user: User;
+  requestId: string;
+  messageId: number;
 };
 
-type StartAgentReplyResult =
-  | { status: "started"; requestId: string }
-  | { status: "busy"; activeRequestId: string };
+/**
+ * Internal orchestrator for starting an agent reply.
+ *
+ * It is split in two phases so the caller can reserve the thread *before*
+ * persisting the user message:
+ *   1. `reserveThread` — atomically claim the thread (or report it busy).
+ *   2. `start`         — attach the message and run the generation.
+ * `releaseReservation` frees the slot if the caller fails in between.
+ */
+export class StartAgentReplyUseCase {
+  constructor(
+    private readonly agentService: AgentService = new AgentService(),
+    private readonly registry = getAgentGenerationRegistry(),
+  ) {}
 
-export class StartAgentReplyUseCase extends UseCase<
-  StartAgentReplyOptions,
-  StartAgentReplyResult
-> {
-  private readonly messageRepository: ChatMessageRepository =
-    new ChatMessageRepository();
-  private readonly agentService: AgentService = new AgentService();
-  private readonly registry: AgentGenerationRegistry =
-    new AgentGenerationRegistry();
-
-  async execute(
-    options: StartAgentReplyOptions,
-  ): Promise<StartAgentReplyResult> {
-    const { thread, messageId, user } = options;
-
-    const message = await this.requireUserMessage(messageId);
-
-    const alreadyStartedRequestId = this.readRequestId(message);
-    if (alreadyStartedRequestId) {
-      return this.started(alreadyStartedRequestId);
-    }
-
+  reserveThread(threadId: number): ReservationResult {
     const requestId = randomUUID();
+    const admission = this.registry.tryAcquire({ threadId, requestId });
 
-    const reservation = this.reserveThread({
-      threadId: thread.id,
-      requestId,
-      messageId,
-    });
-    if (!reservation.acquired) {
-      return this.busy(reservation.active.requestId);
+    if (!admission.acquired) {
+      return { acquired: false, activeRequestId: admission.active.requestId };
     }
-
-    const claimed = await this.claimMessage(messageId, requestId);
-    if (!claimed) {
-      this.registry.release(requestId);
-      return this.started(await this.recoverClaimedRequestId(messageId));
-    }
-
-    this.startGeneration({ thread, user, requestId, messageId });
-    return this.started(requestId);
+    return { acquired: true, requestId };
   }
 
-  private async requireUserMessage(messageId: number): Promise<ChatMessage> {
-    const message = await this.messageRepository.findMessageById(messageId);
-    if (!message) {
-      throw new NotFoundError("User message not found!");
-    }
-    return message;
+  releaseReservation(requestId: string): void {
+    this.registry.release(requestId);
   }
 
-  private readRequestId(message: ChatMessage): string | null {
-    return message.generationRequestId;
-  }
+  start(options: StartReservedOptions): void {
+    const { thread, user, requestId, messageId } = options;
 
-  private reserveThread(input: {
-    threadId: number;
-    requestId: string;
-    messageId: number;
-  }) {
-    return this.registry.tryAcquire(input);
-  }
+    this.registry.attachMessage(requestId, messageId);
 
-  private async claimMessage(
-    messageId: number,
-    requestId: string,
-  ): Promise<boolean> {
-    return this.messageRepository.setGenerationRequestIdIfAbsent({
-      messageId,
-      requestId,
-    });
-  }
-
-  private async recoverClaimedRequestId(messageId: number): Promise<string> {
-    const message = await this.messageRepository.findMessageById(messageId);
-    if (!message?.generationRequestId) {
-      throw new ConflictError("Message claimed without a request id");
-    }
-    return message.generationRequestId;
-  }
-
-  private startGeneration(input: {
-    thread: ThreadRef;
-    user: User;
-    requestId: string;
-    messageId: number
-  }): void {
     try {
-      this.agentService.startReply(input);
+      this.agentService.startReply({ thread, user, requestId, messageId });
     } catch (error) {
-      this.registry.release(input.requestId);
+      this.releaseReservation(requestId);
       throw error;
     }
-  }
-
-  private started(requestId: string): StartAgentReplyResult {
-    return { status: "started", requestId };
-  }
-
-  private busy(activeRequestId: string): StartAgentReplyResult {
-    return { status: "busy", activeRequestId };
   }
 }

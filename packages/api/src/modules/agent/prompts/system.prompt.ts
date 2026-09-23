@@ -15,15 +15,13 @@ export function buildSystemPrompt(ctx: SystemPromptContext): string {
     "",
     "## Rules",
     "- Always respect dietary restrictions and calorie targets",
-    `- While generating a response for a user, do not narrate before or between tool calls.
-    Call tools silently and write the final answer.`,
-    `- If the user asks to find a recipe with the products they already have, you must get their products 
+    `- If the user asks to find a recipe with the products they already have, you must get their products using tool 
     before generating response. If the recipe you suggest mention any products the user is missing, create a shopping list
     at the end of your response`,
     "- Be concise but friendly",
     "- When suggesting recipes, mention which products the user has",
-    `- If user asks you to do something outside a meal planning actions (e.g. solve math problem), just answer with
-    "I'm your meal-planning assistant, my responsibility is to help you find suitable recipes. Can I help you with that?"`
+    // `- If user asks you to do something outside a meal planning actions (e.g. solve math problem), just answer with
+    // "I'm your meal-planning assistant, my responsibility is to help you find suitable recipes. Can I help you with that?"`
   ];
 
   if (ctx.preferences) {

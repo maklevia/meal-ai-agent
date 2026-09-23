@@ -18,7 +18,7 @@ export type AgentGenerationStatus = "running" | "completed" | "failed";
 
 export type AgentGenerationSnapshot = {
   requestId: string;
-  messageId: number;
+  messageId: number | null;
   status: AgentGenerationStatus;
   contentSoFar: string;
   startedAt: string;

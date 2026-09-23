@@ -1,7 +1,7 @@
 import { Service } from "src/core/Service.base";
 import { Agent } from "src/modules/agent/Agent";
 import { AgentContextBuilder } from "src/modules/agent/AgentContextBuilder";
-import { AgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
+import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
 import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import {
   ChatRealtimeNotifier,
@@ -25,7 +25,7 @@ export class AgentService extends Service {
     private readonly threadRepository: ChatThreadRepository = new ChatThreadRepository(),
     private readonly agentContext = new AgentContextBuilder(),
     private readonly agent = new Agent(),
-    private readonly registry = new AgentGenerationRegistry(),
+    private readonly registry = getAgentGenerationRegistry(),
   ) {
     super();
   }

@@ -12,6 +12,7 @@ type SaveMessageOptions = {
 type SaveUserMessageOptions = SaveMessageOptions & {
   clientMessageId?: string;
   generationRequestId?: string;
+  senderId?: number;
 };
 
 type InsertUserMessageResult = {
@@ -58,6 +59,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
 
     const messages = await this.repo.find({
       where,
+      relations: { sender: true },
       order: { id: "DESC" },
       take: limit,
     });
@@ -68,7 +70,8 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   async insertUserMessageIfAbsent(
     options: SaveUserMessageOptions & { clientMessageId: string },
   ): Promise<InsertUserMessageResult> {
-    const { threadId, content, clientMessageId, generationRequestId } = options;
+    const { threadId, content, clientMessageId, generationRequestId, senderId } =
+      options;
 
     const result = await this.repo
       .createQueryBuilder()
@@ -80,6 +83,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
         tokenCount: 0,
         clientMessageId,
         generationRequestId: generationRequestId ?? null,
+        sender: senderId ? { id: senderId } : null,
         thread: { id: threadId },
       })
       .orIgnore()
@@ -109,15 +113,8 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
         thread: { id: threadId },
         clientMessageId,
       },
+      relations: { sender: true },
     });
-  }
-
-  async findMessageById(messageId: number): Promise<ChatMessage | null> {
-    const result = await this.repo.findOne({
-      where: { id: messageId },
-    });
-
-    return result;
   }
 
   async saveAssistantMessage(
@@ -135,18 +132,4 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
     return savedMessage;
   }
 
-  async setGenerationRequestIdIfAbsent(options: {
-    messageId: number;
-    requestId: string;
-  }): Promise<boolean> {
-    const result = await this.repo
-      .createQueryBuilder()
-      .update(ChatMessage)
-      .set({ generationRequestId: options.requestId })
-      .where("id = :id AND generation_request_id IS NULL", {
-        id: options.messageId,
-      })
-      .execute();
-    return (result.affected ?? 0) > 0;
-  }
 }

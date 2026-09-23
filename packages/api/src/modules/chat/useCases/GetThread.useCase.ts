@@ -1,4 +1,3 @@
-import { generateId } from "ai";
 import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
 import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
 import { AgentGenerationSnapshot } from "src/modules/agent/typedefs";

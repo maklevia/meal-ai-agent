@@ -7,6 +7,6 @@ const llmapi = createOpenAI({
 })
 
 export const agentConfig = {
-    model: llmapi(env.AGENT_MODEL),
+    model: llmapi.chat(env.AGENT_MODEL),
     maxSteps: env.AGENT_MAX_STEPS,
 } as const

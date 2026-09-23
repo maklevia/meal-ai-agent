@@ -24,18 +24,14 @@ export class AgentGenerationRegistry {
   private readonly snapshots = new Map<number, AgentGenerationSnapshot>();
   private readonly timers = new Map<number, NodeJS.Timeout>();
 
-  tryAcquire(input: {
-    threadId: number;
-    requestId: string;
-    messageId: number;
-  }): AcquireResult {
+  tryAcquire(input: { threadId: number; requestId: string }): AcquireResult {
     const active = this.activeByThread.get(input.threadId);
     if (active) return { acquired: false, active: this.toSnapshot(active) };
 
     const generation: ActiveAgentGeneration = {
       requestId: input.requestId,
       threadId: input.threadId,
-      messageId: input.messageId,
+      messageId: null,
       status: "running",
       contentSoFar: "",
       startedAt: new Date().toISOString(),
@@ -45,6 +41,12 @@ export class AgentGenerationRegistry {
     this.activeByRequest.set(input.requestId, generation);
     this.activeByThread.set(input.threadId, generation);
     return { acquired: true };
+  }
+
+  /** Attach the triggering user message to an already-reserved generation. */
+  attachMessage(requestId: string, messageId: number): void {
+    const generation = this.activeByRequest.get(requestId);
+    if (generation) generation.messageId = messageId;
   }
 
   getByRequest(requestId: string): ActiveAgentGeneration | undefined {

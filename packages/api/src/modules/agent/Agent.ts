@@ -12,14 +12,23 @@ export class Agent {
       tools: input.tools,
       stopWhen: isStepCount(agentConfig.maxSteps),
       abortSignal,
-      timeout: SNAPSHOT_TTL_MS,
+      // timeout: SNAPSHOT_TTL_MS,
+      // onStepEnd: (args) => {
+      //   console.log(args);
+      // }
     });
 
     for await (const delta of result.textStream) {
         yield {type: "delta", delta};
     }
 
-    const [text, usage] = await Promise.all([result.text, result.usage])
+    const [text, usage, responseMessages] = await Promise.all([
+      result.text,
+      result.usage,
+      result.responseMessages,
+    ]);
+
+    console.dir({ responseMessages }, { depth: null });
 
     yield {type: "finish", text, completionTokens: usage.outputTokens ?? 0}
 
