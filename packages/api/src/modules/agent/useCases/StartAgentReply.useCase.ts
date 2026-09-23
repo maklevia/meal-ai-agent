@@ -57,7 +57,7 @@ export class StartAgentReplyUseCase extends UseCase<
       return this.started(await this.recoverClaimedRequestId(messageId));
     }
 
-    this.startGeneration({ thread, user, requestId });
+    this.startGeneration({ thread, user, requestId, messageId });
     return this.started(requestId);
   }
 
@@ -103,6 +103,7 @@ export class StartAgentReplyUseCase extends UseCase<
     thread: ThreadRef;
     user: User;
     requestId: string;
+    messageId: number
   }): void {
     try {
       this.agentService.startReply(input);

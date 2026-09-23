@@ -28,10 +28,15 @@ export class SocketIOChatNotifier implements ChatRealtimeNotifier {
       });
   }
 
-  agentStarted(input: { thread: ThreadRef; requestId: string }): void {
+  agentStarted(input: {
+    thread: ThreadRef;
+    requestId: string;
+    messageId: number;
+  }): void {
     this.io.to(threadRoom(input.thread.id)).emit("agent:started", {
       threadId: input.thread.id,
       requestId: input.requestId,
+      messageId: input.messageId,
     });
   }
 
@@ -52,11 +57,13 @@ export class SocketIOChatNotifier implements ChatRealtimeNotifier {
     requestId: string;
     message: ChatMessage;
   }): void {
-    this.io.to(threadRoom(input.thread.id)).emit("agent:completed", {
+    const payload = {
       threadId: input.thread.id,
       requestId: input.requestId,
       message: input.message,
-    });
+    };
+    this.io.to(threadRoom(input.thread.id)).emit("agent:completed", payload);
+    this.io.to(this.ownerRoom(input.thread)).emit("agent:completed", payload);
   }
 
   agentFailed(input: {
@@ -64,10 +71,18 @@ export class SocketIOChatNotifier implements ChatRealtimeNotifier {
     requestId: string;
     reason: string;
   }): void {
-    this.io.to(threadRoom(input.thread.id)).emit("agent:failed", {
+    const payload = {
       threadId: input.thread.id,
       requestId: input.requestId,
       reason: input.reason,
-    });
+    };
+    this.io.to(threadRoom(input.thread.id)).emit("agent:failed", payload);
+    this.io.to(this.ownerRoom(input.thread)).emit("agent:failed", payload);
+  }
+
+  private ownerRoom(thread: ThreadRef): string {
+    return thread.familyId !== null
+      ? familyRoom(thread.familyId)
+      : userRoom(thread.userId!);
   }
 }

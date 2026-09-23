@@ -15,6 +15,7 @@ type StartAgentReplyOptions = {
   thread: ThreadRef;
   user: User;
   requestId: string;
+  messageId: number;
 };
 
 export class AgentService extends Service {
@@ -38,11 +39,11 @@ export class AgentService extends Service {
   }
 
   private async runGeneration(options: StartAgentReplyOptions): Promise<void> {
-    const { user, thread, requestId } = options;
+    const { user, thread, requestId, messageId } = options;
     const signal = this.registry.getByRequest(requestId)?.abort.signal;
 
     try {
-      this.notifier.agentStarted({ thread, requestId });
+      this.notifier.agentStarted({ thread, requestId , messageId});
 
       const agentInput = await this.agentContext.build(user, thread);
 

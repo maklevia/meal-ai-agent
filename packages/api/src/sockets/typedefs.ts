@@ -1,4 +1,5 @@
 import { Server, Socket } from "socket.io";
+import { AgentGenerationSnapshot } from "src/modules/agent/typedefs";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { User } from "src/modules/user/entities/User.entity";
@@ -33,7 +34,9 @@ export interface ClientToServerEvents {
   ) => void;
   "thread:join": (
     payload: { threadId: number },
-    ack: (r: SocketAck<{ thread: ChatThread }>) => void,
+    ack: (
+      r: SocketAck<{ thread: ChatThread; generation: AgentGenerationSnapshot }>,
+    ) => void,
   ) => void;
   "thread:leave": (
     payload: { threadId: number },
@@ -45,14 +48,13 @@ export interface ClientToServerEvents {
       r: SocketAck<{
         message: ChatMessage;
         clientMessageId?: string;
-        generation: 
-        | {status: "started"; requestId: string}
-        | {status: "busy", activeRequestId: string};
+        generation:
+          | { status: "started"; requestId: string }
+          | { status: "busy"; activeRequestId: string };
+        inserted: boolean;
       }>,
     ) => void,
   ) => void;
-  // TODO(agent): extend `thread:join`'s ack with `generation: { requestId, status, contentSoFar } | null`
-  // once the agent can stream replies.
 }
 
 export interface ServerToClientEvents {
@@ -65,7 +67,7 @@ export interface ServerToClientEvents {
     createdAt: Date;
   }) => void;
 
-  "agent:started": (payload: { threadId: number; requestId: string }) => void;
+  "agent:started": (payload: { threadId: number; requestId: string, messageId: number }) => void;
   "agent:delta": (payload: {
     threadId: number;
     requestId: string;

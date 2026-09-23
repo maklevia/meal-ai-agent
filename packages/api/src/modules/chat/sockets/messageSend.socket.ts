@@ -14,6 +14,8 @@ export const messageSendSocket = defineSocketEvent({
     clientMessageId: payload.clientMessageId,
   }),
   onSuccess: (result, payload, ctx) => {
+    if (!result.inserted) return;
+
     ctx.socket.to(threadRoom(payload.threadId)).emit("message:created", {
       message: result.message,
     });

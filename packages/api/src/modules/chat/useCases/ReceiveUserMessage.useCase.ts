@@ -20,6 +20,7 @@ type ReceiveUserMessageResult = {
   generation:
     | { status: "started"; requestId: string }
     | { status: "busy"; activeRequestId: string };
+   inserted: boolean; 
 };
 
 export class ReceiveUserMessageUseCase extends ThreadUseCase<
@@ -65,6 +66,6 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
       messageId: message.id,
     });
 
-    return { message, clientMessageId, generation };
+    return { message, clientMessageId, generation, inserted };
   }
 }
