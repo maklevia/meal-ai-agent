@@ -19,13 +19,10 @@ export class Agent {
         yield {type: "delta", delta};
     }
 
-    const [text, usage, responseMessages] = await Promise.all([
+    const [text, usage] = await Promise.all([
       result.text,
       result.usage,
-      result.responseMessages,
     ]);
-
-    console.dir({ responseMessages }, { depth: null });
 
     yield {type: "finish", text, completionTokens: usage.outputTokens ?? 0}
 

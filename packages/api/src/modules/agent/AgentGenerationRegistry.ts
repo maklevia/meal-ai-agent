@@ -12,8 +12,7 @@ type AcquireResult =
  * In-memory, per-thread registry of agent generations.
  *
  * - `activeByThread` / `activeByRequest` are two indexes over the same
- *   running generation object: admission looks up by thread, the streaming
- *   loop looks up by request. Both point at the same instance, so mutations
+ *   running generation object. Both point at the same instance, so mutations
  *   (e.g. `contentSoFar`) are visible through either key.
  * - `snapshots` keeps the last finished generation per thread for a short TTL
  *   so a reconnecting client can still recover the state via `thread:join`.
@@ -82,10 +81,6 @@ export class AgentGenerationRegistry {
     this.scheduleSnapshotEviction(generation.threadId, snapshot);
   }
 
-  /**
-   * Force-free a running generation without leaving a snapshot. Used when the
-   * generation never actually started (e.g. the message claim lost the race).
-   */
   release(requestId: string): void {
     const generation = this.activeByRequest.get(requestId);
     if (!generation) return;
@@ -94,10 +89,6 @@ export class AgentGenerationRegistry {
     this.activeByThread.delete(generation.threadId);
   }
 
-  /**
-   * Abort a running generation (watchdog timeout / user cancellation) and
-   * record it as failed. The abort surfaces as an error in the streaming loop.
-   */
   cancel(requestId: string): boolean {
     const generation = this.activeByRequest.get(requestId);
     if (!generation) return false;
@@ -115,7 +106,6 @@ export class AgentGenerationRegistry {
     if (previousTimer) clearTimeout(previousTimer);
 
     const timer = setTimeout(() => {
-      // only evict if no newer snapshot replaced this one in the meantime
       if (this.snapshots.get(threadId) === snapshot) {
         this.snapshots.delete(threadId);
         this.timers.delete(threadId);

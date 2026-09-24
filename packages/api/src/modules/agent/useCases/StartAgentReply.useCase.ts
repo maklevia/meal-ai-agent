@@ -15,15 +15,6 @@ type StartReservedOptions = {
   messageId: number;
 };
 
-/**
- * Internal orchestrator for starting an agent reply.
- *
- * It is split in two phases so the caller can reserve the thread *before*
- * persisting the user message:
- *   1. `reserveThread` — atomically claim the thread (or report it busy).
- *   2. `start`         — attach the message and run the generation.
- * `releaseReservation` frees the slot if the caller fails in between.
- */
 export class StartAgentReplyUseCase {
   constructor(
     private readonly agentService: AgentService = new AgentService(),

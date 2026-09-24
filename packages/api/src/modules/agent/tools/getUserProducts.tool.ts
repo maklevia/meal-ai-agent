@@ -4,7 +4,7 @@ import z from "zod";
 
 export function createGetUserProductsTool(ctx: ToolContext, dependencies: ToolDependencies) {
     return tool({
-        description: "Get the list of product the user currently has.",
+        description: "Get the list of products the user currently has.",
         inputSchema: z.object({}),
         execute: async () => {
             if (!ctx.familyId) return {products: []};
