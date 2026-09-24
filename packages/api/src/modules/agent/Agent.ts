@@ -1,6 +1,6 @@
 import { isStepCount, streamText } from "ai";
 import { agentConfig } from "src/modules/agent/agent.config";
-import { SNAPSHOT_TTL_MS } from "src/modules/agent/constants";
+import { AGENT_TIMEOUT_MS } from "src/modules/agent/constants";
 import { AgentInput, AgentStreamEvent } from "src/modules/agent/typedefs";
 
 export class Agent {
@@ -12,10 +12,7 @@ export class Agent {
       tools: input.tools,
       stopWhen: isStepCount(agentConfig.maxSteps),
       abortSignal,
-      // timeout: SNAPSHOT_TTL_MS,
-      // onStepEnd: (args) => {
-      //   console.log(args);
-      // }
+      timeout: AGENT_TIMEOUT_MS,
     });
 
     for await (const delta of result.textStream) {

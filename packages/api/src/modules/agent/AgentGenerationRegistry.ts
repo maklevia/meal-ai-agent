@@ -43,7 +43,6 @@ export class AgentGenerationRegistry {
     return { acquired: true };
   }
 
-  /** Attach the triggering user message to an already-reserved generation. */
   attachMessage(requestId: string, messageId: number): void {
     const generation = this.activeByRequest.get(requestId);
     if (generation) generation.messageId = messageId;
