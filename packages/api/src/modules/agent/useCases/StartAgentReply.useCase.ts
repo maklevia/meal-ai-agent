@@ -1,50 +1,111 @@
-import { randomUUID } from "crypto";
-import { AgentService } from "src/modules/agent/Agent.service";
+import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
+import { ConflictError } from "src/errors";
+import { ChatErrorMessages } from "src/errors/messages/chat.messages";
+import { Agent } from "src/modules/agent/Agent";
+import { AgentContextBuilder } from "src/modules/agent/AgentContextBuilder";
 import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
-import { ThreadRef } from "src/modules/chat/realtime/ChatRealtimeNotifier";
-import { User } from "src/modules/user/entities/User.entity";
+import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
+import {
+  ChatRealtimeNotifier,
+  ThreadRef,
+  toThreadRef,
+} from "src/modules/chat/realtime/ChatRealtimeNotifier";
+import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
 
-export type ReservationResult =
-  | { acquired: true; requestId: string }
-  | { acquired: false; activeRequestId: string };
-
-type StartReservedOptions = {
-  thread: ThreadRef;
-  user: User;
-  requestId: string;
+type StartAgentReplyOptions = {
+  threadId: number;
   messageId: number;
+  requestId: string;
 };
 
-export class StartAgentReplyUseCase {
-  constructor(
-    private readonly agentService: AgentService = new AgentService(),
-    private readonly registry = getAgentGenerationRegistry(),
-  ) {}
+type StartAgentReplyResult = {
+  requestId: string;
+};
 
-  reserveThread(threadId: number): ReservationResult {
-    const requestId = randomUUID();
+export class StartAgentReplyUseCase extends ThreadUseCase<
+  StartAgentReplyOptions,
+  StartAgentReplyResult
+> {
+  private readonly notifier: ChatRealtimeNotifier = getChatRealtimeNotifier();
+  private readonly messageRepository: ChatMessageRepository =
+    new ChatMessageRepository();
+  private readonly agentContext: AgentContextBuilder = new AgentContextBuilder();
+  private readonly agent: Agent = new Agent();
+  private readonly registry = getAgentGenerationRegistry();
+
+  async executeThread(
+    options: StartAgentReplyOptions,
+  ): Promise<StartAgentReplyResult> {
+    const { threadId, messageId, requestId } = options;
+
     const admission = this.registry.tryAcquire({ threadId, requestId });
-
     if (!admission.acquired) {
-      return { acquired: false, activeRequestId: admission.active.requestId };
+      throw new ConflictError(ChatErrorMessages.AGENT_BUSY);
     }
-    return { acquired: true, requestId };
-  }
-
-  releaseReservation(requestId: string): void {
-    this.registry.release(requestId);
-  }
-
-  start(options: StartReservedOptions): void {
-    const { thread, user, requestId, messageId } = options;
 
     this.registry.attachMessage(requestId, messageId);
 
+    const thread = toThreadRef(this.thread);
+
+    void this.runGeneration({ thread, requestId, messageId }).catch((error) => {
+      console.error(`Agent generation ${requestId} unhandled error:`, error);
+    });
+
+    return { requestId };
+  }
+
+  private async runGeneration(input: {
+    thread: ThreadRef;
+    requestId: string;
+    messageId: number;
+  }): Promise<void> {
+    const { thread, requestId, messageId } = input;
+    const signal = this.registry.getByRequest(requestId)?.abort.signal;
+
     try {
-      this.agentService.startReply({ thread, user, requestId, messageId });
+      this.notifier.agentStarted({ thread, requestId, messageId });
+
+      const agentInput = await this.agentContext.build(this.user, thread);
+
+      for await (const event of this.agent.stream(agentInput, signal)) {
+        switch (event.type) {
+          case "delta":
+            this.registry.appendDelta(requestId, event.delta);
+            this.notifier.agentDelta({
+              thread,
+              requestId,
+              delta: event.delta,
+            });
+            break;
+
+          case "finish": {
+            const savedMessage =
+              await this.messageRepository.saveAssistantMessage({
+                threadId: thread.id,
+                content: event.text,
+                tokenCount: event.completionTokens,
+                generationRequestId: requestId,
+              });
+
+            await this.threadRepository.touchThread(thread.id);
+            this.registry.finish(requestId, "completed");
+            this.notifier.agentCompleted({
+              thread,
+              requestId,
+              message: savedMessage,
+            });
+            break;
+          }
+        }
+      }
     } catch (error) {
-      this.releaseReservation(requestId);
-      throw error;
+      this.registry.finish(requestId, "failed");
+      const reason = error instanceof Error ? error.message : "Unknown error";
+      this.notifier.agentFailed({
+        thread,
+        requestId,
+        reason,
+      });
     }
   }
 }

@@ -51,7 +51,7 @@ export interface ClientToServerEvents {
       r: SocketAck<{
         message: ChatMessage;
         clientMessageId: string;
-        requestId: string;
+        requestId: string | null;
         inserted: boolean;
       }>,
     ) => void,
