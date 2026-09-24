@@ -14,6 +14,8 @@
     "migration:revert": "DOTENV_CONFIG_PATH=../../.env tsx -r tsconfig-paths/register ../../node_modules/typeorm/cli.js migration:revert -d src/db/data-source.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.71",
+    "ai": "^7.0.107",
     "bcrypt-ts": "^9.0.2",
     "cookie": "^0.7.2",
     "cookie-parser": "^1.4.7",

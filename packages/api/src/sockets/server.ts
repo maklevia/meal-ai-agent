@@ -7,7 +7,7 @@ import { healthPingSocket } from "src/sockets/events/healthPing.socket";
 import { familyRoom, userRoom } from "src/sockets/rooms";
 import { registerSocketEvents } from "src/sockets/SocketBuilder";
 import { AppSocketServer } from "src/sockets/typedefs";
-import { setChatRealtimeNotifier } from "src/modules/chat/realTime/chatNotifier";
+import { setChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import { SocketIOChatNotifier } from "src/modules/chat/sockets/SocketIOChatNotifier";
 
 export function createSocketServer(httpServer: HttpServer): AppSocketServer {

@@ -35,6 +35,10 @@ const envSchema = z.object({
   RATE_LIMIT_ENABLED: stringBoolean,
   AUTH_RATE_LIMIT_MAX: z.coerce.number(),
   GLOBAL_RATE_LIMIT_MAX: z.coerce.number(),
+
+  LLM_API_KEY: z.string().min(1),
+  AGENT_MODEL: z.string().min(1),
+  AGENT_MAX_STEPS: z.coerce.number().int().positive()
 });
 
 const parsed = envSchema.safeParse(process.env);
