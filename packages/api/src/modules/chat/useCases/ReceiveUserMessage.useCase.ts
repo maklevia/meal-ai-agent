@@ -25,13 +25,6 @@ type ReceiveUserMessageResult = {
   inserted: boolean;
 };
 
-/**
- * Chat-side entry point for `message:send`.
- *
- * Persists the user message idempotently, broadcasts it, then hands the
- * generation off to `StartAgentReplyUseCase`. It does not know about
- * streaming, tools or the notifier's agent events.
- */
 export class ReceiveUserMessageUseCase extends ThreadUseCase<
   ReceiveUserMessageOptions,
   ReceiveUserMessageResult
@@ -49,8 +42,6 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
     const { content, clientMessageId } = options;
     const threadId = this.thread.id;
 
-    // Cheap admission guard so a busy thread saves nothing. The authoritative
-    // reservation still happens atomically inside StartAgentReplyUseCase.
     if (this.registry.isBusy(threadId)) {
       throw new ConflictError(ChatErrorMessages.AGENT_BUSY);
     }
@@ -66,7 +57,6 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
         generationRequestId: requestId,
       });
 
-    // Duplicate send: reuse the stored generation, do not start another one.
     if (!inserted) {
       return {
         message,

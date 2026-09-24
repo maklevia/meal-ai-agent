@@ -51,11 +51,6 @@ export class AgentGenerationRegistry {
     return this.activeByRequest.get(requestId);
   }
 
-  /**
-   * Whether a generation is currently running for the thread. Cheap,
-   * synchronous admission guard for callers that want to reject before
-   * persisting. The authoritative claim is still `tryAcquire`.
-   */
   isBusy(threadId: number): boolean {
     return this.activeByThread.has(threadId);
   }
