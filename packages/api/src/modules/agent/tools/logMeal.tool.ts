@@ -3,7 +3,10 @@ import { ToolContext, ToolDependencies } from "src/modules/agent/typedefs";
 import { MealScore } from "src/modules/mealHistory/typedefs";
 import z from "zod";
 
-export function createLogMealTool(ctx: ToolContext, dependencies: ToolDependencies) {
+export function createLogMealTool(
+  ctx: ToolContext,
+  dependencies: ToolDependencies,
+) {
   return tool({
     description:
       "Log a meal the user has tried, with their feedback score (1-5).",
@@ -17,7 +20,7 @@ export function createLogMealTool(ctx: ToolContext, dependencies: ToolDependenci
         .describe("User rating from 1 (disliked) to 5 (loved)"),
     }),
     execute: async ({ mealName, userFeedback }) => {
-        await dependencies.meals.createMealHistoryRecord({
+      await dependencies.meals.createMealHistoryRecord({
         score: userFeedback as MealScore,
         name: mealName,
         userId: ctx.userId,

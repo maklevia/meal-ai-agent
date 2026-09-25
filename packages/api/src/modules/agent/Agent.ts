@@ -13,6 +13,10 @@ export class Agent {
       stopWhen: isStepCount(agentConfig.maxSteps),
       abortSignal,
       timeout: AGENT_TIMEOUT_MS,
+      onStepEnd: (step) => {
+        console.log(`\n===== AGENT STEP ${step.stepNumber} =====`);
+        console.dir(step, { depth: null });
+      },
     });
 
     for await (const delta of result.textStream) {

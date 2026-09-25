@@ -21,7 +21,7 @@ export class AgentContextBuilder {
     const [messages, systemPrompt, tools] = await Promise.all([
       this.loadHistory(thread.id),
       this.getSystemPrompt(user),
-      this.buildTools({ userId: user.id, familyId: thread.familyId }),
+      this.buildTools({ userId: user.id, familyId: user.family?.id ?? null }),
     ]);
 
     return { messages, systemPrompt, tools };
