@@ -84,8 +84,6 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
               await this.messageRepository.saveAssistantMessage({
                 threadId: thread.id,
                 content: event.text,
-                tokenCount: event.completionTokens,
-                generationRequestId: requestId,
               });
 
             await this.threadRepository.touchThread(thread.id);

@@ -54,14 +54,13 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
         content,
         clientMessageId,
         senderId: this.user.id,
-        generationRequestId: requestId,
       });
 
     if (!inserted) {
       return {
         message,
         clientMessageId,
-        requestId: message.generationRequestId ?? null,
+        requestId: null,
         inserted: false,
       };
     }

@@ -1,5 +1,4 @@
 import {
-  Check,
   Column,
   CreateDateColumn,
   Entity,
@@ -16,7 +15,6 @@ import { User } from "src/modules/user/entities/User.entity";
 import { AgentRun } from "src/modules/agent/entities/AgentRun.entity";
 
 @Entity("chat_messages")
-@Check("CHK_token_count_positive", '"token_count" >= 0')
 @Index(
   "UQ_chat_messages_thread_client_message_id",
   ["thread", "clientMessageId"],
@@ -32,14 +30,8 @@ export class ChatMessage {
   @Column({ type: "text" })
   content: string;
 
-  @Column({ type: "int" })
-  tokenCount: number;
-
   @Column({ type: "uuid", nullable: true })
   clientMessageId: string | null;
-
-  @Column({ type: "uuid", nullable: true })
-  generationRequestId: string | null;
 
   @ManyToOne(() => User, {
     nullable: true,

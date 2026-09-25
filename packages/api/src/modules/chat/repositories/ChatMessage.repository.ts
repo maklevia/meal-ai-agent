@@ -11,7 +11,6 @@ type SaveMessageOptions = {
 
 type SaveUserMessageOptions = SaveMessageOptions & {
   clientMessageId?: string;
-  generationRequestId?: string;
   senderId?: number;
 };
 
@@ -20,10 +19,6 @@ type InsertUserMessageResult = {
   inserted: boolean;
 };
 
-type SaveAssistantMessageOptions = SaveMessageOptions & {
-  tokenCount: number;
-  generationRequestId?: string;
-};
 
 type FindUserMessageByClientMessageIdOptions = {
   threadId: number;
@@ -70,7 +65,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   async insertUserMessageIfAbsent(
     options: SaveUserMessageOptions & { clientMessageId: string },
   ): Promise<InsertUserMessageResult> {
-    const { threadId, content, clientMessageId, generationRequestId, senderId } =
+    const { threadId, content, clientMessageId, senderId } =
       options;
 
     const result = await this.repo
@@ -80,9 +75,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
       .values({
         content,
         role: ChatMessageRole.User,
-        tokenCount: 0,
         clientMessageId,
-        generationRequestId: generationRequestId ?? null,
         sender: senderId ? { id: senderId } : null,
         thread: { id: threadId },
       })
@@ -118,15 +111,13 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   }
 
   async saveAssistantMessage(
-    options: SaveAssistantMessageOptions,
+    options: SaveMessageOptions,
   ): Promise<ChatMessage> {
-    const { threadId, content, tokenCount, generationRequestId } = options;
+    const { threadId, content } = options;
     const newMessage = new ChatMessage();
     newMessage.content = content;
     newMessage.thread = { id: threadId } as ChatThread;
     newMessage.role = ChatMessageRole.Assistant;
-    newMessage.tokenCount = tokenCount;
-    newMessage.generationRequestId = generationRequestId ?? null;
 
     const savedMessage = await this.repo.save(newMessage);
     return savedMessage;
