@@ -14,6 +14,8 @@ import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { RefreshToken } from "src/modules/auth/entities/RefreshToken.entity";
 import { RegistrationInvitation } from "src/modules/auth/entities/RegistrationInvitation.entity";
 import { PasswordResetCode } from "src/modules/auth/entities/PasswordResetCode.entity";
+import { AgentRun } from "src/modules/agent/entities/AgentRun.entity";
+import { AgentStep } from "src/modules/agent/entities/AgentStep.entity";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -36,6 +38,8 @@ export const AppDataSource = new DataSource({
     RefreshToken,
     RegistrationInvitation,
     PasswordResetCode,
+    AgentRun,
+    AgentStep
   ],
   migrations: [
     path.join(

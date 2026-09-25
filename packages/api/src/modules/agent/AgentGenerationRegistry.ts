@@ -2,6 +2,8 @@ import { SNAPSHOT_TTL_MS } from "src/modules/agent/constants";
 import {
   ActiveAgentGeneration,
   AgentGenerationSnapshot,
+  AgentRunStatus,
+  TerminalAgentRunStatus,
 } from "src/modules/agent/typedefs";
 
 type AcquireResult =
@@ -31,7 +33,7 @@ export class AgentGenerationRegistry {
       requestId: input.requestId,
       threadId: input.threadId,
       messageId: null,
-      status: "running",
+      status: AgentRunStatus.Started,
       contentSoFar: "",
       startedAt: new Date().toISOString(),
       abort: new AbortController(),
@@ -71,7 +73,7 @@ export class AgentGenerationRegistry {
     }
   }
 
-  finish(requestId: string, status: "completed" | "failed"): void {
+  finish(requestId: string, status: TerminalAgentRunStatus): void {
     const generation = this.activeByRequest.get(requestId);
     if (!generation) return;
 
@@ -98,7 +100,7 @@ export class AgentGenerationRegistry {
     if (!generation) return false;
 
     generation.abort.abort();
-    this.finish(requestId, "failed");
+    this.finish(requestId, AgentRunStatus.Aborted);
     return true;
   }
 

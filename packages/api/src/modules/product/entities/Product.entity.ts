@@ -34,6 +34,6 @@ export class Product {
     nullable: false,
     onDelete: "CASCADE",
   })
-  @JoinColumn()
+  @JoinColumn({ foreignKeyConstraintName: "FK_products_family_id" })
   family: Relation<Family>;
 }

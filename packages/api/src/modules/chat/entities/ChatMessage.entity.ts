@@ -6,12 +6,14 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
+import { AgentRun } from "src/modules/agent/entities/AgentRun.entity";
 
 @Entity("chat_messages")
 @Check("CHK_token_count_positive", '"token_count" >= 0')
@@ -58,4 +60,7 @@ export class ChatMessage {
   })
   @JoinColumn()
   thread: Relation<ChatThread>;
+
+  @OneToOne(() => AgentRun, (agentRun) => agentRun.agentMessage)
+  agentRun: Relation<AgentRun> | null;
 }

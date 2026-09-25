@@ -1,3 +1,4 @@
+import { AgentRunStatus } from "src/modules/agent/typedefs";
 import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
 import { ConflictError } from "src/errors";
 import { ChatErrorMessages } from "src/errors/messages/chat.messages";
@@ -88,7 +89,7 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
               });
 
             await this.threadRepository.touchThread(thread.id);
-            this.registry.finish(requestId, "completed");
+            this.registry.finish(requestId, AgentRunStatus.Completed);
             this.notifier.agentCompleted({
               thread,
               requestId,
@@ -99,7 +100,7 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
         }
       }
     } catch (error) {
-      this.registry.finish(requestId, "failed");
+      this.registry.finish(requestId, AgentRunStatus.Failed);
       const reason = error instanceof Error ? error.message : "Unknown error";
       this.notifier.agentFailed({
         thread,
