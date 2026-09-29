@@ -19,7 +19,6 @@ type InsertUserMessageResult = {
   inserted: boolean;
 };
 
-
 type FindUserMessageByClientMessageIdOptions = {
   threadId: number;
   clientMessageId: string;
@@ -65,8 +64,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   async insertUserMessageIfAbsent(
     options: SaveUserMessageOptions & { clientMessageId: string },
   ): Promise<InsertUserMessageResult> {
-    const { threadId, content, clientMessageId, senderId } =
-      options;
+    const { threadId, content, clientMessageId, senderId } = options;
 
     const result = await this.repo
       .createQueryBuilder()
@@ -122,5 +120,4 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
     const savedMessage = await this.repo.save(newMessage);
     return savedMessage;
   }
-
 }

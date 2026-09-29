@@ -3,6 +3,8 @@ import {
   ModelMessage,
   type AssistantModelMessage,
   type ToolModelMessage,
+  FinishReason,
+  LanguageModelUsage,
 } from "ai";
 import { MealHistoryRepository } from "src/modules/mealHistory/repositories/MealHistoryRepository";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
@@ -15,11 +17,30 @@ export type AgentInput = {
   tools: ToolSet;
 };
 
+export type AgentHooks = {
+  onStepEnd: (step: AgentStepRecord) => Promise<void>;
+}
+
+export type AgentStepRecord = {
+  stepNumber: number;
+  finishReason: FinishReason | null;
+  rawFinishReason: string | null;
+  usage: LanguageModelUsage;
+  responseMessages: AgentResponseMessage[];
+}
+
+export type AgentRunOutcome = {
+  finishReason: FinishReason | null;
+  rawFinishReason: string | null;
+  stepCount: number;
+  totalTokenCount: number 
+}
+
 export type AgentResponseMessage = AssistantModelMessage | ToolModelMessage;
 
 export type AgentStreamEvent =
   | { type: "delta"; delta: string }
-  | { type: "finish"; text: string; completionTokens: number };
+  | { type: "finish"; text: string; outcome: AgentRunOutcome };
 
 export enum AgentRunStatus {
   Started = "started",

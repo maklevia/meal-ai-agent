@@ -1,10 +1,13 @@
-import { AgentRunStatus } from "src/modules/agent/typedefs";
+import { IUnitOfWork } from "src/core/IUnitOfWork";
 import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
-import { ConflictError } from "src/errors";
-import { ChatErrorMessages } from "src/errors/messages/chat.messages";
+import { UnitOfWork } from "src/db/UnitOfWork";
 import { Agent } from "src/modules/agent/Agent";
 import { AgentContextBuilder } from "src/modules/agent/AgentContextBuilder";
 import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
+import { agentConfig } from "src/modules/agent/agent.config";
+import { AgentRunRepository } from "src/modules/agent/repositories/AgentRun.repository";
+import { AgentStepRepository } from "src/modules/agent/repositories/AgentStep.repository";
+import { AgentRunStatus } from "src/modules/agent/typedefs";
 import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import {
   ChatRealtimeNotifier,
@@ -12,6 +15,7 @@ import {
   toThreadRef,
 } from "src/modules/chat/realtime/ChatRealtimeNotifier";
 import { ChatMessageRepository } from "src/modules/chat/repositories/ChatMessage.repository";
+import { ChatThreadRepository } from "src/modules/chat/repositories/ChatThread.repository";
 
 type StartAgentReplyOptions = {
   threadId: number;
@@ -28,21 +32,20 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
   StartAgentReplyResult
 > {
   private readonly notifier: ChatRealtimeNotifier = getChatRealtimeNotifier();
-  private readonly messageRepository: ChatMessageRepository =
-    new ChatMessageRepository();
-  private readonly agentContext: AgentContextBuilder = new AgentContextBuilder();
+  private readonly agentContext: AgentContextBuilder =
+    new AgentContextBuilder();
   private readonly agent: Agent = new Agent();
   private readonly registry = getAgentGenerationRegistry();
+  private readonly uow: IUnitOfWork = new UnitOfWork();
+  private readonly agentRunRepository: AgentRunRepository =
+    new AgentRunRepository();
+  private readonly agentStepRepository: AgentStepRepository =
+    new AgentStepRepository();
 
   async executeThread(
     options: StartAgentReplyOptions,
   ): Promise<StartAgentReplyResult> {
     const { threadId, messageId, requestId } = options;
-
-    const admission = this.registry.tryAcquire({ threadId, requestId });
-    if (!admission.acquired) {
-      throw new ConflictError(ChatErrorMessages.AGENT_BUSY);
-    }
 
     this.registry.attachMessage(requestId, messageId);
 
@@ -63,12 +66,28 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
     const { thread, requestId, messageId } = input;
     const signal = this.registry.getByRequest(requestId)?.abort.signal;
 
+    let agentRunId: number | null = null;
+    let stepCount = 0;
+
     try {
+      const agentRun = await this.agentRunRepository.saveNewAgentRun({
+        requestId,
+        userMessageId: messageId,
+        modelProvider: agentConfig.modelProvider,
+        modelId: agentConfig.modelId,
+      });
+      agentRunId = agentRun.id;
+
       this.notifier.agentStarted({ thread, requestId, messageId });
 
       const agentInput = await this.agentContext.build(this.user, thread);
 
-      for await (const event of this.agent.stream(agentInput, signal)) {
+      for await (const event of this.agent.stream(agentInput, signal, {
+        onStepEnd: (step) => {
+          stepCount = step.stepNumber + 1;
+          return this.agentStepRepository.saveAgentStep(step, agentRun.id);
+        },
+      })) {
         switch (event.type) {
           case "delta":
             this.registry.appendDelta(requestId, event.delta);
@@ -80,13 +99,30 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
             break;
 
           case "finish": {
-            const savedMessage =
-              await this.messageRepository.saveAssistantMessage({
+            const savedMessage = await this.uow.run(async (tx) => {
+              const messages = tx.get(ChatMessageRepository);
+              const threads = tx.get(ChatThreadRepository);
+              const runs = tx.get(AgentRunRepository);
+
+              const message = await messages.saveAssistantMessage({
                 threadId: thread.id,
                 content: event.text,
               });
 
-            await this.threadRepository.touchThread(thread.id);
+              await threads.touchThread(thread.id);
+
+              await runs.updateCompletedRun({
+                requestId,
+                agentMessageId: message.id,
+                finishReason: event.outcome.finishReason,
+                rawFinishReason: event.outcome.rawFinishReason,
+                totalTokenCount: event.outcome.totalTokenCount,
+                stepCount: event.outcome.stepCount,
+              });
+
+              return message;
+            });
+
             this.registry.finish(requestId, AgentRunStatus.Completed);
             this.notifier.agentCompleted({
               thread,
@@ -98,13 +134,25 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
         }
       }
     } catch (error) {
-      this.registry.finish(requestId, AgentRunStatus.Failed);
       const reason = error instanceof Error ? error.message : "Unknown error";
-      this.notifier.agentFailed({
-        thread,
-        requestId,
-        reason,
-      });
+
+      if (agentRunId !== null) {
+        try {
+          await this.agentRunRepository.updateFailedRun({
+            requestId,
+            error: reason,
+            stepCount,
+          });
+        } catch (persistError) {
+          console.error(
+            `Failed to persist failure for agent run ${requestId}:`,
+            persistError,
+          );
+        }
+      }
+
+      this.registry.finish(requestId, AgentRunStatus.Failed);
+      this.notifier.agentFailed({ thread, requestId, reason });
     }
   }
 }

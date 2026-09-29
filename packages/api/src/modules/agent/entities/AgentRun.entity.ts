@@ -29,10 +29,10 @@ export class AgentRun {
   status: AgentRunStatus;
 
   @Column({ type: "varchar", length: 64, nullable: true })
-  modelProvider: string;
+  modelProvider: string | null;
 
   @Column({ type: "varchar", length: 128, nullable: true })
-  modelId: string;
+  modelId: string | null;
 
   @Column({ type: "int", default: 0 })
   stepCount: number;

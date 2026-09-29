@@ -53,10 +53,6 @@ export class AgentGenerationRegistry {
     return this.activeByRequest.get(requestId);
   }
 
-  isBusy(threadId: number): boolean {
-    return this.activeByThread.has(threadId);
-  }
-
   getByThread(threadId: number): AgentGenerationSnapshot | null {
     const active = this.activeByThread.get(threadId);
 
@@ -73,6 +69,13 @@ export class AgentGenerationRegistry {
     }
   }
 
+  release(requestId: string): void {
+    const generation = this.activeByRequest.get(requestId);
+    if (!generation) return;
+    this.activeByRequest.delete(requestId);
+    this.activeByThread.delete(generation.threadId);
+  }
+
   finish(requestId: string, status: TerminalAgentRunStatus): void {
     const generation = this.activeByRequest.get(requestId);
     if (!generation) return;
@@ -85,23 +88,6 @@ export class AgentGenerationRegistry {
     this.snapshots.set(generation.threadId, snapshot);
 
     this.scheduleSnapshotEviction(generation.threadId, snapshot);
-  }
-
-  release(requestId: string): void {
-    const generation = this.activeByRequest.get(requestId);
-    if (!generation) return;
-
-    this.activeByRequest.delete(requestId);
-    this.activeByThread.delete(generation.threadId);
-  }
-
-  cancel(requestId: string): boolean {
-    const generation = this.activeByRequest.get(requestId);
-    if (!generation) return false;
-
-    generation.abort.abort();
-    this.finish(requestId, AgentRunStatus.Aborted);
-    return true;
   }
 
   private scheduleSnapshotEviction(
