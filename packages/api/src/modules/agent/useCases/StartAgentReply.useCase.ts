@@ -67,7 +67,8 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
     const signal = this.registry.getByRequest(requestId)?.abort.signal;
 
     let agentRunId: number | null = null;
-    let stepCount = 0;
+    let stepCount: number = 0;
+    let runFinalized: boolean = false;
 
     try {
       const agentRun = await this.agentRunRepository.saveNewAgentRun({
@@ -123,6 +124,8 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
               return message;
             });
 
+            runFinalized = true;
+
             this.registry.finish(requestId, AgentRunStatus.Completed);
             this.notifier.agentCompleted({
               thread,
@@ -135,6 +138,11 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
       }
     } catch (error) {
       const reason = error instanceof Error ? error.message : "Unknown error";
+
+      if (runFinalized) {
+        console.error(`Post-completion error for agent run ${requestId}:`, error);
+        return;
+      }
 
       if (agentRunId !== null) {
         try {

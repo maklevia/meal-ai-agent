@@ -43,4 +43,8 @@ export class AgentService extends Service {
   releaseAgent(requestId: string): void {
     this.registry.release(requestId);
   }
+
+  cancelAgent(requestId: string): boolean {
+    return this.registry.cancel(requestId);
+  }
 }

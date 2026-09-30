@@ -56,11 +56,15 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
       };
     }
 
-    await this.threadRepository.touchThread(threadId);
-
     const thread = toThreadRef(this.thread);
-    this.notifier.notifyNewMessage({ message, thread });
+    await this.threadRepository.touchThread(threadId).catch((error) => console.error(`Failed to touch thread ${threadId}:`, error));
 
+    try {
+      this.notifier.notifyNewMessage({message, thread})
+    } catch (error) {                                                                                    
+     console.error(`Failed to notify new message for thread ${threadId}:`, error);                      
+   }                                                                                                    
+      
     this.agentService.startAgentGeneration({
       user: this.user,
       messageId: message.id,

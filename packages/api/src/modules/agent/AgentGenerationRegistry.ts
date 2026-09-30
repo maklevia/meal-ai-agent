@@ -90,6 +90,14 @@ export class AgentGenerationRegistry {
     this.scheduleSnapshotEviction(generation.threadId, snapshot);
   }
 
+  cancel(requestId: string): boolean {                                                                 
+     const generation = this.activeByRequest.get(requestId);                                            
+     if (!generation) return false;                                                                     
+     generation.abort.abort();                                                                          
+     this.finish(requestId, AgentRunStatus.Aborted);                                                    
+     return true;                                                                                       
+   } 
+
   private scheduleSnapshotEviction(
     threadId: number,
     snapshot: AgentGenerationSnapshot,
