@@ -1,4 +1,5 @@
 import { BaseRepository } from "src/db/BaseRepository";
+import { AgentRunStatus } from "src/modules/agent/typedefs";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
@@ -37,6 +38,26 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
 
   protected get entity() {
     return ChatMessage;
+  }
+
+  async loadChatMessagesWithAgentSteps(options: GetThreadMessagesOptions): Promise<ChatMessage[]> {
+    const {threadId, beforeId, limit} = options;
+
+    const queryBuilder = this.repo
+    .createQueryBuilder("message")
+    .leftJoinAndSelect("message.agentRun", "run")
+    .leftJoinAndSelect("run.agentStep", "step")
+    .where("message.threadId = :threadId", {threadId})
+    .andWhere("msg.role != :system", {system: ChatMessageRole.System})
+    .andWhere ("run.status = :completed", {completed: AgentRunStatus.Completed})
+    .orderBy("message.id", "DESC")
+    .take(limit);
+
+    if (beforeId !== undefined) {
+        queryBuilder.andWhere('msg.id < :beforeId', { beforeId });
+      }
+
+      return await queryBuilder.getMany()
   }
 
   async getThreadMessages(

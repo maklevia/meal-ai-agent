@@ -3,7 +3,7 @@ import { BaseRepository } from "src/db/BaseRepository";
 import { AgentRun } from "src/modules/agent/entities/AgentRun.entity";
 import { AgentRunStatus } from "src/modules/agent/typedefs";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
-import { EntityManager } from "typeorm";
+import { EntityManager, In } from "typeorm";
 
 type NewAgentRunOptions = {
   requestId: string;
@@ -73,5 +73,24 @@ export class AgentRunRepository extends BaseRepository<AgentRun> {
 
     await this.repo.save(run);
   }
-  
+
+  /**
+   * Loads the agent runs that produced the given assistant chat messages,
+   * together with their steps, so the LLM transcript can be rebuilt.
+   *
+   * Only completed runs are returned: a run exposes `agent_message_id`
+   * exclusively once it finished, and failed/aborted runs may end on an
+   * assistant tool-call without a matching tool result, which is not a valid
+   * transcript to replay.
+   */
+  async findWithStepsByAgentMessageIds(
+    agentMessageIds: number[],
+  ): Promise<AgentRun[]> {
+    if (agentMessageIds.length === 0) return [];
+
+    return this.repo.find({
+      where: { agentMessage: { id: In(agentMessageIds) } },
+      relations: { agentMessage: true, agentStep: true },
+    });
+  }
 }
