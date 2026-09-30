@@ -74,15 +74,6 @@ export class AgentRunRepository extends BaseRepository<AgentRun> {
     await this.repo.save(run);
   }
 
-  /**
-   * Loads the agent runs that produced the given assistant chat messages,
-   * together with their steps, so the LLM transcript can be rebuilt.
-   *
-   * Only completed runs are returned: a run exposes `agent_message_id`
-   * exclusively once it finished, and failed/aborted runs may end on an
-   * assistant tool-call without a matching tool result, which is not a valid
-   * transcript to replay.
-   */
   async findWithStepsByAgentMessageIds(
     agentMessageIds: number[],
   ): Promise<AgentRun[]> {

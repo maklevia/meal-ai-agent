@@ -48,13 +48,13 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
     .leftJoinAndSelect("message.agentRun", "run")
     .leftJoinAndSelect("run.agentStep", "step")
     .where("message.threadId = :threadId", {threadId})
-    .andWhere("msg.role != :system", {system: ChatMessageRole.System})
+    .andWhere("message.role != :system", {system: ChatMessageRole.System})
     .andWhere ("run.status = :completed", {completed: AgentRunStatus.Completed})
     .orderBy("message.id", "DESC")
     .take(limit);
 
     if (beforeId !== undefined) {
-        queryBuilder.andWhere('msg.id < :beforeId', { beforeId });
+        queryBuilder.andWhere('message.id < :beforeId', { beforeId });
       }
 
       return await queryBuilder.getMany()
