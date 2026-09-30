@@ -1,4 +1,11 @@
-import { ToolSet, ModelMessage } from "ai";
+import {
+  ToolSet,
+  ModelMessage,
+  type AssistantModelMessage,
+  type ToolModelMessage,
+  FinishReason,
+  LanguageModelUsage,
+} from "ai";
 import { MealHistoryRepository } from "src/modules/mealHistory/repositories/MealHistoryRepository";
 import { ProductRepository } from "src/modules/product/repositories/Product.repository";
 import { RecipeService } from "src/modules/recipe/Recipe.service";
@@ -10,16 +17,47 @@ export type AgentInput = {
   tools: ToolSet;
 };
 
+export type AgentHooks = {
+  onStepEnd: (step: AgentStepRecord) => Promise<void>;
+}
+
+export type AgentStepRecord = {
+  stepNumber: number;
+  finishReason: FinishReason | null;
+  rawFinishReason: string | null;
+  usage: LanguageModelUsage;
+  responseMessages: AgentResponseMessage[];
+}
+
+export type AgentRunOutcome = {
+  finishReason: FinishReason | null;
+  rawFinishReason: string | null;
+  stepCount: number;
+  totalTokenCount: number 
+}
+
+export type AgentResponseMessage = AssistantModelMessage | ToolModelMessage;
+
 export type AgentStreamEvent =
   | { type: "delta"; delta: string }
-  | { type: "finish"; text: string; completionTokens: number };
+  | { type: "finish"; text: string; outcome: AgentRunOutcome };
 
-export type AgentGenerationStatus = "running" | "completed" | "failed";
+export enum AgentRunStatus {
+  Started = "started",
+  Completed = "completed",
+  Failed = "failed",
+  Aborted = "aborted",
+}
+
+export type TerminalAgentRunStatus =
+  | AgentRunStatus.Completed
+  | AgentRunStatus.Failed
+  | AgentRunStatus.Aborted;
 
 export type AgentGenerationSnapshot = {
   requestId: string;
   messageId: number | null;
-  status: AgentGenerationStatus;
+  status: AgentRunStatus;
   contentSoFar: string;
   startedAt: string;
 };

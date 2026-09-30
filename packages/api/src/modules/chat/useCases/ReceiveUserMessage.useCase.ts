@@ -1,9 +1,5 @@
-import { randomUUID } from "node:crypto";
 import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
-import { ConflictError } from "src/errors";
-import { ChatErrorMessages } from "src/errors/messages/chat.messages";
-import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
-import { StartAgentReplyUseCase } from "src/modules/agent/useCases/StartAgentReply.useCase";
+import { AgentService } from "src/modules/agent/Agent.service";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { getChatRealtimeNotifier } from "src/modules/chat/realtime/chatNotifier";
 import {
@@ -32,57 +28,59 @@ export class ReceiveUserMessageUseCase extends ThreadUseCase<
   private readonly notifier: ChatRealtimeNotifier = getChatRealtimeNotifier();
   private readonly messageRepository: ChatMessageRepository =
     new ChatMessageRepository();
-  private readonly startAgentReply: StartAgentReplyUseCase =
-    new StartAgentReplyUseCase();
-  private readonly registry = getAgentGenerationRegistry();
-
+  private readonly agentService: AgentService = new AgentService();
   async executeThread(
     options: ReceiveUserMessageOptions,
   ): Promise<ReceiveUserMessageResult> {
     const { content, clientMessageId } = options;
     const threadId = this.thread.id;
 
-    if (this.registry.isBusy(threadId)) {
-      throw new ConflictError(ChatErrorMessages.AGENT_BUSY);
-    }
+    const requestId = this.agentService.tryReserveAgent(threadId);
 
-    const requestId = randomUUID();
-
-    const { message, inserted } =
+    try {
+      const { message, inserted } =
       await this.messageRepository.insertUserMessageIfAbsent({
         threadId,
         content,
         clientMessageId,
         senderId: this.user.id,
-        generationRequestId: requestId,
       });
 
     if (!inserted) {
+      this.agentService.releaseAgent(requestId);
       return {
         message,
         clientMessageId,
-        requestId: message.generationRequestId ?? null,
+        requestId: null,
         inserted: false,
       };
     }
 
-    await this.threadRepository.touchThread(threadId);
-
     const thread = toThreadRef(this.thread);
-    this.notifier.notifyNewMessage({ message, thread });
+    await this.threadRepository.touchThread(threadId).catch((error) => console.error(`Failed to touch thread ${threadId}:`, error));
 
-    this.startAgentReply.setAuthUser(this.user);
-    const { requestId: startedRequestId } = await this.startAgentReply.execute({
-      threadId,
+    try {
+      this.notifier.notifyNewMessage({message, thread})
+    } catch (error) {                                                                                    
+     console.error(`Failed to notify new message for thread ${threadId}:`, error);                      
+   }                                                                                                    
+      
+    this.agentService.startAgentGeneration({
+      user: this.user,
       messageId: message.id,
       requestId,
+      threadId,
     });
 
     return {
       message,
       clientMessageId,
-      requestId: startedRequestId,
+      requestId,
       inserted: true,
     };
+    } catch (error){
+      this.agentService.releaseAgent(requestId);
+      throw error;
+    }
   }
 }

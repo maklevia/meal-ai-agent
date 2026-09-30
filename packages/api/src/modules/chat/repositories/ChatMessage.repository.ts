@@ -1,4 +1,5 @@
 import { BaseRepository } from "src/db/BaseRepository";
+import { AgentRunStatus } from "src/modules/agent/typedefs";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
@@ -11,18 +12,12 @@ type SaveMessageOptions = {
 
 type SaveUserMessageOptions = SaveMessageOptions & {
   clientMessageId?: string;
-  generationRequestId?: string;
   senderId?: number;
 };
 
 type InsertUserMessageResult = {
   message: ChatMessage;
   inserted: boolean;
-};
-
-type SaveAssistantMessageOptions = SaveMessageOptions & {
-  tokenCount: number;
-  generationRequestId?: string;
 };
 
 type FindUserMessageByClientMessageIdOptions = {
@@ -43,6 +38,26 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
 
   protected get entity() {
     return ChatMessage;
+  }
+
+  async loadChatMessagesWithAgentSteps(options: GetThreadMessagesOptions): Promise<ChatMessage[]> {
+    const {threadId, beforeId, limit} = options;
+
+    const queryBuilder = this.repo
+    .createQueryBuilder("message")
+    .leftJoinAndSelect("message.agentRun", "run")
+    .leftJoinAndSelect("run.agentStep", "step")
+    .where("message.threadId = :threadId", {threadId})
+    .andWhere("message.role != :system", {system: ChatMessageRole.System})
+    .andWhere ("run.status = :completed", {completed: AgentRunStatus.Completed})
+    .orderBy("message.id", "DESC")
+    .take(limit);
+
+    if (beforeId !== undefined) {
+        queryBuilder.andWhere('message.id < :beforeId', { beforeId });
+      }
+
+      return await queryBuilder.getMany()
   }
 
   async getThreadMessages(
@@ -70,8 +85,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   async insertUserMessageIfAbsent(
     options: SaveUserMessageOptions & { clientMessageId: string },
   ): Promise<InsertUserMessageResult> {
-    const { threadId, content, clientMessageId, generationRequestId, senderId } =
-      options;
+    const { threadId, content, clientMessageId, senderId } = options;
 
     const result = await this.repo
       .createQueryBuilder()
@@ -80,9 +94,7 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
       .values({
         content,
         role: ChatMessageRole.User,
-        tokenCount: 0,
         clientMessageId,
-        generationRequestId: generationRequestId ?? null,
         sender: senderId ? { id: senderId } : null,
         thread: { id: threadId },
       })
@@ -118,18 +130,15 @@ export class ChatMessageRepository extends BaseRepository<ChatMessage> {
   }
 
   async saveAssistantMessage(
-    options: SaveAssistantMessageOptions,
+    options: SaveMessageOptions,
   ): Promise<ChatMessage> {
-    const { threadId, content, tokenCount, generationRequestId } = options;
+    const { threadId, content } = options;
     const newMessage = new ChatMessage();
     newMessage.content = content;
     newMessage.thread = { id: threadId } as ChatThread;
     newMessage.role = ChatMessageRole.Assistant;
-    newMessage.tokenCount = tokenCount;
-    newMessage.generationRequestId = generationRequestId ?? null;
 
     const savedMessage = await this.repo.save(newMessage);
     return savedMessage;
   }
-
 }

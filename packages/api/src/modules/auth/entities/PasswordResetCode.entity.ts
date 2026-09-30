@@ -10,7 +10,7 @@ export class PasswordResetCode {
     @Column({ type: "varchar", length: 255 })
     codeHash: string;
 
-    @CreateDateColumn({type: "timestamptz", default: "NOW()"})
+    @CreateDateColumn({type: "timestamptz", default: () => "NOW()"})
     createdAt: Date;
 
     @Column({type: "timestamptz"})

@@ -1,20 +1,20 @@
 import {
-  Check,
   Column,
   CreateDateColumn,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
+import { AgentRun } from "src/modules/agent/entities/AgentRun.entity";
 
 @Entity("chat_messages")
-@Check("CHK_token_count_positive", '"token_count" >= 0')
 @Index(
   "UQ_chat_messages_thread_client_message_id",
   ["thread", "clientMessageId"],
@@ -30,14 +30,8 @@ export class ChatMessage {
   @Column({ type: "text" })
   content: string;
 
-  @Column({ type: "int" })
-  tokenCount: number;
-
   @Column({ type: "uuid", nullable: true })
   clientMessageId: string | null;
-
-  @Column({ type: "uuid", nullable: true })
-  generationRequestId: string | null;
 
   @ManyToOne(() => User, {
     nullable: true,
@@ -58,4 +52,7 @@ export class ChatMessage {
   })
   @JoinColumn()
   thread: Relation<ChatThread>;
+
+  @OneToOne(() => AgentRun, (agentRun) => agentRun.agentMessage)
+  agentRun: Relation<AgentRun> | null;
 }
