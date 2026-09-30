@@ -1,4 +1,5 @@
 import { Server, Socket } from "socket.io";
+import { AgentGenerationSnapshot } from "src/modules/agent/typedefs";
 import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { User } from "src/modules/user/entities/User.entity";
@@ -33,21 +34,28 @@ export interface ClientToServerEvents {
   ) => void;
   "thread:join": (
     payload: { threadId: number },
-    ack: (r: SocketAck<{ thread: ChatThread }>) => void,
+    ack: (
+      r: SocketAck<{
+        thread: ChatThread;
+        generation: AgentGenerationSnapshot | null;
+      }>,
+    ) => void,
   ) => void;
   "thread:leave": (
     payload: { threadId: number },
     ack: (r: SocketAck<null>) => void,
   ) => void;
   "message:send": (
-    payload: { threadId: number; content: string; clientMessageId?: string },
+    payload: { threadId: number; content: string; clientMessageId: string },
     ack: (
-      r: SocketAck<{ message: ChatMessage; clientMessageId?: string }>,
+      r: SocketAck<{
+        message: ChatMessage;
+        clientMessageId: string;
+        requestId: string | null;
+        inserted: boolean;
+      }>,
     ) => void,
   ) => void;
-  // TODO(agent): extend `message:send`'s ack with `requestId: string` and
-  // `thread:join`'s ack with `generation: { requestId, status, contentSoFar } | null`
-  // once the agent can stream replies.
 }
 
 export interface ServerToClientEvents {
@@ -59,12 +67,23 @@ export interface ServerToClientEvents {
     preview: string;
     createdAt: Date;
   }) => void;
-  // TODO(agent): add the agent streaming events here once implemented:
-  //   "agent:started"   (p: { threadId; requestId })
-  //   "agent:delta"     (p: { threadId; requestId; delta })
-  //   "agent:completed" (p: { threadId; requestId; message })
-  //   "agent:failed"    (p: { threadId; requestId; reason })
-  // Emitted by SocketIOChatNotifier.agentStarted/Delta/Completed/Failed.
+
+  "agent:started": (payload: { threadId: number; requestId: string, messageId: number }) => void;
+  "agent:delta": (payload: {
+    threadId: number;
+    requestId: string;
+    delta: string;
+  }) => void;
+  "agent:completed": (p: {
+    threadId: number;
+    requestId: string;
+    message: ChatMessage;
+  }) => void;
+  "agent:failed": (p: {
+    threadId: number;
+    requestId: string;
+    reason: string;
+  }) => void;
 }
 
 export interface InterServerEvents {}

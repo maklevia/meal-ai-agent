@@ -10,7 +10,7 @@ import {
   OneToMany,
   Relation,
 } from "typeorm";
-import { UserPreferences } from "src/modules/userPreferences/entities/UserPreferences.entity";
+import { UserPreferences } from "src/modules/user/entities/UserPreferences.entity";
 import { Family } from "src/modules/family/entities/Family.entity";
 import { MealHistory } from "src/modules/mealHistory/entities/MealHistory.entity";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";

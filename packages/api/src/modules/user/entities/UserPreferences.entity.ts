@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from "typeorm";
-import { SpecialDiet } from "src/modules/userPreferences/typedefs";
+import { SpecialDiet } from "src/modules/user/typedefs";
 import { User } from "src/modules/user/entities/User.entity";
 
 @Entity("user_preferences")

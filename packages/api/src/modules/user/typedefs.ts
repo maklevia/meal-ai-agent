@@ -11,3 +11,18 @@ export function toUserDto(user: User): UserDto {
   const { passwordHash, refreshTokens, ...dto } = user;
   return dto;
 }
+
+export enum SpecialDiet {
+  Vegan = "vegan",
+  Vegetarian = "vegetarian",
+  Pescatarian = "pescatarian",
+
+  Halal = "halal",
+  Kosher = "kosher",
+
+  GlutenFree = "glutenFree",
+  DairyFree = "dairyFree",
+
+  None = "none",
+}
+

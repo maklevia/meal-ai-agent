@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -10,9 +11,15 @@ import {
 } from "typeorm";
 import { ChatThread } from "src/modules/chat/entities/ChatThread.entity";
 import { ChatMessageRole } from "src/modules/chat/typedefs";
+import { User } from "src/modules/user/entities/User.entity";
 
 @Entity("chat_messages")
 @Check("CHK_token_count_positive", '"token_count" >= 0')
+@Index(
+  "UQ_chat_messages_thread_client_message_id",
+  ["thread", "clientMessageId"],
+  { unique: true },
+)
 export class ChatMessage {
   @PrimaryGeneratedColumn()
   id: number;
@@ -25,6 +32,22 @@ export class ChatMessage {
 
   @Column({ type: "int" })
   tokenCount: number;
+
+  @Column({ type: "uuid", nullable: true })
+  clientMessageId: string | null;
+
+  @Column({ type: "uuid", nullable: true })
+  generationRequestId: string | null;
+
+  @ManyToOne(() => User, {
+    nullable: true,
+    onDelete: "SET NULL",
+  })
+  @JoinColumn({
+    name: "sender_id",
+    foreignKeyConstraintName: "FK_chat_messages_sender_id",
+  })
+  sender: Relation<User> | null;
 
   @CreateDateColumn({ type: "timestamptz", default: () => "NOW()" })
   createdAt: Date;

@@ -46,6 +46,9 @@ services:
       RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED}
       AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX}
       GLOBAL_RATE_LIMIT_MAX: ${GLOBAL_RATE_LIMIT_MAX}
+      LLM_API_KEY: ${LLM_API_KEY}
+      AGENT_MODEL: ${AGENT_MODEL}
+      AGENT_MAX_STEPS: ${AGENT_MAX_STEPS}
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:$${API_PORT}/health || exit 1"]
       interval: ${API_HEALTH_INTERVAL}
