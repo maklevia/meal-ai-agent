@@ -21,5 +21,6 @@ export interface ChatRealtimeNotifier {
   agentStarted(input: {thread: ThreadRef, requestId: string, messageId: number}): void;
   agentDelta(input: {thread: ThreadRef, requestId: string, delta: string}): void;
   agentCompleted(input: {thread: ThreadRef, requestId: string, message: ChatMessage}): void;
+  agentInterrupted(input: {thread: ThreadRef, requestId: string, reason: string, message: ChatMessage}): void;
   agentFailed(input: {thread: ThreadRef, requestId: string, reason: string}): void;
 }

@@ -26,6 +26,11 @@ export const AppDataSource = new DataSource({
   database: env.DB_NAME,
   synchronize: env.DB_SYNCHRONIZE,
   logging: env.DB_LOGGING,
+  extra: {
+    statement_timeout: env.STATEMENT_TIMEOUT,
+    idleTimeoutMillis: env.IDLE_TIMEOUT,
+    connectionTimeoutMillis: env.CONNECTION_TIMEOUT,
+  },
   namingStrategy: new SnakeNamingStrategy(),
   entities: [
     User,

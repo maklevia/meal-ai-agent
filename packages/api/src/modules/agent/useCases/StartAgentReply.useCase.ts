@@ -3,8 +3,13 @@ import { ThreadUseCase } from "src/core/useCases/ThreadUseCase.base";
 import { UnitOfWork } from "src/db/UnitOfWork";
 import { Agent } from "src/modules/agent/Agent";
 import { AgentContextBuilder } from "src/modules/agent/AgentContextBuilder";
+import {
+  AgentGenerationError,
+  AgentGenerationErrorCode,
+} from "src/modules/agent/AgentGenerationError";
 import { getAgentGenerationRegistry } from "src/modules/agent/AgentGenerationRegistry";
 import { agentConfig } from "src/modules/agent/agent.config";
+import { AGENT_INTERRUPTED_MESSAGE } from "src/modules/agent/constants";
 import { AgentRunRepository } from "src/modules/agent/repositories/AgentRun.repository";
 import { AgentStepRepository } from "src/modules/agent/repositories/AgentStep.repository";
 import { AgentRunStatus } from "src/modules/agent/typedefs";
@@ -137,12 +142,28 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
         }
       }
     } catch (error) {
-      const reason = error instanceof Error ? error.message : "Unknown error";
-
       if (runFinalized) {
         console.error(`Post-completion error for agent run ${requestId}:`, error);
         return;
       }
+
+      const reason = error instanceof Error ? error.message : "Unknown error";
+
+      if (
+        agentRunId !== null &&
+        error instanceof AgentGenerationError &&
+        error.code === AgentGenerationErrorCode.Aborted
+      ) {
+        await this.persistInterruptedRun({
+          thread,
+          requestId,
+          reason,
+          stepCount,
+        });
+        return;
+      }
+
+      console.error(`Agent generation ${requestId} failed: ${reason}`);
 
       if (agentRunId !== null) {
         try {
@@ -160,6 +181,54 @@ export class StartAgentReplyUseCase extends ThreadUseCase<
       }
 
       this.registry.finish(requestId, AgentRunStatus.Failed);
+      this.notifier.agentFailed({ thread, requestId, reason });
+    }
+  }
+
+  private async persistInterruptedRun(input: {
+    thread: ThreadRef;
+    requestId: string;
+    reason: string;
+    stepCount: number;
+  }): Promise<void> {
+    const { thread, requestId, reason, stepCount } = input;
+
+    try {
+      const savedMessage = await this.uow.run(async (tx) => {
+        const messages = tx.get(ChatMessageRepository);
+        const threads = tx.get(ChatThreadRepository);
+        const runs = tx.get(AgentRunRepository);
+
+        const message = await messages.saveAssistantMessage({
+          threadId: thread.id,
+          content: AGENT_INTERRUPTED_MESSAGE,
+        });
+
+        await threads.touchThread(thread.id);
+
+        await runs.updateAbortedRun({
+          requestId,
+          agentMessageId: message.id,
+          error: reason,
+          stepCount,
+        });
+
+        return message;
+      });
+
+      this.registry.finish(requestId, AgentRunStatus.Aborted);
+      this.notifier.agentInterrupted({
+        thread,
+        requestId,
+        reason,
+        message: savedMessage,
+      });
+    } catch (persistError) {
+      console.error(
+        `Failed to persist interrupted agent run ${requestId}:`,
+        persistError,
+      );
+      this.registry.finish(requestId, AgentRunStatus.Aborted);
       this.notifier.agentFailed({ thread, requestId, reason });
     }
   }

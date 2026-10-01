@@ -66,6 +66,24 @@ export class SocketIOChatNotifier implements ChatRealtimeNotifier {
     this.io.to(this.ownerRoom(input.thread)).emit("agent:completed", payload);
   }
 
+  agentInterrupted(input: {
+    thread: ThreadRef;
+    requestId: string;
+    reason: string;
+    message: ChatMessage;
+  }): void {
+    const payload = {
+      threadId: input.thread.id,
+      requestId: input.requestId,
+      reason: input.reason,
+      message: input.message,
+    };
+    this.io.to(threadRoom(input.thread.id)).emit("agent:interrupted", payload);
+    this.io
+      .to(this.ownerRoom(input.thread))
+      .emit("agent:interrupted", payload);
+  }
+
   agentFailed(input: {
     thread: ThreadRef;
     requestId: string;

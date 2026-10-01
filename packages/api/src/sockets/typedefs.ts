@@ -79,6 +79,12 @@ export interface ServerToClientEvents {
     requestId: string;
     message: ChatMessage;
   }) => void;
+  "agent:interrupted": (p: {
+    threadId: number;
+    requestId: string;
+    reason: string;
+    message: ChatMessage;
+  }) => void;
   "agent:failed": (p: {
     threadId: number;
     requestId: string;

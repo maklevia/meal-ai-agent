@@ -1,5 +1,4 @@
-import { ChatMessage } from "src/modules/chat/entities/ChatMessage.entity";
-import { ChatRealtimeNotifier, ThreadRef } from "src/modules/chat/realtime/ChatRealtimeNotifier";
+import { ChatRealtimeNotifier } from "src/modules/chat/realtime/ChatRealtimeNotifier";
 
 class NoopChatRealtimeNotifier implements ChatRealtimeNotifier {
   notifyNewMessage(): void {}
@@ -7,6 +6,7 @@ class NoopChatRealtimeNotifier implements ChatRealtimeNotifier {
   agentStarted(): void {}
   agentDelta(): void {}
   agentCompleted(): void {}
+  agentInterrupted(): void {}
   agentFailed(): void {}
 }
 

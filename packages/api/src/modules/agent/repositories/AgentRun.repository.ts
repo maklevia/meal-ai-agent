@@ -74,6 +74,23 @@ export class AgentRunRepository extends BaseRepository<AgentRun> {
     await this.repo.save(run);
   }
 
+  async updateAbortedRun(options: {
+    requestId: string;
+    agentMessageId: number;
+    error: string;
+    stepCount: number;
+  }): Promise<void> {
+    const run = await this.repo.findOneBy({ requestId: options.requestId });
+    if (!run) return;
+
+    run.status = AgentRunStatus.Aborted;
+    run.agentMessage = { id: options.agentMessageId } as ChatMessage;
+    run.error = options.error;
+    run.stepCount = options.stepCount;
+
+    await this.repo.save(run);
+  }
+
   async findWithStepsByAgentMessageIds(
     agentMessageIds: number[],
   ): Promise<AgentRun[]> {

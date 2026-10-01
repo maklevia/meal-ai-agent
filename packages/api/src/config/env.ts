@@ -27,7 +27,9 @@ const envSchema = z.object({
 
   DB_SYNCHRONIZE: stringBoolean,
   DB_LOGGING: stringBoolean,
-
+  IDLE_TIMEOUT: z.coerce.number(),
+  STATEMENT_TIMEOUT: z.coerce.number(),
+  CONNECTION_TIMEOUT: z.coerce.number(),
 
   ACCESS_SECRET: z.string(),
   REFRESH_SECRET: z.string(),
