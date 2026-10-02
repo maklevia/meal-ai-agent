@@ -72,8 +72,6 @@ export class AgentContextBuilder {
 
       modelMessages.push({ role: "assistant", content: message.content });
     }
-
-    console.dir(modelMessages, {depth: null});
     return modelMessages;
   }
 

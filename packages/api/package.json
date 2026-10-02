@@ -16,6 +16,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^4.0.71",
     "ai": "^7.0.107",
+    "axios": "^1.20.0",
     "bcrypt-ts": "^9.0.2",
     "cookie": "^0.7.2",
     "cookie-parser": "^1.4.7",
@@ -39,7 +40,7 @@
     "@types/pg": "^8.11.10",
     "esbuild": "^0.28.2",
     "tsconfig-paths": "^4.2.0",
-    "tsx": "^4.19.2",
+    "tsx": "^4.23.15",
     "typescript": "^5.7.3"
   }
 }

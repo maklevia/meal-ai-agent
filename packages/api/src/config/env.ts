@@ -38,6 +38,8 @@ const envSchema = z.object({
   AUTH_RATE_LIMIT_MAX: z.coerce.number(),
   GLOBAL_RATE_LIMIT_MAX: z.coerce.number(),
 
+  SPOONACULAR_API_KEY: z.string(),
+
   LLM_API_KEY: z.string().min(1),
   AGENT_MODEL: z.string().min(1),
   AGENT_MAX_STEPS: z.coerce.number().int().positive()

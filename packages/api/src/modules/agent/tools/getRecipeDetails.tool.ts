@@ -1,4 +1,5 @@
 import { tool } from "ai";
+import { RecipeService } from "src/modules/recipe/Recipe.service";
 import z from "zod";
 
 export function createGetRecipeDetailsTool() {
@@ -6,11 +7,12 @@ export function createGetRecipeDetailsTool() {
         description: "Get detailed informatio(ingredients, instructions) about a specific recipe.",
         inputSchema: z.object({
             source: z.string().describe("Which recipe API this recipe came from."),
-            recipeId: z.string().describe("The recipe ID from the source API"),
+            recipeId: z.number().describe("The recipe ID from the source API"),
         }),
         execute: async ({source, recipeId}) => {
-            //TODO integration with external API
-            return {recipe: "", note: "External Api Integration awaiting"}
+            const recipeService = new RecipeService();
+            const result = await recipeService.getDetails(recipeId);
+            return {recipe: result}
         }
     })
 }

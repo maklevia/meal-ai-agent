@@ -17,9 +17,6 @@ export enum SpecialDiet {
   Vegetarian = "vegetarian",
   Pescatarian = "pescatarian",
 
-  Halal = "halal",
-  Kosher = "kosher",
-
   GlutenFree = "glutenFree",
   DairyFree = "dairyFree",
 
